@@ -1,136 +1,268 @@
 <template>
-  <v-app>
-    <!-- Top Navbar -->
-    <v-app-bar app elevation="2">
-      <v-btn icon @click="drawer = !drawer">
-        <v-icon icon="mdi-menu" />
-      </v-btn>
+  <div class="travelgo-premium-app">
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-brand">
+          <svg class="brand-logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#ffffff"
+              d="M12 2v7l9 6v-2l-9-5.5V3.5c0-.83-.67-1.5-1.5-1.5S9 2.67 9 3.5V9L0 14.5v2l9-6V19l-2 1.5V22l3.5-1 3.5 1v-1.5L12 19v-9.5z" />
+            <path fill="#38bdf8" d="M12 9l8.5 5.5V16L12 11.5v-2.5z M9 11.5L0.5 16v-1.5L9 9v2.5z" />
+          </svg>
+          <span class="logo-text">Travel<span class="text-accent">Go</span></span>
+        </div>
 
-      <router-link to="/" class="text-decoration-none text-white">
-        <v-toolbar-title class="d-flex align-center">
-          <v-avatar size="36">
-            <v-img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" />
-          </v-avatar>
-          Shop Name
-        </v-toolbar-title>
-      </router-link>
+        <div class="nav-menu">
+          <!-- replace က path အစားထိုးပေး -->
+          <router-link to="/" class="nav-link" replace>Home</router-link>
+          <router-link to="/packages" class="nav-link" replace>Packages</router-link>
+          <router-link to="/destinations" class="nav-link" replace>Destinations</router-link>
+          <router-link to="/about" class="nav-link" replace>About Us</router-link>
+          <router-link to="/contact" class="nav-link" replace>Contact</router-link>
+        </div>
 
-      <v-spacer />
-      <!-- LEFT SIDE NAV LINKS -->
-      <div class="d-flex align-center ml-4">
-        <v-btn to="/" variant="text" class="nav-link d-none d-md-flex"> Home </v-btn>
+        <div class="nav-actions">
+          <template v-if="!$store.state.user">
+            <button class="btn-login" @click="$router.replace('/login') "style="box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">Login</button>
+            <button class="btn-signup" @click="$router.replace('/signup')">Sign Up</button>
+          </template>
 
-        <v-btn to="/about" variant="text" class="nav-link d-none d-md-flex"> Product </v-btn>
+          <template v-else>
+            <v-menu min-width="200px" rounded offset-y>
+              <template v-slot:activator="{ props }">
+                <v-btn variant="text" class="profile-trigger-btn" v-bind="props">
+                  <v-avatar size="32" class="mr-2">
+                    <v-img :src="$store.state.user.profile_image ||
+                      'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+                      " />
+                  </v-avatar>
+                  <span class="user-display-name">{{ $store.state.user.name }}</span>
+                  <v-icon icon="mdi-chevron-down" size="small" class="ml-1 text-white" />
+                </v-btn>
+              </template>
 
-        <v-btn to="/contact" variant="text" class="nav-link d-none d-md-flex"> Contact </v-btn>
+              <v-list class="mt-2 dropdown-card-list">
+                <v-list-item class="px-4 py-2">
+                  <div class="d-flex align-center">
+                    <v-avatar size="40" class="mr-3">
+                      <v-img :src="$store.state.user.profile_image ||
+                        'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+                        " />
+                    </v-avatar>
+                    <div>
+                      <h4 class="text-subtitle-1 font-weight-bold">{{ $store.state.user.name }}</h4>
+                      <span class="text-caption text-grey">{{ $store.state.user.email }}</span>
+                    </div>
+                  </div>
+                </v-list-item>
+
+                <v-divider class="my-1"></v-divider>
+
+                <v-list-item to="/profile" prepend-icon="mdi-account-circle-outline">
+                  <v-list-item-title>My Profile</v-list-item-title>
+                </v-list-item>
+
+                <v-list-item @click="handleLogout" prepend-icon="mdi-logout" class="text-red-darken-1">
+                  <v-list-item-title class="font-weight-medium">Logout</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </template>
+        </div>
       </div>
+    </nav>
 
-      <v-spacer />
-
-      <!-- RIGHT ICONS -->
-      <v-btn icon>
-        <v-icon>mdi-cart</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-login</v-icon>
-      </v-btn>
-
-      <v-menu>
-        <template v-slot:activator="{ props }">
-          <v-btn v-bind="props" class="profile-btn" variant="text">
-            <v-avatar size="32" class="mr-2">
-              <v-img src="https://i.pravatar.cc/100" />
-            </v-avatar>
-
-            <span class="username">Snowy</span>
-
-            <v-icon size="18" class="ml-1">mdi-chevron-down</v-icon>
-          </v-btn>
-        </template>
-
-        <v-list width="200" class="profile-menu">
-          <v-list-item class="nav-link">
-            <v-list-item-title>Profile</v-list-item-title>
-          </v-list-item>
-
-          <v-divider />
-
-          <v-list-item class="nav-link" @click="logout">
-            <v-list-item-title class="text-red"> Logout </v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </v-app-bar>
-
-    <!-- Sidebar / Drawer -->
-    <v-navigation-drawer v-model="drawer" app :temporary="$vuetify.display.smAndDown">
-      <v-list nav>
-        <v-list-item to="/" title="Home" prepend-icon="mdi-home" />
-        <v-list-item to="/about" title="Product" prepend-icon="mdi-package-variant" />
-        <v-list-item to="/contact" title="Contact" prepend-icon="mdi-phone" />
-      </v-list>
-    </v-navigation-drawer>
-
-    <!-- Main Content -->
-    <v-main>
-      <v-container fluid>
-        <RouterView />
-      </v-container>
-    </v-main>
-  </v-app>
+    <main class="main-router-content">
+      <router-view />
+    </main>
+  </div>
 </template>
+
 <script>
 export default {
-  data: () => ({
-    drawer: false,
-  }),
-  props: {},
-  mounted: function () {},
-  methods: {},
-  watch: {},
-  components: {},
+  name: 'App',
+  methods: {
+    handleLogout() {
+      // OTPBS စနစ်အတိုင်း Store ထဲက logout action ကို လှမ်းခေါ်ပြီး Home ပြန်ပို့
+      this.$store.dispatch('logout').then(() => {
+        if (this.$route.path !== '/') {
+          this.$router.push('/')
+        }
+      })
+    },
+  },
 }
 </script>
-<style scoped>
-.shop-brand {
-  cursor: pointer;
+
+<style>
+/* VUETIFY OVERRIDE FIX */
+.v-application,
+.v-application__wrap,
+.v-main,
+.v-container {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #f8fafc !important;
 }
 
-.shop-name {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+body,
+html {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  background-color: #f8fafc !important;
+}
+</style>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.travelgo-premium-app {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.main-router-content {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar styles */
+.navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  padding: 20px 0;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo-svg {
+  width: 32px;
+  height: 32px;
+  transform: rotate(45deg);
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.text-accent {
+  color: #38bdf8;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 32px;
+  align-items: center;
 }
 
 .nav-link {
-  font-size: 16px;
-  transition: all 0.3s ease;
-  border-radius: 8px;
-}
-
-.nav-link:hover {
-  background-color: rgba(25, 118, 210, 0.1);
-  transform: translateY(-2px);
-}
-
-.profile-btn {
-  text-transform: none;
-  border-radius: 12px;
-  padding: 6px 10px;
-}
-
-.profile-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.username {
-  font-weight: 500;
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
   font-size: 14px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-.profile-menu {
-  border-radius: 12px;
-  padding: 6px;
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Buttons style */
+.btn-login {
+  background: transparent;
+  border: 1px solid #2563eb;
+  color: white;
+  padding: 8px 20px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+   text-shadow:0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.btn-login:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #2563eb;
+}
+
+.btn-signup {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 9px 22px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-signup:hover {
+  background: #1d4ed8;
+}
+
+/* 🌟 Vuetify Profile Menu Button Styles */
+.profile-trigger-btn {
+  color: white !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  padding: 0 12px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.profile-trigger-btn:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.user-display-name {
+  max-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+}
+
+/* Dropdown Menu List Card Shadow custom ညှိချက် */
+.dropdown-card-list {
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08) !important;
+  border: 1px solid #e2e8f0 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 </style>
