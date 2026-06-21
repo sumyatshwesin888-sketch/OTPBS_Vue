@@ -113,7 +113,7 @@ html {
   padding: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  overflow: hidden !important;
+ overflow-y: auto !important;
   background-color: #f8fafc !important;
 }
 </style>
@@ -121,14 +121,15 @@ html {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
+
 .travelgo-premium-app {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   background-color: #f8fafc;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  
 }
 
 .main-router-content {

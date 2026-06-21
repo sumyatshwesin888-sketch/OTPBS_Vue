@@ -18,21 +18,24 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue'),
     },
     {
-      path: '/domestic',
-      name: 'domestic',
+      path: '/packagedetail/:id',
+      name: 'packagedetail',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/DomesticView.vue'),
+      component: () => import('../views/PackageDetailView.vue'),
     },
+    
     {
-      path: '/domesticdetail',
-      name: 'domesticdetail',
+      path: '/packages',
+      name: 'packages',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/DomesticViewDetail.vue'),
+      component: () => import('../views/Packages.vue'),
     },
+
+    
   ],
 })
 
