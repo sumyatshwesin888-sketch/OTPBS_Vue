@@ -32,6 +32,30 @@ const router = createRouter({
       name: 'contact',
       component: () => import('../views/Contact.vue'),
     },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/Profile.vue'),
+    },
+    {
+      path: '/packagedetail/:id',
+      name: 'packagedetail',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/PackageDetailView.vue'),
+    },
+    
+    {
+      path: '/packages',
+      name: 'packages',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/Packages.vue'),
+    },
+
+    
   ],
 })
 

@@ -3,22 +3,7 @@
     <main class="login-card">
       <h2 class="card-title">Welcome Back!</h2>
       <p class="card-subtitle">Unlock exclusive travel deals & book your dream trip!</p>
-
-      <div class="social-login-section">
-        <p class="divider-text"><span>Login with</span></p>
-        <div class="social-buttons">
-          <button
-            @click="loginWithSocial('google')"
-            class="btn-social"
-            aria-label="Log in with Google"
-          >
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-              alt="Google"
-            />
-          </button>
-        </div>
-      </div>
+       
 
       <form @submit.prevent="handleSubmit" class="form-content">
         <div class="input-group">
@@ -95,7 +80,7 @@
       </form>
 
     <footer class="card-footer">
-  <p>Don't have an account? <router-link to="/signup">Sign Up</router-link></p>
+  <p>Don't have an account? <a href="/signup">Sign Up</a></p>
 </footer>
     </main>
   </div>

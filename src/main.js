@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -28,6 +29,7 @@ const vuetify = createVuetify({
 const app = createApp(App)
 
 // Middleware တွေကို သုံးမယ် (use)
+app.use(createPinia())
 app.use(router)
 app.use(vuetify)
 app.use(store)

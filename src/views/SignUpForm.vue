@@ -1,34 +1,12 @@
 <template>
   <div class="signup-container">
     <header class="app-header">
-      <div class="logo-area">
-        <span class="logo-icon">🧭</span>
-        <div>
-          <h1 class="brand-name">TravelGo</h1>
-          <p class="brand-tagline">Book your next adventure</p>
-        </div>
-      </div>
+     
     </header>
 
     <main class="signup-card">
       <h2 class="card-title">Create Your Account</h2>
       <p class="card-subtitle">Unlock exclusive travel deals & book your dream trip!</p>
-
-      <div class="social-signup-section">
-        <p class="divider-text"><span>Sign up with</span></p>
-        <div class="social-buttons">
-          <button
-            @click="signUpWithSocial('google')"
-            class="btn-social"
-            aria-label="Sign up with Google"
-          >
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-              alt="Google"
-            />
-          </button>
-        </div>
-      </div>
 
       <form @submit.prevent="handleSubmit" class="form-content">
         <div class="input-group">
@@ -46,62 +24,100 @@
         </div>
 
         <div class="input-group">
-          <i class="fa-solid fa-lock input-icon"></i>
-          <input
-            :type="isPasswordVisible ? 'text' : 'password'"
-            v-model="formData.password"
-            placeholder="Password"
-            required
-          />
-          <span class="toggle-password" @click.stop="togglePasswordVisibility">
-            <svg
-              v-if="isPasswordVisible"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-              class="svg-icon"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 1-4.243-4.243m4.242 4.242L9.88 9.88"
-              />
-            </svg>
+  <i class="fa-solid fa-lock input-icon"></i>
+  <input
+    :type="isPasswordVisible ? 'text' : 'password'"
+    v-model="formData.password"
+    placeholder="Password"
+    required
+  />
+  <span class="toggle-password" @click.stop="togglePasswordVisibility">
+    <svg
+      v-if="isPasswordVisible"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="2"
+      stroke="currentColor"
+      class="svg-icon"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 1-4.243-4.243m4.242 4.242L9.88 9.88"
+      />
+    </svg>
 
-            <svg
-              v-else
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-              class="svg-icon"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-          </span>
-        </div>
+    <svg
+      v-else
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="2"
+      stroke="currentColor"
+      class="svg-icon"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+      />
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+      />
+    </svg>
+  </span>
+</div>
 
-        <div class="input-group">
-          <i class="fa-solid fa-lock input-icon"></i>
-          <input
-            type="password"
-            v-model="formData.confirmPassword"
-            placeholder="Confirm Password"
-            required
-          />
-        </div>
+<div class="input-group">
+  <i class="fa-solid fa-lock input-icon"></i>
+  <input
+    :type="isConfirmPasswordVisible ? 'text' : 'password'"
+    v-model="formData.confirmPassword"
+    placeholder="Confirm Password"
+    required
+  />
+  <span class="toggle-password" @click.stop="toggleConfirmPasswordVisibility">
+    <svg
+      v-if="isConfirmPasswordVisible"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="2"
+      stroke="currentColor"
+      class="svg-icon"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 1-4.243-4.243m4.242 4.242L9.88 9.88"
+      />
+    </svg>
+
+    <svg
+      v-else
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="2"
+      stroke="currentColor"
+      class="svg-icon"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+      />
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+      />
+    </svg>
+  </span>
+</div>
 
         <button type="submit" class="btn-submit">
           Create Account <span class="arrow">→</span>
@@ -127,13 +143,28 @@ export default {
         confirmPassword: '',
       },
       isPasswordVisible: false,
+      isConfirmPasswordVisible: false,
     }
-  },
+  },mounted(){
+const appHeight = () => {
+      const doc = document.documentElement;
+      doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+    }
+    window.addEventListener('resize', appHeight);
+    appHeight();
+  }
+  ,
+  
+  
   methods: {
     togglePasswordVisibility() {
       this.isPasswordVisible = !this.isPasswordVisible
       console.log(' eye condition', this.isPasswordVisible)
     },
+    toggleConfirmPasswordVisibility() {
+    this.isConfirmPasswordVisible = !this.isConfirmPasswordVisible
+    console.log(' eye condition', this.isConfirmPasswordVisible)
+  },
     handleSubmit() {
       if (this.formData.password !== this.formData.confirmPassword) {
         alert('Passwords do not match!')
@@ -163,23 +194,29 @@ export default {
 }
 
 .signup-container {
-  width: 100%;
-  min-height: 100vh;
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), url('img/signupimg.png');
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: var(--app-height, 100vh);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), url('img/signupimg.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  padding: 40px;
+  overflow: hidden; /* <-- ဒီမှာ လုံးဝ scroll ဆွဲလို့မရအောင် ပိတ်လိုက်တာပါ */
+}
+.signup-scroll-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* <-- လှုပ်လို့ မရအောင် အသေပိတ်ခြင်း */
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  position: relative;
+  justify-content: center;
+  padding: 20px;
 }
-
 .app-header {
-  margin-bottom: 24px;
   width: 100%;
   max-width: 450px;
   display: flex;
@@ -212,16 +249,19 @@ export default {
 
 .signup-card {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   width: 100%;
-  max-width: 450px;
+  max-width: 420px; /* ဖုန်း screen တွေနဲ့ ဆံ့အောင် width ကို နည်းနည်း လျှော့ပေးထားပါတယ် */
   border-radius: 24px;
-  padding: 35px 40px;
+  padding: 30px 35px; /* Form မရှည်ထွက်လာအောင် padding လျှော့လိုက်ပါတယ် */
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-  margin-top: 10px;
+  position: relative;
+  
+  /* မလှုပ်အောင် ထိန်းထားခြင်း */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform;
+  margin:60px auto;
 }
-
 .card-title {
   color: #0b1a30;
   font-size: 1.7rem;
@@ -298,7 +338,7 @@ export default {
 .form-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .input-group {
@@ -322,14 +362,13 @@ export default {
 
 .input-group input {
   width: 100%;
-  padding: 14px 16px 14px 45px;
+  padding: 12px 16px 12px 45px;
   border: 1.5px solid #cbd5e1;
   border-radius: 12px;
   font-size: 0.95rem;
   color: #334155;
   background-color: #f8fafc;
   outline: none;
-  transition: all 0.3s ease;
 }
 
 .input-group input:focus {
