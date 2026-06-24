@@ -35,24 +35,9 @@ const router = createRouter({
   component: () => import('../components/BookingPage.vue') // Your booking component
 },
 
-    {
-       path: '/packagedetail/:id',
-      name: 'packagedetail',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../components/PackageDetailView.vue'),
-    },
+    
 
-    { path: '/package/:id', name: 'PackageDetailView', component: PackageDetailView },
- 
-
-    {
-      path: '/packages',
-      name: 'packages',
-      
-      component: () => import('../components/Packages.vue'),
-    },
+   
 
      {
       path: '/payment',
