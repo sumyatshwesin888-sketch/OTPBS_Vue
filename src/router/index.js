@@ -53,6 +53,18 @@ const router = createRouter({
       
       component: () => import('../components/ConfirmationPage.vue'),
     },
+    {
+      path: '/packages',
+      name: 'packages',
+      
+      component: () => import('../views/Packages.vue'),
+    },
+    {
+      path: '/packagedetail/:id',
+      name: 'packagedetail',
+      
+      component: () => import('../views/PackageDetailView.vue'),
+    },
 
 
 
