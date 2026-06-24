@@ -99,23 +99,33 @@ export default {
       isPasswordVisible: false,
     }
   },
-  methods: {
+ methods: {
     togglePasswordVisibility() {
       this.isPasswordVisible = !this.isPasswordVisible
     },
     handleSubmit() {
-      console.log('Login Submitted Data:', this.formData)
-      alert('Logged In Successfully!')
-    },
-    loginWithSocial(platform) {
-      console.log(`Logging in with ${platform}`)
+      const savedUser = localStorage.getItem('user_account')
+
+      if (!savedUser) {
+        alert('No account found! Please sign up first.')
+        return
+      }
+
+      const user = JSON.parse(savedUser)
+
+      if (this.formData.email === user.email && this.formData.password === user.password) {
+        alert('Logged In Successfully!')
+        
+        localStorage.setItem('is_logged_in', 'true')
+        
+        this.$router.push('/profile')
+      } else {
+        alert('Invalid Email or Password! Please try again.')
+      }
     },
     handleForgotPassword() {
       console.log('Redirect to Forgot Password Page')
-    },
-    navigateToSignUp() {
-      console.log('Redirect to Sign Up Page')
-    },
+    }
   },
 }
 </script>
@@ -133,7 +143,7 @@ export default {
 .login-container {
   width: 100%;
   min-height: 100vh;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url('img/loginimg.png');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('img/login.avif');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -141,6 +151,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 .login-card {

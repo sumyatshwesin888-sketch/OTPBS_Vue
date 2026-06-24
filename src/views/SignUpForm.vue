@@ -156,29 +156,43 @@ const appHeight = () => {
   ,
   
   
-  methods: {
+ methods: {
     togglePasswordVisibility() {
       this.isPasswordVisible = !this.isPasswordVisible
-      console.log(' eye condition', this.isPasswordVisible)
+      console.log('eye condition', this.isPasswordVisible)
     },
     toggleConfirmPasswordVisibility() {
-    this.isConfirmPasswordVisible = !this.isConfirmPasswordVisible
-    console.log(' eye condition', this.isConfirmPasswordVisible)
-  },
+      this.isConfirmPasswordVisible = !this.isConfirmPasswordVisible
+      console.log('eye condition', this.isConfirmPasswordVisible)
+    },
     handleSubmit() {
       if (this.formData.password !== this.formData.confirmPassword) {
         alert('Passwords do not match!')
         return
       }
-      console.log('Form Submitted Data:', this.formData)
-      alert('Account Created Successfully!')
+
+      const userData = {
+        fullName: this.formData.fullName,
+        phone: this.formData.phone,
+        email: this.formData.email,
+        password: this.formData.password,
+        bio: '',
+        gender: ''
+      }
+
+      localStorage.setItem('user_account', JSON.stringify(userData))
+      
+      console.log('Form Submitted Data & Saved to LocalStorage:', userData)
+      alert('Account Created Successfully! Please Log In.')
+      
+      this.$router.push('/login')
     },
     signUpWithSocial(platform) {
       console.log(`Signing up with ${platform}`)
     },
     navigateToLogin() {
       console.log('Redirect to Login Page')
-    },
+    }
   },
 }
 </script>
@@ -200,16 +214,16 @@ const appHeight = () => {
   width: 100vw;
   height: 100vh;
   height: var(--app-height, 100vh);
-  background-image: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), url('img/signupimg.png');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('img/signupimg.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  overflow: hidden; /* <-- ဒီမှာ လုံးဝ scroll ဆွဲလို့မရအောင် ပိတ်လိုက်တာပါ */
+  overflow: hidden; 
 }
 .signup-scroll-wrapper {
   width: 100%;
   height: 100%;
-  overflow: hidden; /* <-- လှုပ်လို့ မရအောင် အသေပိတ်ခြင်း */
+  overflow: hidden; 
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -250,9 +264,9 @@ const appHeight = () => {
 .signup-card {
   background: rgba(255, 255, 255, 0.95);
   width: 100%;
-  max-width: 420px; /* ဖုန်း screen တွေနဲ့ ဆံ့အောင် width ကို နည်းနည်း လျှော့ပေးထားပါတယ် */
+  max-width: 420px; 
   border-radius: 24px;
-  padding: 30px 35px; /* Form မရှည်ထွက်လာအောင် padding လျှော့လိုက်ပါတယ် */
+  padding: 30px 35px; 
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   position: relative;
   
