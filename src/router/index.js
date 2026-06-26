@@ -1,13 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
-<<<<<<< HEAD
-//import PackageDetailView from '../components/PackageDetailView.vue';
-//import BookingPage from '../components/BookingPage.vue';
-=======
-// import PackageDetailView from '../components/PackageDetailView.vue';
-// import BookingPage from '../components/BookingPage.vue';
->>>>>>> f10e23ba6cb1878fb9781237089bb87f0f7b2b52
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

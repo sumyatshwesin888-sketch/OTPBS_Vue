@@ -172,12 +172,10 @@ export default {
       if (savedUser && isLoggedIn === 'true') {
         const user = JSON.parse(savedUser)
         
-        // Data များကို သေချာစွာ ထည့်သွင်းပေးထားပါတယ်
         this.auth.user.email = user.email || ''
         this.auth.profile.full_name = user.full_name || ''
         this.auth.profile.phone = user.phone || ''
         
-        // Dialog အတွက် Form data
         this.editForm.full_name = user.full_name || ''
         this.editForm.phone = user.phone || ''
       } else {
@@ -290,7 +288,6 @@ export default {
   background: #e2e8f0;
 }
 
-/* Tab Pills Navigation */
 .content-selection-nav {
   display: flex;
   gap: 12px;
@@ -317,7 +314,6 @@ export default {
   border-color: #1b3d8a;
 }
 
-/* Empty States */
 .profile-dynamic-content-area {
   margin-bottom: 32px;
 }
@@ -353,7 +349,6 @@ export default {
   margin: 0 auto 16px;
 }
 
-/* Logout Section */
 .danger-zone-logout-section {
   display: flex;
   justify-content: center;
@@ -378,7 +373,6 @@ export default {
   background: #fef2f2;
 }
 
-/* Dialog Forms */
 .modern-profile-dialog {
   border-radius: 20px !important;
 }
