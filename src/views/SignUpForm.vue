@@ -138,9 +138,11 @@ export default {
     return {
       formData: {
         fullName: '',
+        phone: '',
         email: '',
         password: '',
         confirmPassword: '',
+        terms: false,
       },
       isPasswordVisible: false,
       isConfirmPasswordVisible: false,
@@ -159,11 +161,9 @@ const appHeight = () => {
  methods: {
     togglePasswordVisibility() {
       this.isPasswordVisible = !this.isPasswordVisible
-      console.log('eye condition', this.isPasswordVisible)
     },
     toggleConfirmPasswordVisibility() {
       this.isConfirmPasswordVisible = !this.isConfirmPasswordVisible
-      console.log('eye condition', this.isConfirmPasswordVisible)
     },
     handleSubmit() {
       if (this.formData.password !== this.formData.confirmPassword) {
@@ -171,29 +171,42 @@ const appHeight = () => {
         return
       }
 
-      const userData = {
-        fullName: this.formData.fullName,
-        phone: this.formData.phone,
-        email: this.formData.email,
-        password: this.formData.password,
-        bio: '',
-        gender: ''
+      // ၁။ အကောင့်ရှိပြီးသား ဟုတ်မဟုတ် အရင်စစ်ဆေးမယ်
+      const existingUser = localStorage.getItem('user_account')
+      if (existingUser) {
+        const savedUser = JSON.parse(existingUser)
+        // ရိုက်ထည့်လိုက်တဲ့ email က ရှိပြီးသား email နဲ့ တူနေရင် တားဆီးမယ်
+        if (this.formData.email === savedUser.email) {
+          alert('Account already exists! Please log in instead.')
+          this.$router.push('/login')
+          return
+        }
       }
 
+      // ၂။ အကောင့်အသစ်ကို ဒေတာစုစည်းပြီး LocalStorage ထဲ သိမ်းမယ်
+      const userData = {
+        full_name: this.formData.fullName,
+        phone: this.formData.phone,
+        email: this.formData.email,
+        password: this.formData.password
+      }
       localStorage.setItem('user_account', JSON.stringify(userData))
       
-      console.log('Form Submitted Data & Saved to LocalStorage:', userData)
-      alert('Account Created Successfully! Please Log In.')
+      // ၃။ Sign Up လုပ်ပြီးတာနဲ့ တစ်ပြိုင်နက် Login အခြေအနေကို true ပေးလိုက်မယ်
+      localStorage.setItem('is_logged_in', 'true')
       
-      this.$router.push('/login')
+      alert('Account Created Successfully!')
+      
+      // ၄။ Login စာမျက်နှာကို မသွားတော့ဘဲ Home Page (/) ဆီကို တိုက်ရိုက် လွှတ်လိုက်ပါမယ်
+      this.$router.push('/')
     },
     signUpWithSocial(platform) {
       console.log(`Signing up with ${platform}`)
     },
     navigateToLogin() {
-      console.log('Redirect to Login Page')
+      this.$router.push('/login')
     }
-  },
+  }
 }
 </script>
 
