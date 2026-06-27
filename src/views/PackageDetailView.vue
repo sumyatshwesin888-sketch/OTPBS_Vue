@@ -34,8 +34,8 @@
                   d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
                 />
               </svg>
-              <span class="rat-val">{{ pkg.rating }}</span>
-              <span class="rat-cnt">({{ pkg.review_count }} reviews)</span>
+              <span class="rat-val">{{ averageRating }}</span>
+              <span class="rat-cnt">({{ commentsDataset.length }} reviews)</span>
             </div>
           </div>
 
@@ -83,6 +83,72 @@
               </div>
             </div>
           </div>
+
+          <!-- 🌟 Modern Reviews & Comments Section 🌟 -->
+          <div class="content-block rating-comment-section">
+            <h2 class="review-block-title">Reviews & Comments</h2>
+
+            <div class="comment-form">
+              <h3 class="form-title">Write a Review</h3>
+
+              <div class="rating-input-wrapper">
+                <span class="rating-label">Your Rating:</span>
+                <div class="stars-container">
+                  <span
+                    v-for="star in 5"
+                    :key="star"
+                    @click="newRating = star"
+                    class="interactive-star"
+                    :style="{ color: star <= newRating ? '#f59e0b' : '#cbd5e1' }"
+                  >
+                    ★
+                  </span>
+                </div>
+                <span class="rating-number">({{ newRating }}/5)</span>
+              </div>
+
+              <textarea
+                v-model="newComment"
+                placeholder="Share your experience about this package..."
+                rows="4"
+                class="modern-textarea"
+              ></textarea>
+
+              <div class="btn-submit-wrapper">
+                <button @click="submitReview" class="modern-submit-btn">Submit Review</button>
+              </div>
+            </div>
+
+            <div class="comments-list">
+              <h3 class="list-title">User Reviews ({{ commentsDataset.length }})</h3>
+
+              <div v-if="commentsDataset.length === 0" class="no-reviews">
+                No reviews yet. Be the first to review!
+              </div>
+
+              <div v-for="(rev, index) in commentsDataset" :key="index" class="comment-card">
+                <div class="comment-card-header">
+                  <div class="user-info">
+                    <!-- Avatar ထဲက စာလုံးကိုလည်း နာမည်ရဲ့ ပထမဆုံးစာလုံး ဖြစ်အောင် လုပ် -->
+                    <div class="user-avatar">{{ (rev.user_name || 'A')[0].toUpperCase() }}</div>
+                    <!-- Rating ပေးတဲ့ UserName -->
+                    <span class="user-name">{{ rev.user_name || 'Anonymous Traveller' }}</span>
+                  </div>
+                  <div class="display-stars">
+                    <span
+                      v-for="s in 5"
+                      :key="s"
+                      :style="{ color: s <= rev.rating ? '#f59e0b' : '#cbd5e1' }"
+                      class="static-star"
+                    >
+                      ★
+                    </span>
+                  </div>
+                </div>
+                <p class="comment-content-text">{{ rev.comment }}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="detail-right">
@@ -112,6 +178,19 @@
                 </div>
                 <span class="spec-val">{{ pkg.duration }}</span>
               </div>
+              <div class="spec-row">
+    <div class="spec-lbl">📅 Departure Date</div>
+    <span class="spec-val" style="font-weight: 600; color: #0f172a;">
+      {{ pkg.departure_date || 'Coming Soon' }}
+    </span>
+  </div>
+
+  <div class="spec-row">
+    <div class="spec-lbl">🎟️ Ticket Left</div>
+    <span class="spec-val" :style="{ color: pkg.available_tickets <= 5 ? '#ef4444' : '#10b981', fontWeight: '700' }">
+      {{ pkg.available_tickets > 0 ? pkg.available_tickets + ' / ' + (pkg.max_tickets || 20) + ' Left' : 'Out Of Stock' }}
+    </span>
+  </div>
 
               <div class="spec-row">
                 <div class="spec-lbl">
@@ -237,7 +316,7 @@
 <script>
 export default {
   name: 'PackageDetailView',
-  
+
   // ၁။ State Variables (Data)
   data() {
     return {
@@ -245,8 +324,13 @@ export default {
       loading: true,
       selectedImg: '',
       inWishlist: false,
-      
-      // မူရင်း Dataset ထဲက ID 1 ကနေ 24 အထိ အားလုံးကို ပုံစံလုံးဝမပျက်ဘဲ ဒီအတိုင်း သိမ်းထားပါတယ်
+
+      newRating: 0,
+      newComment: '',
+      // Database ကနေ လှမ်းယူရမှာလက်ရှိစမ်းဖို့ Array ပုံစံသိမ်းထားနိုင်
+      commentsDataset: [],
+
+      // မူရင်း Dataset ထဲက ID 1 ကနေ 24 အထိ အားလုံးကို ပုံစံလုံးဝမပျက်ဘဲ ဒီအတိုင်း သိမ်းထား
       packagesDataset: [
         {
           id: 1,
@@ -263,6 +347,9 @@ export default {
           level: 'budget',
           city: 'Hpa An',
           country: 'Myanmar',
+          departure_date: '30.06.2026', // Card ထဲမှာ ပြသရန် Date
+          max_tickets: 20, // စုစုပေါင်းဆံ့သည့် ဦးရေ
+          available_tickets: 18, //လက်ကျန်ဦးရေ
           image:
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM47OeGkz0jR-u1pXERcqjcANzdiJW8Qwlf-ADoF4QGplTaPI9TLIppc&s=10',
           thumbnail_images: [
@@ -573,7 +660,8 @@ export default {
           itinerary: [
             {
               title: 'Arrival',
-              description: 'Arrive at Ngwe Saung Beach and check-in to your selected 4-star beach resort.',
+              description:
+                'Arrive at Ngwe Saung Beach and check-in to your selected 4-star beach resort.',
             },
             {
               title: 'Beach Activities',
@@ -582,7 +670,8 @@ export default {
             },
             {
               title: 'Excursion',
-              description: 'Take a cultural and nature-filled excursion to visit the nearby Elephant Camp.',
+              description:
+                'Take a cultural and nature-filled excursion to visit the nearby Elephant Camp.',
             },
             {
               title: 'Relax',
@@ -591,7 +680,8 @@ export default {
             },
             {
               title: 'Return',
-              description: 'Complete resort check-out and embark on a comfortable drive back to Mandalay.',
+              description:
+                'Complete resort check-out and embark on a comfortable drive back to Mandalay.',
             },
           ],
         },
@@ -610,7 +700,8 @@ export default {
           level: 'premium',
           city: 'Ngwe Saung',
           country: 'Myanmar',
-          image: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=600',
+          image:
+            'https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=600',
           thumbnail_images: [
             'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
             'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
@@ -638,7 +729,8 @@ export default {
             },
             {
               title: 'Return',
-              description: 'Complete executive check-out and take a private SUV transfer directly back home.',
+              description:
+                'Complete executive check-out and take a private SUV transfer directly back home.',
             },
           ],
         },
@@ -720,7 +812,8 @@ export default {
             },
             {
               title: 'Return',
-              description: 'Enjoy a traditional Shan breakfast before checking out for a smooth return drive.',
+              description:
+                'Enjoy a traditional Shan breakfast before checking out for a smooth return drive.',
             },
           ],
         },
@@ -739,7 +832,8 @@ export default {
           level: 'premium',
           city: 'Kalaw',
           country: 'Myanmar',
-          image: 'https://i.travelapi.com/lodging/16000000/15660000/15651600/15651577/182bbc8c_z.jpg',
+          image:
+            'https://i.travelapi.com/lodging/16000000/15660000/15651600/15651577/182bbc8c_z.jpg',
           thumbnail_images: [
             'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
             'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
@@ -987,7 +1081,8 @@ export default {
           itinerary: [
             {
               title: 'Arrival',
-              description: 'Land in Tokyo, transfer to a 4-star city hotel, and witness views from Tokyo Tower.',
+              description:
+                'Land in Tokyo, transfer to a 4-star city hotel, and witness views from Tokyo Tower.',
             },
             {
               title: 'City Highlights',
@@ -1354,53 +1449,146 @@ export default {
             },
           ],
         },
-      ]
-    };
+      ],
+    }
   },
 
   // ၂။ Methods
   methods: {
-    loadPackageDetail() {
-      this.loading = true;
-      const packageId = parseInt(this.$route.params.id);
-      
-      const foundPkg = this.packagesDataset.find((p) => p.id === packageId);
-      if (foundPkg) {
-        this.pkg = foundPkg;
-        this.selectedImg = foundPkg.image;
-      } else {
-        this.pkg = null;
+    //database ချိတ်ရင်သုံးဖို့
+    //     async submitReview() {
+    //  if (this.newRating === 0) {
+    //         alert("Please select a star rating.");
+    //         return;
+    //       }
+    //       if (!this.newComment.trim()) {
+    //         alert("Please enter a comment.");
+    //         return;
+    //       }
+
+    //   try {
+    //     // 🌟 Backend API ဆီသို့ Data လှမ်းပို့ခြင်း
+    //     const response = await axios.post('https://api.yourtravelwebsite.com/reviews', {
+    //       packageId: this.pkg.id, // ဘယ်ခရီးစဉ်အတွက် review လဲဆိုတာ id ပါ ပို့ရမယ်
+    //       rating: this.newRating,
+    //       comment: this.newComment
+    //     });
+
+    //     // API ကနေ အောင်မြင်စွာ သိမ်းဆည်းပြီးကြောင်း Response ပြန်လာမှ UI မှာ ပြပေးမယ်
+    //     if (response.data.success) {
+    //       this.commentsDataset.unshift(response.data.newReview);
+
+    //       this.newComment = '';
+    //       this.newRating = 0;
+    //     }
+    //   } catch (error) {
+    //     alert("Comment ပို့လို့ မအောင်မြင်ပါဘူး။");
+    //   }
+    // }
+    submitReview() {
+      if (this.newRating === 0) {
+        alert('Please select a star rating.')
+        return
       }
-      this.loading = false;
+      if (!this.newComment.trim()) {
+        alert('Please enter a comment.')
+        return
+      }
+
+      const pkgId = this.$route.params.id
+
+      // 🔑 LocalStorage ထဲကနေ login ဝင်ထားတဲ့ user info ကို လှမ်းယူတာ (သင့် system ပေါ်မူတည်ပြီး ပြောင်းလဲနိုင်ပါတယ်)
+      const currentUser = JSON.parse(localStorage.getItem('current_user'))
+      const currentUserName = currentUser ? currentUser.name : 'Anonymous Traveller'
+
+      // ၁။ လက်ရှိ list ထဲ ထည့်တယ်
+      this.commentsDataset.unshift({
+        rating: this.newRating,
+        comment: this.newComment,
+        user_name: currentUserName,
+      })
+
+      // ၂။ အားလုံးပေါင်းသိမ်းထားတဲ့ localStorage object ထဲမှာ သွားသိမ်းမယ်
+      const allReviews = localStorage.getItem('all_packages_reviews')
+      const reviewsObj = allReviews ? JSON.parse(allReviews) : {}
+      reviewsObj[pkgId] = this.commentsDataset
+      localStorage.setItem('all_packages_reviews', JSON.stringify(reviewsObj))
+      // 🌟 ထည့်ရမည့် ကုဒ်အသစ်: အခြား Component တွေက လှမ်းသိနိုင်အောင် Event ထုတ်လွှတ်လိုက်ခြင်း
+      window.dispatchEvent(new Event('reviews-updated'))
+
+      // ၃။ UI ပေါ်က Package rating တွေကိုပါ update ဖြစ်သွားအောင် localStorage ထဲမှာ ရလဒ် သိမ်းမယ်
+      const savedStats = localStorage.getItem('package_stats')
+      const statsObj = savedStats ? JSON.parse(savedStats) : {}
+      statsObj[pkgId] = {
+        avg: this.averageRating,
+        count: this.commentsDataset.length,
+      }
+      localStorage.setItem('package_stats', JSON.stringify(statsObj))
+
+      this.newComment = ''
+      this.newRating = 0
+    },
+
+    loadPackageDetail() {
+      this.loading = true
+      const packageId = parseInt(this.$route.params.id)
+      const foundPkg = this.packagesDataset.find((p) => p.id === packageId)
+      if (foundPkg) {
+        this.pkg = foundPkg
+        this.selectedImg = foundPkg.image
+      } else {
+        this.pkg = null
+      }
+      this.loading = false
     },
     handleBooking() {
-      alert(`Booking process started for: ${this.pkg?.title}`);
+      alert(`Booking process started for: ${this.pkg?.title}`)
+    },
+    setImage(img) {
+      this.selectedImg = img
     },
     toggleWishlist() {
-      this.inWishlist = !this.inWishlist;
+      this.inWishlist = !this.inWishlist
     },
     formatMMK(price) {
-      return price;
-    }
+      return price
+    },
   },
 
   // ၃။ Watcher
   watch: {
     '$route.params.id': {
       handler: 'loadPackageDetail',
-      immediate: true
-    }
+      immediate: true,
+    },
+  },
+  // Title အောက်က ကြယ်ပွင့်တွက်ချက်ရန်
+  computed: {
+    averageRating() {
+      if (this.commentsDataset.length === 0) return 0
+      const sum = this.commentsDataset.reduce((acc, rev) => acc + rev.rating, 0)
+      return (sum / this.commentsDataset.length).toFixed(1)
+    },
   },
 
   // ၄။ Mounted Hook
   mounted() {
-    this.loadPackageDetail();
-  }
-};
+    this.loadPackageDetail()
+    const pkgId = this.$route.params.id
+    const allReviews = localStorage.getItem('all_packages_reviews')
+    const reviewsObj = allReviews ? JSON.parse(allReviews) : {}
+
+    if (reviewsObj[pkgId]) {
+      this.commentsDataset = reviewsObj[pkgId]
+    } else {
+      // မရှိသေးရင် base အနေနဲ့ 5 star တစ်ခု ထည့်ထားပေးမယ်
+      this.commentsDataset = []
+    }
+  },
+}
 </script>
 
 <style scoped>
-
 .detail-page {
   background: #f8fafc;
   min-height: 100vh;
@@ -1724,5 +1912,192 @@ export default {
   border-radius: 10px;
   font-size: 14px;
   text-decoration: none;
+}
+/* --- Reviews & Comments Section Styles --- */
+.rating-comment-section {
+  margin-top: 40px;
+  font-family: sans-serif;
+}
+
+.review-block-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+/* Form Card Design */
+.comment-form {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 32px;
+}
+
+.form-title {
+  font-size: 16px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* Star Inputs */
+.rating-input-wrapper {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-label {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.stars-container {
+  display: flex;
+  gap: 4px;
+}
+
+.interactive-star {
+  cursor: pointer;
+  font-size: 24px;
+  transition: transform 0.1s ease;
+}
+
+.interactive-star:hover {
+  transform: scale(1.2);
+}
+
+.rating-number {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f59e0b;
+  margin-left: 4px;
+}
+
+/* Textarea & Button */
+.modern-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  font-size: 14px;
+  color: #334155;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.modern-textarea:focus {
+  border-color: #10b981;
+}
+
+.btn-submit-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.modern-submit-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.modern-submit-btn:hover {
+  background: #059669;
+}
+
+.modern-submit-btn:active {
+  transform: scale(0.98);
+}
+
+/* Comments List & Cards */
+.list-title {
+  font-size: 16px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.no-reviews {
+  color: #94a3b8;
+  font-size: 14px;
+  padding: 20px;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #e2e8f0;
+}
+
+.comment-card {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.comment-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  background: #e0f2fe;
+  color: #0284c7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.display-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.static-star {
+  font-size: 16px;
+}
+
+.comment-content-text {
+  font-size: 14px;
+  color: #475569;
+  margin: 0;
+  padding-left: 40px;
+  line-height: 1.5;
 }
 </style>

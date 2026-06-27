@@ -127,6 +127,22 @@
                     <span class="pkg-group">👥 {{ pkg.group_size }}</span>
                   </div>
 
+                  <div
+                    class="pkg-ticket-status"
+                    style="font-size: 13px; margin-top: 4px; margin-bottom: 12px"
+                  >
+                    <span
+                      v-if="pkg.available_tickets > 0"
+                      :style="{
+                        color: pkg.available_tickets <= 5 ? '#ef4444' : '#10b981',
+                        fontWeight: '600',
+                      }"
+                    >
+                      🎟️ {{ pkg.available_tickets }} Tickets Left
+                    </span>
+                    <span v-else style="color: #ef4444; font-weight: 600"> 🚫 Out Of Stock </span>
+                  </div>
+
                   <div class="pkg-rating-row">
                     <span class="star-icon">⭐</span>
                     <span class="rating-val">{{ pkg.rating }}</span>
@@ -163,9 +179,22 @@ export default {
     return {
       activeTab: 'all',
       searchQuery: '', // Search စာသား သိမ်းဆည်းရန် Variable
-      packagesData: [
+      packagesData: []
+    }
+  },
         // --- Hpa An Trips ---
-        {
+  created(){
+        // ၁။ Browser (localStorage) ထဲမှာ data ရှိပြီးသားလား စစ်မယ်
+    const savedPackages = localStorage.getItem('travel_packages');
+
+    if (savedPackages) {
+      // ရှိရင် အဲ့ဒီ data ကို ယူသုံးမယ် (ဒါမှ ဝယ်ထားတဲ့ လက်ကျန်တွေ ပါလာမှာပါ)
+      this.packagesData = JSON.parse(savedPackages);
+    } else {
+      // မရှိသေးရင် (App စဖွင့်ချင်းဆိုရင်) data ကို အသစ်သတ်မှတ်ပြီး localStorage ထဲ သိမ်းမယ်
+      const defaultPackages = [
+
+      {
           id: 1,
           title: 'Hpa-An Explore',
           price: '195,000 MMK',
@@ -179,6 +208,7 @@ export default {
           country: 'Myanmar',
           image:
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM47OeGkz0jR-u1pXERcqjcANzdiJW8Qwlf-ADoF4QGplTaPI9TLIppc&s=10',
+          available_tickets: 20,
         },
         {
           id: 2,
@@ -194,6 +224,7 @@ export default {
           country: 'Myanmar',
           image:
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC2F6dkl--5ZgGST33-gDENeFeDjfWokz5G0caN9E_sHarjggPWSNBUe0&s=10',
+          available_tickets: 18,
         },
         {
           id: 3,
@@ -209,6 +240,7 @@ export default {
           country: 'Myanmar',
           image:
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhKjPwzLJT5EpxUj3ligmXhDLn6WOAxCdc3aoTQSiz8MhKwdmJxb3xOIkU&s=10',
+          available_tickets: 10,
         },
         // --- Bagan Trips ---
         {
@@ -225,6 +257,7 @@ export default {
           country: 'Myanmar',
           image:
             'https://images.unsplash.com/photo-1599403275295-57bca684efd3?q=80&w=1041&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          available_tickets: 20,
         },
         {
           id: 5,
@@ -240,6 +273,7 @@ export default {
           country: 'Myanmar',
           image:
             'https://images.unsplash.com/photo-1515900959941-d1cce424f5c4?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          available_tickets: 18,
         },
         {
           id: 6,
@@ -253,8 +287,10 @@ export default {
           level: 'premium',
           city: 'Bagan',
           country: 'Myanmar',
+
           image:
             'https://media.istockphoto.com/id/614446038/photo/hot-air-balloons-in-bagan-myanmar.jpg?s=612x612&w=0&k=20&c=nlxHdhqgEUUw_5M0dRlfhzHvjQG_epUqzLyUjcJJKmw=',
+          available_tickets: 10,
         },
         // --- Ngwe Saung Trips ---
         {
@@ -270,6 +306,7 @@ export default {
           city: 'Ngwe Saung',
           country: 'Myanmar',
           image: 'https://www.mcs-myanmartravel.com/wp-content/uploads/2015/07/ngwesaung.jpg',
+          available_tickets: 20,
         },
         {
           id: 8,
@@ -285,6 +322,7 @@ export default {
           country: 'Myanmar',
           image:
             'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/22/30/d2/d1/eskala-hotels-resorts.jpg?w=1200&h=-1&s=1',
+          available_tickets: 18,
         },
         {
           id: 9,
@@ -300,6 +338,7 @@ export default {
           country: 'Myanmar',
           image:
             'https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 10,
         },
         // --- Kalaw Trips ---
         {
@@ -316,6 +355,7 @@ export default {
           country: 'Myanmar',
           image:
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSRG9FCoqjY-LUvTY_RQJ2EDSYiZIuv5pdTN22nhTS-g&s=10',
+          available_tickets: 20,
         },
         {
           id: 11,
@@ -331,6 +371,7 @@ export default {
           country: 'Myanmar',
           image:
             'https://indochinatreks.com/wp-content/uploads/2022/12/12.-Kalaw-inle-lake-fishermen-istock.jpg',
+          available_tickets: 18,
         },
         {
           id: 12,
@@ -346,6 +387,7 @@ export default {
           country: 'Myanmar',
           image:
             'https://i.travelapi.com/lodging/16000000/15660000/15651600/15651577/182bbc8c_z.jpg',
+          available_tickets: 10,
         },
         // --- Thailand Trips ---
         {
@@ -362,6 +404,7 @@ export default {
           country: 'Thailand',
           image:
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZcLJa-cWwqzjwGQIJuINkTQ1ccor6N8ADP42u7BMhHZTdZmuumbOGCN_y&s=10',
+          available_tickets: 20,
         },
         {
           id: 14,
@@ -377,6 +420,7 @@ export default {
           country: 'Thailand',
           image:
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsuqSWfs1NiHiKGMVxXP2vsi7f942K7nR-Pl7jYYKLuyFpTEKALyz1DdY&s=10',
+          available_tickets: 18,
         },
         {
           id: 15,
@@ -392,6 +436,7 @@ export default {
           country: 'Thailand',
           image:
             'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?q=80&w=801&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          available_tickets: 10,
         },
         // --- Japan Trips ---
         {
@@ -408,6 +453,7 @@ export default {
           country: 'Japan',
           image:
             'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 20,
         },
         {
           id: 17,
@@ -423,6 +469,7 @@ export default {
           country: 'Japan',
           image:
             'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 18,
         },
         {
           id: 18,
@@ -438,6 +485,7 @@ export default {
           country: 'Japan',
           image:
             'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 10,
         },
         // --- Singapore Trips ---
         {
@@ -454,6 +502,7 @@ export default {
           country: 'Singapore',
           image:
             'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 20,
         },
         {
           id: 20,
@@ -469,6 +518,7 @@ export default {
           country: 'Singapore',
           image:
             'https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 18,
         },
         {
           id: 21,
@@ -484,6 +534,7 @@ export default {
           country: 'Singapore',
           image:
             'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 10,
         },
         // --- China Trips ---
         {
@@ -500,6 +551,7 @@ export default {
           country: 'China',
           image:
             'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?auto=format&fit=crop&w=800&q=80',
+          available_tickets: 20,
         },
         {
           id: 23,
@@ -515,6 +567,7 @@ export default {
           country: 'China',
           image:
             'https://plus.unsplash.com/premium_photo-1664299326174-f73b66496733?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          available_tickets: 18,
         },
         {
           id: 24,
@@ -530,8 +583,11 @@ export default {
           country: 'China',
           image:
             'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 10,
         },
-      ],
+      ]
+      this.packagesData = defaultPackages;
+      localStorage.setItem('travel_packages', JSON.stringify(defaultPackages));
     }
   },
   computed: {

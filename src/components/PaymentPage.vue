@@ -93,7 +93,7 @@ export default {
   } else {
     console.warn("No booking data found in localStorage");
     // data မရှိရင် အရင် page ကို ပြန်ပို့ပါ
-    this.$router.push('/');
+    // this.$router.push('/');
   }
 },
 

@@ -1,7 +1,7 @@
 <template>
   <div class="home-view-container">
     <header class="hero-section">
-      <div class="hero-bg-media-layer" style="background-image: url('/Homebg.png')"></div>
+      <div class="hero-bg-media-layer" style="background-image: url('/homebg (2).png')"></div>
       <div class="hero-overlay-gradient"></div>
 
       <div class="hero-content">

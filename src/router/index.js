@@ -58,7 +58,7 @@ const router = createRouter({
 
      {
       path: '/payment',
-      name: 'PaymentPage',
+      name: 'Payment',
       
       component: () => import('../components/PaymentPage.vue'),
     },
@@ -83,7 +83,19 @@ const router = createRouter({
       component: () => import('../views/PackageDetailView.vue'),
     },
 
+{
+      path: '/destinations',
+      name: 'destinations',
+      
+      component: () => import('../views/Destination.vue'),
+    },
 
+    {
+      path: '/destination/:name',
+      name: 'destination',
+      
+      component: () => import('../views/DestinationDetail.vue'),
+    },
 
 
 
