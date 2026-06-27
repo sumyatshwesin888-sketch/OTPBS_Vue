@@ -107,25 +107,35 @@ export default {
       const savedUser = localStorage.getItem('user_account')
 
       if (!savedUser) {
-        alert('No account found! Please sign up first.')
+        alert('No account found! Please Sign Up first.')
+        this.$router.push('/signup')
         return
       }
 
       const user = JSON.parse(savedUser)
 
+      // Email နှင့် Password ကို တိုက်စစ်ပါမယ်
       if (this.formData.email === user.email && this.formData.password === user.password) {
         alert('Logged In Successfully!')
         
+        // Login ဝင်ထားကြောင်း အခြေအနေပြောင်းလဲမည်
         localStorage.setItem('is_logged_in', 'true')
         
-        this.$router.push('/profile')
+        // Login ဝင်ပြီးနောက် Home Page (/) သို့ ဦးတည်ရွှေ့ပြောင်းပါမည်
+        this.$router.push('/')
       } else {
         alert('Invalid Email or Password! Please try again.')
       }
     },
+    loginWithSocial(platform) {
+      console.log(`Logging in with ${platform}`)
+    },
     handleForgotPassword() {
       console.log('Redirect to Forgot Password Page')
-    }
+    },
+    navigateToSignUp() {
+      this.$router.push('/signup')
+    },
   },
 }
 </script>
@@ -290,9 +300,9 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;  /* ဗမာ့အတိုင်း width ကို ချုံ့လိုက်ပါတယ် */
-  height: 24px; /* height ကို ချုံ့လိုက်ပါတယ် */
-  z-index: 3;   /* Click နှိပ်လို့ရအောင် အပေါ်ဆုံးမှာ ထားပါတယ် */
+  width: 24px; 
+  height: 24px; 
+  z-index: 3; 
 }
 
 .svg-icon {
