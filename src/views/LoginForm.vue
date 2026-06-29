@@ -4,7 +4,6 @@
       <h2 class="card-title">Welcome Back!</h2>
       <p class="card-subtitle">Unlock exclusive travel deals & book your dream trip!</p>
        
-
       <form @submit.prevent="handleSubmit" class="form-content">
         <div class="input-group">
           <i class="fa-solid fa-envelope input-icon"></i>
@@ -79,9 +78,9 @@
         </button>
       </form>
 
-    <footer class="card-footer">
-  <p>Don't have an account? <a href="/signup">Sign Up</a></p>
-</footer>
+      <footer class="card-footer">
+        <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+      </footer>
     </main>
   </div>
 </template>
@@ -99,7 +98,7 @@ export default {
       isPasswordVisible: false,
     }
   },
- methods: {
+  methods: {
     togglePasswordVisibility() {
       this.isPasswordVisible = !this.isPasswordVisible
     },
@@ -114,14 +113,16 @@ export default {
 
       const user = JSON.parse(savedUser)
 
-      // Email နှင့် Password ကို တိုက်စစ်ပါမယ်
       if (this.formData.email === user.email && this.formData.password === user.password) {
         alert('Logged In Successfully!')
         
-        // Login ဝင်ထားကြောင်း အခြေအနေပြောင်းလဲမည်
         localStorage.setItem('is_logged_in', 'true')
         
-        // Login ဝင်ပြီးနောက် Home Page (/) သို့ ဦးတည်ရွှေ့ပြောင်းပါမည်
+        // 🌟 ဤနေရာတွင် အဓိကပြင်ဆင်လိုက်ခြင်းဖြစ်ပါတယ်: 
+        // LocalStorage ထဲက User data ကို Vuex Store ရဲ့ state ထဲလှမ်းထည့်ပေးလိုက်ခြင်းဖြင့် 
+        // Navbar မှာရှိတဲ့ Login/Signup နေရာမှာ Profile ပုံစံ ချက်ချင်းပြောင်းသွားမှာ ဖြစ်ပါတယ်
+        this.$store.commit('SET_USER', user)
+        
         this.$router.push('/')
       } else {
         alert('Invalid Email or Password! Please try again.')
@@ -153,7 +154,7 @@ export default {
 .login-container {
   width: 100%;
   min-height: 100vh;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('img/login.avif');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('public/login.avif');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -189,63 +190,6 @@ export default {
   text-align: center;
   margin-bottom: 25px;
   line-height: 1.4;
-}
-
-.social-login-section {
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-.divider-text {
-  width: 100%;
-  text-align: center;
-  border-bottom: 1px solid #e2e8f0;
-  line-height: 0.1em;
-  margin: 10px 0 20px;
-  color: #718096;
-  font-size: 0.85rem;
-}
-
-.divider-text span {
-  background: #ffffff;
-  padding: 0 15px;
-}
-
-.social-buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-}
-
-.btn-social {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  width: 55px;
-  height: 55px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
-}
-
-.btn-social:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-}
-
-.btn-social img {
-  width: 26px;
-  height: 26px;
-}
-
-.or-text {
-  font-size: 0.8rem;
-  color: #a0aec0;
-  font-weight: 600;
 }
 
 .form-content {

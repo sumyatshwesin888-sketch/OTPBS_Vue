@@ -171,11 +171,9 @@ const appHeight = () => {
         return
       }
 
-      // ၁။ အကောင့်ရှိပြီးသား ဟုတ်မဟုတ် အရင်စစ်ဆေးမယ်
       const existingUser = localStorage.getItem('user_account')
       if (existingUser) {
         const savedUser = JSON.parse(existingUser)
-        // ရိုက်ထည့်လိုက်တဲ့ email က ရှိပြီးသား email နဲ့ တူနေရင် တားဆီးမယ်
         if (this.formData.email === savedUser.email) {
           alert('Account already exists! Please log in instead.')
           this.$router.push('/login')
@@ -183,7 +181,6 @@ const appHeight = () => {
         }
       }
 
-      // ၂။ အကောင့်အသစ်ကို ဒေတာစုစည်းပြီး LocalStorage ထဲ သိမ်းမယ်
       const userData = {
         full_name: this.formData.fullName,
         phone: this.formData.phone,
@@ -192,12 +189,10 @@ const appHeight = () => {
       }
       localStorage.setItem('user_account', JSON.stringify(userData))
       
-      // ၃။ Sign Up လုပ်ပြီးတာနဲ့ တစ်ပြိုင်နက် Login အခြေအနေကို true ပေးလိုက်မယ်
       localStorage.setItem('is_logged_in', 'true')
       
       alert('Account Created Successfully!')
       
-      // ၄။ Login စာမျက်နှာကို မသွားတော့ဘဲ Home Page (/) ဆီကို တိုက်ရိုက် လွှတ်လိုက်ပါမယ်
       this.$router.push('/')
     },
     signUpWithSocial(platform) {
@@ -227,7 +222,7 @@ const appHeight = () => {
   width: 100vw;
   height: 100vh;
   height: var(--app-height, 100vh);
-  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('img/signupimg.png');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('public/signupimg.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -282,8 +277,6 @@ const appHeight = () => {
   padding: 30px 35px; 
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   position: relative;
-  
-  /* မလှုပ်အောင် ထိန်းထားခြင်း */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   will-change: transform;

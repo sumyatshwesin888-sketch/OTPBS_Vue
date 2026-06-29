@@ -82,7 +82,6 @@ export default {
   name: 'App',
   methods: {
     handleLogout() {
-      // OTPBS စနစ်အတိုင်း Store ထဲက logout action ကို လှမ်းခေါ်ပြီး Home ပြန်ပို့
       this.$store.dispatch('logout').then(() => {
         if (this.$route.path !== '/') {
           this.$router.push('/')
