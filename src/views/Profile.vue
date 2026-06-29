@@ -87,61 +87,68 @@
         </button>
       </div>
 
-      <v-dialog v-model="showEdit" max-width="450px" backdrop="static">
-        <v-card class="modern-profile-dialog">
-          <v-card-text class="pa-6">
-            <div class="dialog-header-wrapper">
-              <h3 class="modern-dialog-title">Edit Profile Information</h3>
-              <p class="modern-dialog-subtitle">Update your personal details below.</p>
-            </div>
+      <v-dialog v-model="showEdit" max-width="460px" scrollable>
+  <v-card class="modern-profile-dialog pa-4">
+    
+    <!-- Header ပိုင်း -->
+    <v-card-item class="pb-2">
+      <h3 class="modern-dialog-title">Edit Profile Information</h3>
+      <p class="modern-dialog-subtitle">Update your personal details below.</p>
+    </v-card-item>
 
-            <form @submit.prevent="handleUpdateProfile" class="modern-dialog-form">
-              <div class="modern-input-group">
-                <label class="modern-input-label">Full Name</label>
-                <input
-                  type="text"
-                  v-model="editForm.full_name"
-                  placeholder="Enter your full name"
-                  class="modern-input-field"
-                  required
-                />
-              </div>
+    <!-- Form & Input ပိုင်း -->
+    <v-card-text class="py-2">
+      <form @submit.prevent="handleUpdateProfile" id="editProfileForm" class="modern-dialog-form">
+        <div class="modern-input-group">
+          <label class="modern-input-label">Full Name</label>
+          <input
+            type="text"
+            v-model="editForm.full_name"
+            placeholder="Enter your full name"
+            class="modern-input-field"
+            required
+          />
+        </div>
 
-              <div class="modern-input-group mt-4">
-                <label class="modern-input-label">Phone Number</label>
-                <input
-                  type="text"
-                  v-model="editForm.phone"
-                  placeholder="Enter your phone number"
-                  class="modern-input-field"
-                  required
-                />
-              </div>
+        <div class="modern-input-group mt-5">
+          <label class="modern-input-label">Phone Number</label>
+          <input
+            type="text"
+            v-model="editForm.phone"
+            placeholder="Enter your phone number"
+            class="modern-input-field"
+            required
+          />
+        </div>
+      </form>
+    </v-card-text>
 
-              <div class="dialog-actions-row mt-6">
-                <v-btn
-                  variant="text"
-                  color="#64748B"
-                  class="text-none action-cancel-btn"
-                  rounded="xl"
-                  @click="showEdit = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  type="submit"
-                  color="#1B3D8A"
-                  variant="flat"
-                  class="text-none action-save-btn"
-                  rounded="xl"
-                >
-                  Save Changes
-                </v-btn>
-              </div>
-            </form>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
+    <v-card-actions class="pt-4 px-6 gap-3">
+      <v-spacer></v-spacer>
+      <v-btn
+        variant="text"
+        color="#64748B"
+        class="text-none font-weight-bold px-4"
+        rounded="xl"
+        @click="showEdit = false"
+      >
+        Cancel
+      </v-btn>
+      <v-btn
+        type="submit"
+        form="editProfileForm"
+        color="#1B3D8A"
+        variant="flat"
+        class="text-none font-weight-bold px-6 text-white"
+        rounded="xl"
+        style="background-color: #1B3D8A !important;"
+      >
+        Save Changes
+      </v-btn>
+    </v-card-actions>
+
+  </v-card>
+</v-dialog>
     </div>
   </div>
 </template>
@@ -460,18 +467,21 @@ export default {
 .modern-profile-dialog {
   border-radius: 24px !important;
   background: #ffffff !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden;
 }
 
 .modern-dialog-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #0f172a;
+  line-height: 1.3;
 }
-
 .modern-dialog-subtitle {
   font-size: 13px;
   color: #64748b;
-  margin-bottom: 24px;
+  margin-top: 4px;
+  margin-bottom: 0px;
 }
 
 .modern-input-group {
@@ -479,29 +489,29 @@ export default {
   flex-direction: column;
   gap: 8px;
 }
-
 .modern-input-label {
   font-size: 13px;
   font-weight: 600;
   color: #334155;
+  padding-left: 4px;
 }
 
 .modern-input-field {
   border: 1.5px solid #cbd5e1;
   border-radius: 14px;
   padding: 12px 16px;
-  font-size: 14px;
+  font-size: 15px;
   color: #0f172a;
   background: #f8fafc;
   outline: none;
   width: 100%;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .modern-input-field:focus {
-  border-color: #2563eb;
+  border-color: #1B3D8A;
   background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 4px rgba(27, 61, 138, 0.15);
 }
 
 .dialog-actions-row {
