@@ -4,13 +4,7 @@ import axios from '../config'
 export default createStore({
   state: {
     count: 0,
-    userAccount: {
-      userName: '',
-      password: '',
-      role: '',
-      profileName: '',
-      domain: '',
-    },
+    user: null,
   },
 
   mutations: {
@@ -20,20 +14,31 @@ export default createStore({
     decrement(state) {
       state.count--
     },
-    updateUserAccount: function (state, value) {
-      state.userAccount = value
-      if (value.password != undefined) {
+    
+    SET_USER(state, value) {
+      state.user = value
+      
+      if (value && value.password !== undefined) {
         axios.defaults.headers.common['Authorization'] = `${value.password}`
       } else {
         axios.defaults.headers.common['Authorization'] = ``
       }
     },
+
+    CLEAR_USER(state) {
+      state.user = null
+      axios.defaults.headers.common['Authorization'] = ``
+    }
   },
 
   actions: {
     increment({ commit }) {
       commit('increment')
     },
+    logout({ commit }) {
+      commit('CLEAR_USER')
+      localStorage.removeItem('is_logged_in')
+    }
   },
 
   getters: {

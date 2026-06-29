@@ -191,6 +191,8 @@ const appHeight = () => {
       
       localStorage.setItem('is_logged_in', 'true')
       
+      this.$store.commit('SET_USER', userData)
+      
       alert('Account Created Successfully!')
       
       this.$router.push('/')

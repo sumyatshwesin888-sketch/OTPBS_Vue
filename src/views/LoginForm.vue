@@ -99,9 +99,6 @@ export default {
     }
   },
   methods: {
-    togglePasswordVisibility() {
-      this.isPasswordVisible = !this.isPasswordVisible
-    },
     handleSubmit() {
       const savedUser = localStorage.getItem('user_account')
 
@@ -117,11 +114,13 @@ export default {
         alert('Logged In Successfully!')
         
         localStorage.setItem('is_logged_in', 'true')
+                const loginData = {
+          ...user,
+          name: user.username || user.name || 'User',
+          email: user.email
+        }
         
-        // 🌟 ဤနေရာတွင် အဓိကပြင်ဆင်လိုက်ခြင်းဖြစ်ပါတယ်: 
-        // LocalStorage ထဲက User data ကို Vuex Store ရဲ့ state ထဲလှမ်းထည့်ပေးလိုက်ခြင်းဖြင့် 
-        // Navbar မှာရှိတဲ့ Login/Signup နေရာမှာ Profile ပုံစံ ချက်ချင်းပြောင်းသွားမှာ ဖြစ်ပါတယ်
-        this.$store.commit('SET_USER', user)
+        this.$store.commit('SET_USER', loginData)
         
         this.$router.push('/')
       } else {
@@ -139,6 +138,7 @@ export default {
     },
   },
 }
+
 </script>
 
 <style scoped>
