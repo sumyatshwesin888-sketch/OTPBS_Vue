@@ -47,13 +47,8 @@
         <h3>Quick Info</h3>
 
         <div class="info-row">
-          <span>🌎 Country</span>
-          <span>{{ destination.quickInfo.country }}</span>
-        </div>
-
-        <div class="info-row">
-          <span>📍 Region</span>
-          <span>{{ destination.quickInfo.region }}</span>
+          <span>🌎 Location</span>
+          <span>{{ destination.quickInfo.locations }}</span>
         </div>
 
         <div class="info-row">
@@ -154,8 +149,7 @@ Bagan is one of Myanmar's most iconic cultural destinations and a UNESCO World H
 `,
 
     quickInfo: {
-      country: 'Myanmar',
-      region: 'Mandalay Region',
+     locations: 'Mandalay',
       season: 'Nov - Feb',
       duration: '3 - 5 Days'
     },
@@ -204,8 +198,7 @@ Kalaw is a peaceful hill town located in Shan State, Myanmar, and is well known 
 `,
 
     quickInfo: {
-      country: 'Myanmar',
-      region: 'Shan State',
+     locations: 'Shan State',
       season: 'Nov - Feb',
       duration: '3 - 5 Days'
     },
@@ -254,8 +247,8 @@ Hpa-An is one of Myanmar's most beautiful natural destinations, famous for its l
 `,
 
   quickInfo: {
-    country: 'Myanmar',
-    region: 'Kayin State',
+    locations: 'Kayin State',
+   
     season: 'Nov - Feb',
     duration: '3 - 4 Days'
   },
@@ -303,8 +296,7 @@ Ngwe Saung Beach is one of Myanmar's most popular coastal destinations, known fo
 `,
 
   quickInfo: {
-    country: 'Myanmar',
-    region: 'Ayeyarwady Region',
+locations: 'Ayeyarwady',
     season: 'Oct - Mar',
     duration: '4 - 5 Days'
   },
@@ -352,8 +344,7 @@ Thailand is one of Southeast Asia’s most popular travel destinations, known fo
 `,
 
     quickInfo: {
-      country: 'Thailand',
-      region: 'Bangkok',
+      locations: 'Thailand',
       season: 'Nov - Mar',
       duration: '4 - 5 Days'
     },
@@ -401,8 +392,7 @@ Japan is a fascinating destination where ancient traditions blend seamlessly wit
 `,
 
     quickInfo: {
-      country: 'Japan',
-      region: 'Tokyo',
+     locations: 'Japan',
       season: 'Mar - May',
       duration: '5 - 7 Days'
     },
@@ -454,8 +444,7 @@ China is a diverse and culturally rich destination that combines thousands of ye
 `,
 
     quickInfo: {
-      country: 'China',
-      region: 'Shanghai',
+      locations: 'China',
       season: 'Mar - May',
       duration: '4 - 5 Days'
     },
@@ -505,8 +494,7 @@ Singapore is a modern and dynamic city-state renowned for its iconic skyline, wo
 `,
 
     quickInfo: {
-      country: 'Singapore',
-      region: 'Singapore City',
+      locations: 'Singapore',
       season: 'All Year',
       duration: '4 - 5 Days'
     },

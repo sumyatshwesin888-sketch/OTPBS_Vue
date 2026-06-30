@@ -128,17 +128,6 @@
               {{ dest.description }}
             </p>
 
-            <div class="tags">
-
-              <span
-                v-for="tag in dest.tags"
-                :key="tag"
-              >
-                {{ tag }}
-              </span>
-
-            </div>
-
             <div class="card-footer">
 
               <span class="price">
@@ -167,70 +156,42 @@ const domesticDestinations = [
 
   {
     name: 'Bagan',
-    region: 'MANDALAY REGION',
     image: '/bagan.jpg',
-    packages: 3,
+    
     price: '650,000 MMK',
 
     description:
       'Ancient temples and breathtaking sunrise views.',
-
-    tags: [
-      'Ananda Temple',
-      'Balloon',
-      'Sunset'
-    ]
   },
 
   {
     name: 'Kalaw',
-    region: 'SHAN STATE',
     image: '/kalaw.jpg',
-    packages: 3,
+    
     price: '420,000 MMK',
 
     description:
       'Cool weather and beautiful trekking routes.',
-
-    tags: [
-      'Pine Forest',
-      'View Point',
-      'Inle Lake'
-    ]
   },
 
   {
     name: 'Hpa-An',
-    region: 'KAYIN STATE',
     image: '/hpaan.jpg',
-    packages: 3,
+    
     price: '195,000 MMK',
 
     description:
       'Mountains, caves and natural beauty.',
-
-    tags: [
-      'Saddan Cave',
-      'Zwegabin',
-      'Kyauk Ka Lat'
-    ]
   },
 
   {
     name: 'Ngwe Saung',
-    region: 'AYEYARWADY REGION',
     image: '/ngwesaung.jpg',
-    packages: 3,
+    
     price: '750,000 MMK',
 
     description:
       'Beautiful beach and seafood paradise.',
-
-    tags: [
-      'Beach',
-      'Island',
-      'Seafood'
-    ]
   }
 
 ]
@@ -239,70 +200,42 @@ const internationalDestinations = [
 
   {
     name: 'Thailand',
-    region: 'BANGKOK',
     image: '/thailand.jpg',
-    packages: 3,
+    
     price: '1,650,000 MMK',
 
     description:
       'Shopping, culture and vibrant city life.',
-
-    tags: [
-      'Grand Palace',
-      'Wat Arun',
-      'Cruise'
-    ]
   },
 
   {
     name: 'Japan',
-    region: 'TOKYO',
     image: '/japan.jpg',
-    packages: 3,
+    
     price: '3,250,000 MMK',
 
     description:
       'Technology and traditional culture.',
-
-    tags: [
-      'Fuji',
-      'Tokyo',
-      'Shibuya'
-    ]
   },
 
   {
     name: 'China',
-    region: 'SHANGHAI',
     image: '/china.jpg',
-    packages: 3,
+    
     price: '1,950,000 MMK',
 
     description:
       'Historic landmarks and modern skyline.',
-
-    tags: [
-      'The Bund',
-      'Yu Garden',
-      'Shanghai'
-    ]
   },
 
   {
     name: 'Singapore',
-    region: 'SINGAPORE CITY',
     image: '/signapore.jpg',
-    packages: 3,
+    
     price: '2,850,000 MMK',
 
     description:
       'Luxury lifestyle and iconic attractions.',
-
-    tags: [
-      'Marina Bay',
-      'Sentosa',
-      'Merlion'
-    ]
   }
 
 ]
@@ -448,28 +381,6 @@ const internationalDestinations = [
   line-height:1.7;
   margin-bottom:15px;
 }
-
-/* Tags */
-
-.tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-
-  margin-bottom:20px;
-}
-
-.tags span{
-  background:#eff6ff;
-  color:#2563eb;
-
-  padding:6px 10px;
-
-  border-radius:20px;
-
-  font-size:12px;
-}
-
 /* Footer */
 
 .card-footer{
