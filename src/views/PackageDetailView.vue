@@ -192,7 +192,20 @@
 
             <div class="divider" />
 
-            <button class="book-btn" @click="handleBook">Book Now</button>
+           <div v-if="showAuthAlert" class="auth-modal-overlay" @click="showAuthAlert = false">
+        <div class="auth-modal-content" @click.stop>
+          <div class="auth-dialog-body">
+            <div class="auth-dialog-icon">🔒</div>
+            <h3 class="auth-dialog-title">Login Required</h3>
+            <p>Please log in to continue with your booking.</p>
+            <div class="auth-actions">
+              <button @click="router.push('/login')" class="auth-btn login">Login Now</button>
+              <button @click="showAuthAlert = false" class="auth-btn cancel">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+            <button class="book-btn" @click="handleBookNow">Book Now</button>
 
             <button class="wishlist-btn" @click="toggleWishlist">
               <svg
@@ -233,13 +246,14 @@
       <p>Package not found.</p>
       <router-link to="/packages" class="not-found-link">Browse Packages</router-link>
     </div>
+    
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
+import { useAuthStore } from '@/store/auth';
 const route = useRoute()
 const router = useRouter()
 
@@ -247,6 +261,7 @@ const pkg = ref(null)
 const loading = ref(true)
 const selectedImg = ref('')
 const inWishlist = ref(false)
+const authStore = useAuthStore();
 
 const packagesDataset = [
   {
@@ -1294,16 +1309,33 @@ function loadPackage() {
   }
 }
 
+
+const showAuthAlert = ref(false);
+const props = defineProps({
+  pkg: {
+    type: Object,
+    default: null
+  }
+});
 // function handleBook() {
 //   // 💡 id နေရာမှာ route.params.id ကို သုံးပြီး လမ်းကြောင်းမှန်အောင် ပြင်ထားပါတယ်
 //   router.push('/packagedetail/' + route.params.id)
 // }
 // handleBook function ကို ရှာပြီး အောက်ကအတိုင်း ပြောင်းရေးပါ
-const handleBook = () => {
+
+
+const handleBookNow = () => {
   if (pkg.value && pkg.value.id) {
-    router.push({ name: 'booking', params: { id: pkg.value.id } })
+    const authStore = useAuthStore();
+
+  if (!authStore.isLoggedIn) {
+    showAuthAlert.value = true;
+  } else {
+    // [Existing Flow] Proceed to booking
+   router.push(`/booking/${pkg.value.id}`);
   }
 }
+};
 
 function toggleWishlist() {
   inWishlist.value = !inWishlist.value
@@ -1315,6 +1347,22 @@ watch(() => route.params.id, loadPackage)
 
 <style scoped>
 /* CSS styles များကို နဂိုအတိုင်း ချန်လှပ်ထားပါသည် */
+.auth-modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.auth-modal-content {
+  background: white; padding: 24px; border-radius: 16px;
+  width: 90%; max-width: 400px; text-align: center;
+}
+.auth-dialog-icon { font-size: 40px; margin-bottom: 10px; }
+.auth-dialog-title { margin-bottom: 10px; color: #1e293b; font-weight: 700; }
+.auth-actions { display: flex; gap: 10px; margin-top: 20px; }
+.auth-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; }
+.auth-btn.login { background: #00bcd4; color: white; }
+.auth-btn.cancel { background: #e2e8f0; color: #64748b; }
 .detail-page {
   background: #f8fafc;
   min-height: 100vh;

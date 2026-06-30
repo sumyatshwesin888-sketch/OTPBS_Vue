@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import { useAuthStore } from '../store/auth';
 
 import PackageDetailView from '../components/PackageDetailView.vue';
 import BookingPage from '../components/BookingPage.vue';
@@ -93,5 +94,10 @@ const router = createRouter({
 
   ],
 })
-
+router.beforeEach((to) => {
+  const authStore = useAuthStore();
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    return { name: 'Login' };
+  }
+});
 export default router

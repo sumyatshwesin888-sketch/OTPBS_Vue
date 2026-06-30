@@ -90,11 +90,20 @@
   
 </template>
 <script>
+import { useAuthStore } from '../store/auth';
 export default {
   data() {
     return {
 
+      errors: {},
        selectedPackage: null,
+       form: { 
+        name: '', 
+        email: '', 
+        phone: '', 
+        travelers: 1, 
+        date: '' 
+      },
       packagesDataset: [
         
     {id: 1,
@@ -1126,6 +1135,21 @@ currentStep: 1,
       return this.selectedPackage.price * this.form.travelers;
     }
   },
+
+  created() {
+    const authStore = useAuthStore();
+
+    // 1. Authentication Check: Redirect to login if not logged in
+    if (!authStore.isLoggedIn) {
+      this.$router.push('/login');
+      return;
+    }
+    if (authStore.user) {
+      this.form.name = authStore.user.fullName || '';
+      this.form.phone = authStore.user.phone || '';
+      this.form.email = authStore.user.email || '';
+    }
+  },
   mounted() {
     this.loadSelectedPackage();
     const today = new Date().toISOString().split('T')[0];
@@ -1157,32 +1181,12 @@ currentStep: 1,
   // 3. Validation စစ်ဆေးခြင်း
   validateForm() {
     this.errors = {};
-    if (!this.form.name) this.errors.name = "Full Name is required";
-    if (!/^\S+@\S+\.\S+$/.test(this.form.email)) this.errors.email = "Invalid email";
-    
-    // Errors မရှိပါက သိမ်းဆည်းပြီး Payment Page သို့သွားပါ
-    if (Object.keys(this.errors).length === 0) {
-      const bookingData = {
-        id: "BK-" + Math.floor(Math.random() * 90000 + 10000),
-        package: this.selectedPackage, // package object အပြည့်အစုံ
-  travelerInfo: {
-    name: this.form.name,
-    phone: this.form.phone,
-    email: this.form.email,
-    travelers: this.form.travelers,
-    date: this.form.date
-  },
-  package: {
-        title: this.selectedPackage.title,     // The package title
-        duration: this.selectedPackage.duration, // The package duration
-        image: this.selectedPackage.image
-      },
-  totalAmount: this.totalPrice
-      };
-      localStorage.setItem('booking_data', JSON.stringify(bookingData));
-      this.saveBookingData();
-      this.$router.push('/payment');
-    }
+      if (!this.form.name) this.errors.name = 'Full name is required';
+      
+      if (Object.keys(this.errors).length === 0) {
+        // Proceed to payment (update route as per your project)
+        this.$router.push('/payment');
+      }
   },
 
   // 4. Button နှိပ်သည့်အခါ ခေါ်မည့် Function
