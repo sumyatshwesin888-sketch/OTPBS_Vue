@@ -3,15 +3,16 @@
     <main class="login-card">
       <h2 class="card-title">Welcome Back!</h2>
       <p class="card-subtitle">Unlock exclusive travel deals & book your dream trip!</p>
-       
+
       <form @submit.prevent="handleSubmit" class="form-content">
         <div class="input-group">
           <i class="fa-solid fa-envelope input-icon"></i>
-          <input 
-            type="email" 
-            v-model="formData.email" 
-            placeholder="Email Address" 
-            required 
+          <input
+            type="email"
+            v-model="formData.email"
+            placeholder="Email Address"
+            :disabled="loading"
+            required
           />
         </div>
 
@@ -21,6 +22,7 @@
             :type="isPasswordVisible ? 'text' : 'password'"
             v-model="formData.password"
             placeholder="Password"
+            :disabled="loading"
             required
           />
           <span class="toggle-password" @click.stop="togglePasswordVisibility">
@@ -65,7 +67,7 @@
 
         <div class="form-options">
           <label class="remember-me">
-            <input type="checkbox" v-model="formData.rememberMe" />
+            <input type="checkbox" v-model="formData.rememberMe" :disabled="loading" />
             <span>Remember Me</span>
           </label>
           <a href="#" @click.prevent="handleForgotPassword" class="forgot-password">
@@ -73,13 +75,16 @@
           </a>
         </div>
 
-        <button type="submit" class="btn-submit">
-          Log In <span class="arrow">→</span>
+        <button type="submit" class="btn-submit" :disabled="loading || !formValid">
+          <span v-if="loading" class="spinner"></span>
+          <span v-else>Log In <span class="arrow">→</span></span>
         </button>
       </form>
 
       <footer class="card-footer">
-        <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+        <p>
+          Don't have an account? <a href="/signup" @click.prevent="navigateToSignUp">Sign Up</a>
+        </p>
       </footer>
     </main>
   </div>
@@ -96,49 +101,106 @@ export default {
         rememberMe: false,
       },
       isPasswordVisible: false,
+      loading: false, // UI မှာ  Loading state ပြရန်
     }
   },
+  computed: {
+    
+    formValid() {
+      return !!(this.formData.email && this.formData.password && this.formData.password.length >= 6)
+    },
+  },
   methods: {
+    togglePasswordVisibility() {
+      this.isPasswordVisible = !this.isPasswordVisible
+    },
+
     handleSubmit() {
-      const savedUser = localStorage.getItem('user_account')
+      this.loading = true
 
-      if (!savedUser) {
-        alert('No account found! Please Sign Up first.')
-        this.$router.push('/signup')
-        return
-      }
+      
+      setTimeout(() => {
+        // ------------------ ၁။ ADMIN ACCOUNT LOGIN CHECK ------------------
+        if (this.formData.email === 'admin@gmail.com') {
+          if (this.formData.password === '123456') {
+            alert('Admin Logged In Successfully!')
 
-      const user = JSON.parse(savedUser)
+            const adminData = {
+              email: this.formData.email,
+              name: 'Admin',
+              full_name: 'Admin',
+              role: 'ADMIN',
+            }
 
-      if (this.formData.email === user.email && this.formData.password === user.password) {
-        alert('Logged In Successfully!')
-        
-        localStorage.setItem('is_logged_in', 'true')
-                const loginData = {
-          ...user,
-          name: user.username || user.name || 'User',
-          email: user.email
+            
+            this.$store.commit('SET_USER', adminData)
+
+            // Remember Me ပေါ်မူတည်ပြီး သိမ်း
+            if (this.formData.rememberMe) {
+              localStorage.setItem('travelAdminAuth', 'true')
+              localStorage.setItem('travelAdminUser', JSON.stringify(adminData))
+            } else {
+              sessionStorage.setItem('travelAdminAuth', 'true')
+              sessionStorage.setItem('travelAdminUser', JSON.stringify(adminData))
+            }
+
+            localStorage.setItem('user_role', 'ADMIN')
+            localStorage.setItem('is_logged_in', 'true')
+
+            this.loading = false
+            this.$router.push('/admin/dashboard')
+          } else {
+            this.loading = false
+            alert('Invalid Admin Password! Please try again.')
+          }
+          return
         }
-        
-        this.$store.commit('SET_USER', loginData)
-        
-        this.$router.push('/')
-      } else {
-        alert('Invalid Email or Password! Please try again.')
-      }
+
+        // ------------------ ၂။ CUSTOMER/USER LOGIN CHECK ------------------
+        const savedUser = localStorage.getItem('user_account')
+
+        if (!savedUser) {
+          this.loading = false
+          alert('No account found! Please Sign Up first.')
+          this.$router.push('/signup')
+          return
+        }
+
+        const user = JSON.parse(savedUser)
+
+        if (this.formData.email === user.email && this.formData.password === user.password) {
+          alert('Logged In Successfully!')
+
+          localStorage.setItem('user_role', 'CUSTOMER')
+          localStorage.setItem('is_logged_in', 'true')
+
+          // User Information များကို App State Management (Vuex) ထဲသို့ စနစ်တကျ ထည့်သွင်းခြင်း
+          const loginData = {
+            ...user,
+            name: user.username || user.name || 'User',
+            full_name: user.username || user.name || 'User', // ဤလိုင်းအသစ် ထည့်ထားသည်
+            email: user.email,
+          }
+          this.$store.commit('SET_USER', loginData)
+
+          this.loading = false
+          this.$router.push('/')
+        } else {
+          this.loading = false
+          alert('Invalid Email or Password! Please try again.')
+        }
+      }, 600)
     },
-    loginWithSocial(platform) {
-      console.log(`Logging in with ${platform}`)
-    },
+
     handleForgotPassword() {
       console.log('Redirect to Forgot Password Page')
     },
+
     navigateToSignUp() {
       this.$router.push('/signup')
     },
   },
 }
-
 </script>
 
 <style scoped>
@@ -154,7 +216,8 @@ export default {
 .login-container {
   width: 100%;
   min-height: 100vh;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('public/login.avif');
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('public/login.avif');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -211,7 +274,7 @@ export default {
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  z-index: 2; 
+  z-index: 2;
 }
 
 .input-group input {
@@ -225,13 +288,18 @@ export default {
   outline: none;
   transition: all 0.3s ease;
   position: relative;
-  z-index: 1; 
+  z-index: 1;
 }
 
 .input-group input:focus {
   border-color: #00bcd4;
   background-color: #ffffff;
   box-shadow: 0 0 0 4px rgba(0, 188, 212, 0.1);
+}
+
+.input-group input:disabled {
+  background-color: #e2e8f0;
+  cursor: not-allowed;
 }
 
 .toggle-password {
@@ -244,9 +312,9 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px; 
-  height: 24px; 
-  z-index: 3; 
+  width: 24px;
+  height: 24px;
+  z-index: 3;
 }
 
 .svg-icon {
@@ -307,15 +375,39 @@ export default {
   align-items: center;
   gap: 8px;
   margin-top: 10px;
-  transition: background 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    transform 0.1s;
 }
 
-.btn-submit:hover {
+.btn-submit:hover:not(:disabled) {
   background: #00acc1;
 }
 
-.btn-submit:active {
+.btn-submit:active:not(:disabled) {
   transform: scale(0.98);
+}
+
+.btn-submit:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Button အတွင်းမှာ လည်မည့် Loading CSS */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .arrow {
