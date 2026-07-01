@@ -38,6 +38,8 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null;
     profile.value = null;
     localStorage.removeItem('user');
+    localStorage.removeItem("is_logged_in");
+localStorage.removeItem("current_user");
   }
 
   // Placeholder for compatibility if your components call this

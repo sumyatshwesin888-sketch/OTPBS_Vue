@@ -1,5 +1,6 @@
 <template>
   <div class="travelgo-about-wrapper">
+    <!-- Header Banner -->
     <header class="about-hero-banner">
       <div class="hero-image-overlay"></div>
       <div class="hero-text-content">
@@ -9,6 +10,7 @@
     </header>
 
     <main class="about-main-container">
+      <!-- Our Story Section -->
       <section class="our-story-section">
         <div class="story-info-side">
           <h2>Our Story</h2>
@@ -24,7 +26,7 @@
             Our team of travel experts works 24/7 to bring you the best travel packages, exclusive
             deals, and excellent service.
           </p>
-          <button class="action-btn-learn" @click="onLearnMoreClick">Learn More</button>
+          <button class="action-btn-learn" @click="scrollToValues">Learn More</button>
         </div>
         <div class="story-image-side">
           <img
@@ -35,6 +37,7 @@
         </div>
       </section>
 
+      <!-- Floating Stats Bar -->
       <section class="floating-stats-bar">
         <div v-for="(item, idx) in statsBlock" :key="'stat-' + idx" class="single-stat-box">
           <div class="stat-icon-circle" :style="{ backgroundColor: item.bg, color: item.color }">
@@ -47,6 +50,7 @@
         </div>
       </section>
 
+      <!-- Why Choose Us Section -->
       <section class="why-choose-us-section">
         <h2>Why Choose Us?</h2>
         <div class="features-flex-grid">
@@ -61,6 +65,22 @@
               <h4>{{ feat.title }}</h4>
               <p>{{ feat.desc }}</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Core Values Section (Team အစား ဒီဇိုင်းဆန်းဆန်းလေး ပြောင်းလဲထားသောအပိုင်း) -->
+      <section ref="valuesSection" class="core-values-section">
+        <h2>Our Core Values</h2>
+        <p class="section-subtitle">The principles that guide our journeys</p>
+
+        <div class="values-flex-grid">
+          <div v-for="(val, idx) in valuesBlock" :key="'value-' + idx" class="value-card-item">
+            <div class="value-icon-box" :style="{ color: val.color }">
+              <i :class="val.icon"></i>
+            </div>
+            <h4>{{ val.title }}</h4>
+            <p>{{ val.desc }}</p>
           </div>
         </div>
       </section>
@@ -88,11 +108,7 @@ export default {
           bg: '#e6f4ea',
           color: '#137333',
         },
-        { count: '3+', 
-          label: 'Countries', 
-          icon: 'fas fa-globe', 
-          bg: '#fef7e0', 
-          color: '#b06000' },
+        { count: '3+', label: 'Countries', icon: 'fas fa-globe', bg: '#fef7e0', color: '#b06000' },
         {
           count: '24/7',
           label: 'Customer Support',
@@ -131,24 +147,45 @@ export default {
           color: '#a855f7',
         },
       ],
+      // Core Values Data
+      valuesBlock: [
+        {
+          title: 'Eco-Friendly Tourism',
+          desc: 'We promote responsible travel to protect natural habitats and support local communities.',
+          icon: 'fas fa-leaf',
+          color: '#137333',
+        },
+        {
+          title: 'Customer-First Mindset',
+          desc: 'Your comfort and happiness are at the heart of everything we plan and design.',
+          icon: 'fas fa-heart',
+          color: '#c5221f',
+        },
+        {
+          title: 'Seamless Integration',
+          desc: 'Making booking, traveling, and exploring as smooth and digital as possible.',
+          icon: 'fas fa-bolt',
+          color: '#b06000',
+        },
+      ],
     }
   },
   methods: {
-    onLearnMoreClick() {
-      console.log('Learn more navigation logic here.')
+    scrollToValues() {
+      if (this.$refs.valuesSection) {
+        this.$refs.valuesSection.scrollIntoView({ behavior: 'smooth' })
+      }
     },
   },
 }
 </script>
 
 <style scoped>
-.travelgo-about-wrapper{
+.travelgo-about-wrapper {
   background-color: rgb(236, 249, 254);
-}
-.travelgo-about-page {
-  background-color: #f8fafc;
   color: #1e293b;
   min-height: 100vh;
+  padding-bottom: 60px;
 }
 
 .about-main-container {
@@ -159,7 +196,7 @@ export default {
 
 .about-hero-banner {
   position: relative;
-  background-image:url('img/about.jpg');
+  background-image: url('public/about.jpg');
   background-size: cover;
   background-position: center 30%;
   height: 300px;
@@ -197,10 +234,14 @@ export default {
   align-items: center;
   gap: 50px;
   margin: 60px 0;
+  position: relative;
 }
 
 .story-info-side {
   flex: 1.1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .story-info-side h2 {
@@ -229,11 +270,12 @@ export default {
   margin-top: 10px;
   box-shadow: 0 4px 14px rgba(26, 115, 232, 0.3);
   transition: all 0.2s ease-in-out;
+  display: inline-block;
 }
 
 .action-btn-learn:hover {
   background-color: #1557b0;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .story-image-side {
@@ -290,12 +332,9 @@ export default {
   font-weight: 500;
 }
 
-/* ========================================================
-   4. Why Choose Us Section
-   ======================================================== */
 .why-choose-us-section {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 60px;
 }
 
 .why-choose-us-section h2 {
@@ -350,12 +389,76 @@ export default {
   margin: 0;
 }
 
+/* Core Values Section CSS */
+.core-values-section {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: 40px;
+}
+
+.core-values-section h2 {
+  font-size: 2.2rem;
+  color: #0f172a;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.section-subtitle {
+  color: #64748b;
+  font-size: 1.05rem;
+  margin-bottom: 40px;
+}
+
+.values-flex-grid {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+}
+
+.value-card-item {
+  flex: 1;
+  max-width: 350px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 40px 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.015);
+  border: 1px solid rgba(241, 245, 249, 0.6);
+  transition: all 0.3s ease;
+}
+
+.value-card-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+}
+
+.value-icon-box {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.value-card-item h4 {
+  font-size: 1.25rem;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+}
+
+.value-card-item p {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
 /* Responsive Grid Setup */
 @media (max-width: 992px) {
   .our-story-section {
     flex-direction: column;
     gap: 35px;
     text-align: center;
+  }
+  .story-info-side {
+    align-items: center;
   }
   .floating-stats-bar {
     flex-wrap: wrap;
@@ -367,10 +470,13 @@ export default {
     justify-content: flex-start;
     padding-left: 15%;
   }
-  .features-flex-grid {
+  .features-flex-grid,
+  .values-flex-grid {
     flex-wrap: wrap;
+    justify-content: center;
   }
-  .feature-card-item {
+  .feature-card-item,
+  .value-card-item {
     flex: 1 1 43%;
   }
 }
@@ -381,7 +487,8 @@ export default {
     padding-left: 0;
     justify-content: center;
   }
-  .feature-card-item {
+  .feature-card-item,
+  .value-card-item {
     flex: 1 1 100%;
   }
   .hero-text-content h1 {

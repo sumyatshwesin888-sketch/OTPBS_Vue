@@ -41,6 +41,7 @@
       </div>
 
       <div class="action-buttons">
+        <button class="back-btn" @click="$router.go(-1)">Back</button>
         <button class="btn-outline" @click="downloadReceipt">Download Receipt</button>
         <button class="btn-primary" @click="$router.push('/packages')">Browse More Packages</button>
       </div>
@@ -74,41 +75,285 @@ export default {
 
 <style scoped>
 
-.card details-card{border-radius: 25%;}
-.page-wrapper { max-width: 900px; margin: 0 auto; padding: 20px; }
-.card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-
-/* Grid Layout */
-.booking-content { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; margin-top: 20px; }
-
-/* Success Card */
-.success-card { text-align: center; margin-bottom: 20px; }
-.success-icon { width: 50px; height: 50px; background: #22c55e; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; }
-
-/* Package Card */
-.package-header { display: flex; justify-content: space-between; align-items: center; }
-.duration-badge { background: #f0fdf4; color: #166534; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-
-/* Details */
-.section-title { margin-bottom: 20px; border-bottom: 1px solid #f3f4f6; padding-bottom: 10px; }
-.row { display: flex; justify-content: space-between; margin-bottom: 15px; }
-.total { font-size: 1.3rem; color: #22c55e; font-weight: 800; margin-top: 10px; }
-
-/* Responsive */
-@media (max-width: 768px) {
-  .booking-content { grid-template-columns: 1fr; }
+.page-wrapper {
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 42px 20px;
+  font-family: "Inter", sans-serif;
+  background: radial-gradient(circle at top, #eaf3ff, #f6f9ff);
 }
 
-/* Stepper (Keep original) */
-.stepper-container { display: flex; justify-content: center; margin-bottom: 40px; }
-.stepper { display: flex; align-items: center; gap: 20px; }
-.step { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #9ca3af; }
-.circle { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #d1d5db; display: flex; align-items: center; justify-content: center; font-weight: bold; background: white; }
-.step.active .circle { background: #22c55e; border-color: #22c55e; color: white; }
-.line { width: 80px; height: 2px; background: #d1d5db; margin-top: -20px; }
+/* STEP PROGRESS (premium blue glass) */
+.stepper-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+}
 
-/* Buttons */
-.action-buttons { display: flex; gap: 15px; margin-top: 30px; }
-.btn-primary { flex: 1; padding: 15px; background: #22c55e; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
-.btn-outline { flex: 1; padding: 15px; background: white; border: 1px solid #22c55e; color: #22c55e; border-radius: 12px; cursor: pointer; font-weight: 600; }
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.08);
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 2px solid #dbeafe;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.step.active .circle {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.35);
+}
+
+.step.completed .circle {
+  background: #1d4ed8;
+  color: white;
+  border-color: #1d4ed8;
+}
+
+.line {
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(to right, #dbeafe, #93c5fd);
+}
+
+/* GRID */
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 26px;
+}
+
+/* BASE CARD */
+.card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 22px;
+  padding: 26px;
+  box-shadow: 0 18px 45px rgba(30, 64, 175, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.08);
+}
+
+/* =========================
+   ✨ SUCCESS CARD (AIR TICKET STYLE)
+========================= */
+.success-card {
+  position: relative;
+  text-align: center;
+  padding: 42px 25px;
+  border-radius: 22px;
+  color: white;
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+  overflow: hidden;
+}
+
+/* animated glow */
+.success-card::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  top: -80px;
+  right: -80px;
+  filter: blur(30px);
+}
+
+.success-card::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.25);
+  top: 55%;
+  left: 0;
+  transform: rotate(-6deg);
+}
+
+.success-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.success-card h1 {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.success-card p {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* =========================
+   🎟️ DETAILS CARD (TICKET STYLE)
+========================= */
+.details-card {
+  position: relative;
+  border-radius: 22px;
+  border: 1px solid #e0e7ff;
+}
+
+/* ticket cut effect */
+.details-card::before,
+.details-card::after {
+  content: "";
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  background: #f6f9ff;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.details-card::before {
+  left: -14px;
+}
+
+.details-card::after {
+  right: -14px;
+}
+
+/* HEADER */
+.package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.package-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.package-header p {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.duration-badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1d4ed8;
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+}
+
+/* ROWS */
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 11px 0;
+  font-size: 14px;
+  border-bottom: 1px dashed #e5e7eb;
+  color: #334155;
+}
+
+.row strong {
+  color: #0f172a;
+}
+
+/* TOTAL */
+.total {
+  border: none;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1d4ed8;
+  padding-top: 14px;
+}
+
+/* BUTTONS */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  border: 2px solid #1d4ed8;
+  background: white;
+  color: #1d4ed8;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.back-btn {
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid #cbd5f5;
+  background: white;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .checkout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+}
 </style>

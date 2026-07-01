@@ -74,6 +74,14 @@
 <script>
 export default {
   name: 'App',
+  created() {
+    const savedUser = localStorage.getItem("user");
+
+    if (savedUser && !this.$store.state.user) {
+      this.$store.commit("SET_USER", JSON.parse(savedUser));
+    }
+  },
+
   methods: {
     handleLogout() {
       this.$store.dispatch('logout').then(() => {

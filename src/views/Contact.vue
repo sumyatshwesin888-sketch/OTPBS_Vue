@@ -1,7 +1,7 @@
 <template>
   <div class="travelgo-contact-wrapper">
     <div class="contact-container">
-      
+      <!-- Left Side: Contact Information -->
       <div class="contact-info-side">
         <h1 class="main-title">Contact Us</h1>
         <p class="subtitle">We'd love to hear from you!</p>
@@ -55,15 +55,26 @@
 
       <div class="contact-form-card">
         <form @submit.prevent="handleSubmit">
-          
           <div class="form-row">
             <div class="form-group">
               <label for="fullName">Full Name</label>
-              <input type="text"  id="fullName" v-model="formData.fullName" placeholder="Enter your full name" required>
+              <input
+                type="text"
+                id="fullName"
+                v-model="formData.fullName"
+                placeholder="Enter your full name"
+                required
+              />
             </div>
             <div class="form-group">
               <label for="email">Email Address</label>
-              <input  type="email"  id="email"  v-model="formData.email"  placeholder="Enter your email" required>
+              <input
+                type="email"
+                id="email"
+                v-model="formData.email"
+                placeholder="Enter your email"
+                required
+              />
             </div>
           </div>
 
@@ -82,16 +93,20 @@
 
           <div class="form-group full-width">
             <label for="message">Message</label>
-            <textarea id="message" v-model="formData.message" placeholder="Type your message..." rows="5" required></textarea>
+            <textarea
+              id="message"
+              v-model="formData.message"
+              placeholder="Type your message..."
+              rows="5"
+              required
+            ></textarea>
           </div>
 
           <button type="submit" class="submit-btn">
             <i class="fas fa-paper-plane"></i> Send Message
           </button>
-
         </form>
       </div>
-
     </div>
   </div>
 </template>
@@ -105,35 +120,35 @@ export default {
         fullName: '',
         email: '',
         subject: '',
-        message: ''
-      }
-    };
+        message: '',
+      },
+    }
   },
   methods: {
     handleSubmit() {
-      console.log('Form Data Submitted:', this.formData);
-      alert('Your message has been sent successfully!');
-      
+      console.log('Form Data Submitted:', this.formData)
+      alert('Your message has been sent successfully!')
+
       this.formData = {
         fullName: '',
         email: '',
         subject: '',
-        message: ''
-      };
-    }
-  }
-};
+        message: '',
+      }
+    },
+  },
+}
 </script>
 
 <style scoped>
 .travelgo-contact-wrapper {
-  background-color: #f1f5f9;
+  background-color: #0b132b;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  min-height: calc(100vh - 80px); /* Navigation bar နေရာစာ ချန်ထားတာပါ */
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
 }
 
 .contact-container {
@@ -141,11 +156,8 @@ export default {
   width: 100%;
   margin: 0 auto;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 60px;
-  background-size: 60% auto;
-  background-repeat: no-repeat;
-  background-position: left center;
 }
 
 .contact-info-side {
@@ -153,30 +165,31 @@ export default {
 }
 
 .main-title {
-  font-size: 2.8rem;
+  font-size: 3rem;
   font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 8px 0;
+  color: #ffffff; 
+  margin: 0 0 10px 0;
+  letter-spacing: -0.5px;
 }
 
 .subtitle {
-  font-size: 1.4rem;
-  color: #1e3a8a;
+  font-size: 1.35rem;
+  color: #3b82f6; 
   font-weight: 600;
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
 }
 
 .description {
-  color: #475569;
+  color: #94a3b8; 
   font-size: 1.05rem;
-  line-height: 1.6;
+  line-height: 1.7;
   margin: 0 0 40px 0;
 }
 
 .info-list {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
 }
 
 .info-item {
@@ -186,21 +199,29 @@ export default {
 }
 
 .icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: #ffffff;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px; 
+  background-color: rgba(255, 255, 255, 0.05); 
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  font-size: 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.phone-ic { color: #2563eb; }
-.email-ic { color: #3b82f6; }
-.address-ic { color: #10b981; }
-.hours-ic { color: #64748b; }
+.phone-ic {
+  color: #60a5fa;
+}
+.email-ic {
+  color: #60a5fa;
+}
+.address-ic {
+  color: #34d399;
+}
+.hours-ic {
+  color: #94a3b8;
+}
 
 .info-text {
   display: flex;
@@ -208,15 +229,17 @@ export default {
 }
 
 .info-text .label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #64748b;
   font-weight: 600;
-  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
 }
 
 .info-text .value {
-  font-size: 1.05rem;
-  color: #1e293b;
+  font-size: 1.1rem;
+  color: #f1f5f9; 
   font-weight: 500;
   line-height: 1.4;
 }
@@ -224,15 +247,14 @@ export default {
 .contact-form-card {
   flex: 1.2;
   background-color: #ffffff;
-  border-radius: 20px;
-  padding: 45px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(241, 245, 249, 0.9);
+  border-radius: 24px;
+  padding: 50px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); 
 }
 
 .form-row {
   display: flex;
-  gap: 20px;
+  gap: 24px;
   margin-bottom: 24px;
 }
 
@@ -247,24 +269,24 @@ export default {
 }
 
 .form-group label {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #475569;
+  color: #334155;
   margin-bottom: 8px;
 }
 
-.form-group input, 
+.form-group input,
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 18px;
   border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 1rem;
-  color: #1e293b;
+  color: #0f172a;
   background-color: #f8fafc;
   box-sizing: border-box;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .form-group input::placeholder,
@@ -272,13 +294,13 @@ export default {
   color: #94a3b8;
 }
 
-.form-group input:focus, 
+.form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: #1d4ed8;
   background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+  box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1);
 }
 
 .select-wrapper {
@@ -298,7 +320,7 @@ export default {
   font-family: 'Font Awesome 5 Free';
   font-weight: 900;
   position: absolute;
-  right: 16px;
+  right: 18px;
   top: 50%;
   transform: translateY(-50%);
   color: #64748b;
@@ -308,40 +330,43 @@ export default {
 
 .submit-btn {
   width: 100%;
-  background-color: #1d4ed8;
+  background-color: #1a73e8;
   color: #ffffff;
   border: none;
-  padding: 14px;
+  padding: 16px;
   font-size: 1.05rem;
   font-weight: 600;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  transition: background-color 0.2s ease;
-  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
+  transition: all 0.25s ease;
+  margin-top: 12px;
 }
 
 .submit-btn:hover {
-  background-color: #1e40af;
+  background-color: #1557b0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(26, 115, 232, 0.4);
 }
-
 
 @media (max-width: 992px) {
   .contact-container {
     flex-direction: column;
-    gap: 45px;
-    background-size: 100% auto;
+    gap: 50px;
   }
-  
-  .contact-info-side, 
+
+  .contact-info-side,
   .contact-form-card {
     width: 100%;
   }
-  
-  .main-title { font-size: 2.4rem; }
+
+  .main-title {
+    font-size: 2.6rem;
+  }
 }
 
 @media (max-width: 576px) {
@@ -349,9 +374,9 @@ export default {
     flex-direction: column;
     gap: 24px;
   }
-  
+
   .contact-form-card {
-    padding: 25px;
+    padding: 30px 20px;
   }
 }
 </style>

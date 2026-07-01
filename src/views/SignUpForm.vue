@@ -138,9 +138,11 @@ export default {
     return {
       formData: {
         fullName: '',
+        phone: '',
         email: '',
         password: '',
         confirmPassword: '',
+        terms: false,
       },
       isPasswordVisible: false,
       isConfirmPasswordVisible: false,
@@ -159,11 +161,9 @@ const appHeight = () => {
  methods: {
     togglePasswordVisibility() {
       this.isPasswordVisible = !this.isPasswordVisible
-      console.log('eye condition', this.isPasswordVisible)
     },
     toggleConfirmPasswordVisibility() {
       this.isConfirmPasswordVisible = !this.isConfirmPasswordVisible
-      console.log('eye condition', this.isConfirmPasswordVisible)
     },
     handleSubmit() {
       if (this.formData.password !== this.formData.confirmPassword) {
@@ -171,29 +171,39 @@ const appHeight = () => {
         return
       }
 
-      const userData = {
-        fullName: this.formData.fullName,
-        phone: this.formData.phone,
-        email: this.formData.email,
-        password: this.formData.password,
-        bio: '',
-        gender: ''
+      const existingUser = localStorage.getItem('user_account')
+      if (existingUser) {
+        const savedUser = JSON.parse(existingUser)
+        if (this.formData.email === savedUser.email) {
+          alert('Account already exists! Please log in instead.')
+          this.$router.push('/login')
+          return
+        }
       }
 
+      const userData = {
+        full_name: this.formData.fullName,
+        phone: this.formData.phone,
+        email: this.formData.email,
+        password: this.formData.password
+      }
       localStorage.setItem('user_account', JSON.stringify(userData))
       
-      console.log('Form Submitted Data & Saved to LocalStorage:', userData)
-      alert('Account Created Successfully! Please Log In.')
+      localStorage.setItem('is_logged_in', 'true')
       
-      this.$router.push('/login')
+      this.$store.commit('SET_USER', userData)
+      
+      alert('Account Created Successfully!')
+      
+      this.$router.push('/')
     },
     signUpWithSocial(platform) {
       console.log(`Signing up with ${platform}`)
     },
     navigateToLogin() {
-      console.log('Redirect to Login Page')
+      this.$router.push('/login')
     }
-  },
+  }
 }
 </script>
 
@@ -214,7 +224,7 @@ const appHeight = () => {
   width: 100vw;
   height: 100vh;
   height: var(--app-height, 100vh);
-  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('img/signupimg.png');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('public/signupimg.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -269,8 +279,6 @@ const appHeight = () => {
   padding: 30px 35px; 
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
   position: relative;
-  
-  /* မလှုပ်အောင် ထိန်းထားခြင်း */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   will-change: transform;

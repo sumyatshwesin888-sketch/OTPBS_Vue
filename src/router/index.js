@@ -2,8 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import { useAuthStore } from '../store/auth';
 
-import PackageDetailView from '../components/PackageDetailView.vue';
-import BookingPage from '../components/BookingPage.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -56,13 +54,10 @@ const router = createRouter({
   component: () => import('../components/BookingPage.vue') // Your booking component
 },
 
-    
-
-   
 
      {
       path: '/payment',
-      name: 'PaymentPage',
+      name: 'Payment',
       
       component: () => import('../components/PaymentPage.vue'),
     },
@@ -87,7 +82,19 @@ const router = createRouter({
       component: () => import('../views/PackageDetailView.vue'),
     },
 
+{
+      path: '/destinations',
+      name: 'destinations',
+      
+      component: () => import('../views/Destination.vue'),
+    },
 
+    {
+      path: '/destination/:name',
+      name: 'destination',
+      
+      component: () => import('../views/DestinationDetail.vue'),
+    },
 
 
 

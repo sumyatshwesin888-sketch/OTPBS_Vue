@@ -4,14 +4,16 @@
       <div class="banner-overlay"></div>
       <div class="banner-content">
         <h1 class="banner-title">Travel Packages</h1>
-        <p class="banner-subtitle">Choose from domestic Myanmar trips or international adventures</p>
-        
+        <p class="banner-subtitle">
+          Choose from domestic Myanmar trips or international adventures
+        </p>
+
         <div class="search-bar-container">
-          <span class="search-icon">🔍</span>
-          <input 
-            v-model="searchQuery" 
-            type="text" 
-            placeholder="Search by title, city, country, price, duration or group..." 
+          <v-icon class="search-icon" size="18" color="#64748B">mdi-magnify</v-icon>
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search by title, city, country, price, duration or group..."
             class="search-input"
           />
         </div>
@@ -20,36 +22,35 @@
 
     <div class="filter-controls-section">
       <div class="tabs-wrapper">
-        <button 
-          :class="['filter-tab-btn', { active: activeTab === 'all' }]" 
+        <button
+          :class="['filter-tab-btn', { active: activeTab === 'all' }]"
           @click="setActiveTab('all')"
         >
-          <span class="tab-icon">🗂️</span> All Packages
+          <v-icon size="18" class="mr-1">mdi-magnify</v-icon> All Packages
         </button>
-        <button 
-          :class="['filter-tab-btn', { active: activeTab === 'domestic' }]" 
+        <button
+          :class="['filter-tab-btn', { active: activeTab === 'domestic' }]"
           @click="setActiveTab('domestic')"
         >
-          <span class="tab-icon">📍</span> Domestic Trips
+          <v-icon size="18" class="mr-1">mdi-map-marker</v-icon> Domestic Trips
         </button>
-        <button 
-          :class="['filter-tab-btn', { active: activeTab === 'international' }]" 
+        <button
+          :class="['filter-tab-btn', { active: activeTab === 'international' }]"
           @click="setActiveTab('international')"
         >
-          <span class="tab-icon">🌐</span> International Trips
+          <v-icon size="18" class="mr-1">mdi-earth</v-icon> International Trips
         </button>
       </div>
     </div>
 
     <main class="packages-grid-section">
       <div class="container-max">
-        <div v-if="activeTab === 'all' && filteredAllPackages.length > 0" class="all-packages-layout">
+        <div
+          v-if="activeTab === 'all' && filteredAllPackages.length > 0"
+          class="all-packages-layout"
+        >
           <div class="packages-grid-layout">
-            <div 
-              v-for="pkg in filteredAllPackages" 
-              :key="pkg.id" 
-              class="package-premium-card"
-            >
+            <div v-for="pkg in filteredAllPackages" :key="pkg.id" class="package-premium-card">
               <div class="card-image-box">
                 <img :src="pkg.image" :alt="pkg.title" class="pkg-display-img" />
                 <span :class="['pkg-type-badge', pkg.type]">
@@ -59,8 +60,11 @@
 
               <div class="card-body-content">
                 <h3 class="pkg-card-title">{{ pkg.title }}</h3>
-                <div class="pkg-location-row">📍 {{ pkg.city }}, {{ pkg.country }}</div>
-                
+                <div class="pkg-location-row d-flex align-center">
+                  <v-icon size="14" color="#64748B" class="mr-1">mdi-map-marker</v-icon>
+                  {{ pkg.city }}, {{ pkg.country }}
+                </div>
+
                 <div class="pkg-meta-row">
                   <span class="pkg-duration">🕒 {{ pkg.duration }}</span>
                   <span class="pkg-group">👥 {{ pkg.group_size }}</span>
@@ -87,23 +91,27 @@
         </div>
 
         <div v-else-if="activeTab !== 'all' && Object.keys(filteredGroupedPackages).length > 0">
-          <div v-for="(packages, groupName) in filteredGroupedPackages" :key="groupName" class="location-group">
+          <div
+            v-for="(packages, groupName) in filteredGroupedPackages"
+            :key="groupName"
+            class="location-group"
+          >
             <div class="location-header">
-              <span class="location-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#10B981">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-              </span>
+              <v-icon
+                :color="activeTab === 'domestic' ? '#10B981' : '#3B82F6'"
+                size="22"
+                class="mr-1"
+              >
+                {{ activeTab === 'domestic' ? 'mdi-map-marker' : 'mdi-earth' }}
+              </v-icon>
+
               <h2 class="location-title">{{ groupName }}</h2>
+
               <span class="location-country">{{ packages[0].country }}</span>
             </div>
 
             <div class="packages-grid-layout">
-              <div 
-                v-for="pkg in packages" 
-                :key="pkg.id" 
-                class="package-premium-card"
-              >
+              <div v-for="pkg in packages" :key="pkg.id" class="package-premium-card">
                 <div class="card-image-box">
                   <img :src="pkg.image" :alt="pkg.title" class="pkg-display-img" />
                   <span :class="['pkg-level-badge', pkg.level]">
@@ -113,10 +121,26 @@
 
                 <div class="card-body-content">
                   <h3 class="pkg-card-title">{{ pkg.title }}</h3>
-                  
+
                   <div class="pkg-meta-row">
                     <span class="pkg-duration">🕒 {{ pkg.duration }}</span>
                     <span class="pkg-group">👥 {{ pkg.group_size }}</span>
+                  </div>
+
+                  <div
+                    class="pkg-ticket-status"
+                    style="font-size: 13px; margin-top: 4px; margin-bottom: 12px"
+                  >
+                    <span
+                      v-if="pkg.available_tickets > 0"
+                      :style="{
+                        color: pkg.available_tickets <= 5 ? '#ef4444' : '#10b981',
+                        fontWeight: '600',
+                      }"
+                    >
+                      🎟️ {{ pkg.available_tickets }} Tickets Left
+                    </span>
+                    <span v-else style="color: #ef4444; font-weight: 600"> 🚫 Out Of Stock </span>
                   </div>
 
                   <div class="pkg-rating-row">
@@ -149,440 +173,497 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-
 export default {
   name: 'PackagesView',
-  setup() {
-    const route = useRoute()
-    const activeTab = ref('all')
-    const searchQuery = ref('') // Search စာသား သိမ်းဆည်းရန် Variable
+  data() {
+    return {
+      activeTab: 'all',
+      searchQuery: '', // Search စာသား သိမ်းဆည်းရန် Variable
+      packagesData: []
+    }
+  },
+        // --- Hpa An Trips ---
+  created(){
+        // ၁။ Browser (localStorage) ထဲမှာ data ရှိပြီးသားလား စစ်မယ်
+    const savedPackages = localStorage.getItem('travel_packages');
 
-   const packagesData = ref([
-  
-      // --- Hpa An Trips --- 
-      {
-        id: 1,
-        title: 'Hpa-An Explore',
-        price: '195,000 MMK',
-        duration: '3 Days / 2 Nights',
-        group_size: '2 - 10 People',
-        rating: '4.7',
-        reviews: '45',
-        type: 'domestic',
-        level: 'budget',
-        city: 'Hpa An',
-        country: 'Myanmar',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM47OeGkz0jR-u1pXERcqjcANzdiJW8Qwlf-ADoF4QGplTaPI9TLIppc&s=10'
-      },
-      {
-        id: 2,
-        title: 'Hpa-An Adventure',
-        price: '390,000 MMK',
-        duration: '4Days / 3Nights',
-        group_size: '2-8 People',
-        rating: '4.8',
-        reviews: '72',
-        type: 'domestic',
-        level: 'standard',
-        city: 'Hpa An',
-        country: 'Myanmar',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC2F6dkl--5ZgGST33-gDENeFeDjfWokz5G0caN9E_sHarjggPWSNBUe0&s=10'
-      },
-      {
-        id: 3,
-        title: 'Hpa-An Luxury Retreat ',
-        price: '950,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-8 People',
-        rating: '5.0',
-        reviews: '38',
-        type: 'domestic',
-        level: 'premium',
-        city: 'Hpa An',
-        country: 'Myanmar',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhKjPwzLJT5EpxUj3ligmXhDLn6WOAxCdc3aoTQSiz8MhKwdmJxb3xOIkU&s=10'
-      },
-      // --- Bagan Trips --- 
-      {
-        id: 4,
-        title: 'Bagan Heritage  & Sunset Exolore',
-        price: '650,000 MMK',
-        duration: '3Days / 2Nights',
-        group_size: '2-15 People',
-        rating: '4.8',
-        reviews: '180',
-        type: 'domestic',
-        level: 'budget',
-        city: 'Bagan',
-        country: 'Myanmar',
-        image: 'https://images.unsplash.com/photo-1599403275295-57bca684efd3?q=80&w=1041&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-      },
-      {
-        id: 5,
-        title: 'Bagan Cultural Discovery & River Experience',
-        price: '950,000 MMK',
-        duration: '4Days / 3Nights',
-        group_size: '2-12 People',
-        rating: '4.9',
-        reviews: '220',
-        type: 'domestic',
-        level: 'standard',
-        city: 'Bagan',
-        country: 'Myanmar',
-        image: 'https://images.unsplash.com/photo-1515900959941-d1cce424f5c4?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-      },
-      {
-        id: 6,
-        title: 'Bagan Royal Balloon & Luxury Escape',
-        price: '1,850,000 MMK',
-        duration: '4Days / 3Nights',
-        group_size: '2-4 People(Private)',
-        rating: '5',
-        reviews: '62',
-        type: 'domestic',
-        level: 'premium',
-        city: 'Bagan',
-        country: 'Myanmar',
-        image: 'https://media.istockphoto.com/id/614446038/photo/hot-air-balloons-in-bagan-myanmar.jpg?s=612x612&w=0&k=20&c=nlxHdhqgEUUw_5M0dRlfhzHvjQG_epUqzLyUjcJJKmw='
-      },
-      // --- Ngwe Saung Trips --- 
-      {
-        id: 7,
-        title: 'Ngwe Saung Costal Escape',
-        price: '750,000 MMK',
-        duration: '4Days / 3Nights',
-        group_size: '2-20 People',
-        rating: '4.5',
-        reviews: '126',
-        type: 'domestic',
-        level: 'budget',
-        city: 'Ngwe Saung',
-        country: 'Myanmar',
-        image: 'https://www.mcs-myanmartravel.com/wp-content/uploads/2015/07/ngwesaung.jpg'
-      },
-      {
-        id: 8,
-        title: 'Ngwe Saung Coastal Experience',
-        price: '1,200,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-15 People',
-        rating: '4.8',
-        reviews: '246',
-        type: 'domestic',
-        level: 'standard',
-        city: 'Ngwe Saung',
-        country: 'Myanmar',
-        image: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/22/30/d2/d1/eskala-hotels-resorts.jpg?w=1200&h=-1&s=1'
-      },
-      {
-        id: 9,
-        title: 'Ngwe Saung Ocean Prestige',
-        price: '2,200,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-8 People',
-        rating: '4.9',
-        reviews: '89',
-        type: 'domestic',
-        level: 'premium',
-        city: 'Ngwe Saung',
-        country: 'Myanmar',
-        image: 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=600'
-      },
-      // --- Kalaw Trips --- 
-      {
-        id: 10,
-        title: 'Kalaw Nature & Trekking Experience',
-        price: '420,000 MMK',
-        duration: '3Days / 2Nigts',
-        group_size: '2-12 People',
-        rating: '4.7',
-        reviews: '135',
-        type: 'domestic',
-        level: 'budget',
-        city: 'Kalaw',
-        country: 'Myanmar',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSRG9FCoqjY-LUvTY_RQJ2EDSYiZIuv5pdTN22nhTS-g&s=10'
-      },
-      {
-        id: 11,
-        title: 'Kalaw & Inle Scenic Adventure',
-        price: '720,000 MMK',
-        duration: '4Days / 3Nights',
-        group_size: '2-10 People',
-        rating: '4.9',
-        reviews: '185',
-        type: 'domestic',
-        level: 'standard',
-        city: 'Kalaw',
-        country: 'Myanmar',
-        image: 'https://indochinatreks.com/wp-content/uploads/2022/12/12.-Kalaw-inle-lake-fishermen-istock.jpg'
-      },
-      {
-        id: 12,
-        title: 'Kalaw Luxury Mountain Retreat',
-        price: '1,250,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-6 People',
-        rating: '5',
-        reviews: '29',
-        type: 'domestic',
-        level: 'premium',
-        city: 'Kalaw',
-        country: 'Myanmar',
-        image: 'https://i.travelapi.com/lodging/16000000/15660000/15651600/15651577/182bbc8c_z.jpg'
-      },
+    if (savedPackages) {
+      // ရှိရင် အဲ့ဒီ data ကို ယူသုံးမယ် (ဒါမှ ဝယ်ထားတဲ့ လက်ကျန်တွေ ပါလာမှာပါ)
+      this.packagesData = JSON.parse(savedPackages);
+    } else {
+      // မရှိသေးရင် (App စဖွင့်ချင်းဆိုရင်) data ကို အသစ်သတ်မှတ်ပြီး localStorage ထဲ သိမ်းမယ်
+      const defaultPackages = [
 
-      // --- Thailand Trips --- 
       {
-        id: 13,
-        title: 'Bangkok City Tour',
-        price: '1,650,000 MMK',
-        duration: '4Days / 3Nights',
-        group_size: '2-12 People',
-        rating: '4.6',
-        reviews: '112',
-        type: 'international',
-        level: 'budget',
-        city: 'Bangkok',
-        country: 'Thailand',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZcLJa-cWwqzjwGQIJuINkTQ1ccor6N8ADP42u7BMhHZTdZmuumbOGCN_y&s=10'
-      },
-      {
-        id: 14,
-        title: 'Chiang Mai Cultural Heritage',
-        price: '2,550,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-10 People',
-        rating: '4.8',
-        reviews: '150',
-        type: 'international',
-        level: 'standard',
-        city: 'Chiang Mai',
-        country: 'Thailand',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsuqSWfs1NiHiKGMVxXP2vsi7f942K7nR-Pl7jYYKLuyFpTEKALyz1DdY&s=10'
-      },
-      {
-        id: 15,
-        title: 'Phuket Luxury Island Resort',
-        price: '4,450,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-4 People',
-        rating: '5.0',
-        reviews: '85',
-        type: 'international',
-        level: 'premium',
-        city: 'Phuket',
-        country: 'Thailand',
-        image: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?q=80&w=801&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-      },
-      // --- Japan Trips --- 
-      {
-        id: 16,
-        title: 'Tokyo City Explore',
-        price: '3,250,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-10 People',
-        rating: '4.8',
-        reviews: '142',
-        type: 'international',
-        level: 'budget',
-        city: 'Tokyo',
-        country: 'Japan',
-        image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&q=80&w=600'
-      },
-      {
-        id: 17,
-        title: 'Tokyo Mount Fuji Advanture',
-        price: '4,250,000 MMK',
-        duration: '6Days / 5Nights',
-        group_size: '2-10 People',
-        rating: '4.9',
-        reviews: '198',
-        type: 'international',
-        level: 'standard',
-        city: 'Tokyo',
-        country: 'Japan',
-        image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&q=80&w=600'
-      },
-      {
-        id: 18,
-        title: 'Osaka & Kyoto Cherry Blossom Tour',
-        price: '6,850,000 MMK',
-        duration: '6Days / 5Nights',
-        group_size: '2-6 People',
-        rating: '5.0',
-        reviews: '53',
-        type: 'international',
-        level: 'premium',
-        city: 'Osaka',
-        country: 'Japan',
-        image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=600'
-      },
-      // --- Singapore Trips --- 
-      {
-        id: 19,
-        title: 'Singapore City Escape',
-        price: '2,850,000 MMK',
-        duration: '4Days / 3Nights',
-        group_size: '2-25 People',
-        rating: '4.6',
-        reviews: '112',
-        type: 'international',
-        level: 'budget',
-        city: 'Singapore',
-        country: 'Singapore',
-        image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&q=80&w=600'
-      },
-      {
-        id: 20,
-        title: 'Singapore Advanture',
-        price: '3,850,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-20 People',
-        rating: '4.8',
-        reviews: '128',
-        type: 'international',
-        level: 'standard',
-        city: 'Singapore',
-        country: 'Singapore',
-        image: 'https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&q=80&w=600'
-      },
-      {
-        id: 21,
-        title: 'Singapore Luxury Prestige Escape',
-        price: '6,500,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-6 People',
-        rating: '4.9',
-        reviews: '156',
-        type: 'international',
-        level: 'premium',
-        city: 'Singapore',
-        country: 'Singapore',
-        image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600'
-      },
-      // --- China Trips --- 
-      {
-        id: 22,
-        title: 'Shanghai City Explore',
-        price: '1,950,000 MMK',
-        duration: '4Days / 3Nights',
-        group_size: '2-12 People',
-        rating: '4.7',
-        reviews: '165',
-        type: 'international',
-        level: 'budget',
-        city: 'Shanghai',
-        country: 'China',
-        image: 'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?auto=format&fit=crop&w=800&q=80'
-      },
-      {
-        id: 23,
-        title: 'Shanghai & Suzhou Cultural Discovery',
-        price: '2,950,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-10 People',
-        rating: '4.9',
-        reviews: '240',
-        type: 'international',
-        level: 'standard',
-        city: 'Shanghai',
-        country: 'China',
-        image: 'https://plus.unsplash.com/premium_photo-1664299326174-f73b66496733?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-      },
-      {
-        id: 24,
-        title: 'Shanghai Luxury Skyline ',
-        price: '4,850,000 MMK',
-        duration: '5Days / 4Nights',
-        group_size: '2-4 People',
-        rating: '5.0',
-        reviews: '95',
-        type: 'international',
-        level: 'premium',
-        city: 'Shanghai',
-        country: 'China',
-        image: 'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?auto=format&fit=crop&q=80&w=600'
-      }
-    ])
+          id: 1,
+          title: 'Hpa-An Explore',
+          price: '195,000 MMK',
+          duration: '3 Days / 2 Nights',
+          group_size: '2 - 10 People',
+          rating: '4.7',
+          reviews: '45',
+          type: 'domestic',
+          level: 'budget',
+          city: 'Hpa An',
+          country: 'Myanmar',
+          image:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM47OeGkz0jR-u1pXERcqjcANzdiJW8Qwlf-ADoF4QGplTaPI9TLIppc&s=10',
+          available_tickets: 20,
+        },
+        {
+          id: 2,
+          title: 'Hpa-An Adventure',
+          price: '390,000 MMK',
+          duration: '4Days / 3Nights',
+          group_size: '2-8 People',
+          rating: '4.8',
+          reviews: '72',
+          type: 'domestic',
+          level: 'standard',
+          city: 'Hpa An',
+          country: 'Myanmar',
+          image:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC2F6dkl--5ZgGST33-gDENeFeDjfWokz5G0caN9E_sHarjggPWSNBUe0&s=10',
+          available_tickets: 18,
+        },
+        {
+          id: 3,
+          title: 'Hpa-An Luxury Retreat ',
+          price: '950,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-8 People',
+          rating: '5.0',
+          reviews: '38',
+          type: 'domestic',
+          level: 'premium',
+          city: 'Hpa An',
+          country: 'Myanmar',
+          image:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhKjPwzLJT5EpxUj3ligmXhDLn6WOAxCdc3aoTQSiz8MhKwdmJxb3xOIkU&s=10',
+          available_tickets: 10,
+        },
+        // --- Bagan Trips ---
+        {
+          id: 4,
+          title: 'Bagan Heritage & Sunset Exolore',
+          price: '650,000 MMK',
+          duration: '3Days / 2Nights',
+          group_size: '2-15 People',
+          rating: '4.8',
+          reviews: '180',
+          type: 'domestic',
+          level: 'budget',
+          city: 'Bagan',
+          country: 'Myanmar',
+          image:
+            'https://images.unsplash.com/photo-1599403275295-57bca684efd3?q=80&w=1041&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          available_tickets: 20,
+        },
+        {
+          id: 5,
+          title: 'Bagan Cultural Discovery & River Experience',
+          price: '950,000 MMK',
+          duration: '4Days / 3Nights',
+          group_size: '2-12 People',
+          rating: '4.9',
+          reviews: '220',
+          type: 'domestic',
+          level: 'standard',
+          city: 'Bagan',
+          country: 'Myanmar',
+          image:
+            'https://images.unsplash.com/photo-1515900959941-d1cce424f5c4?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          available_tickets: 18,
+        },
+        {
+          id: 6,
+          title: 'Bagan Royal Balloon & Luxury Escape',
+          price: '1,850,000 MMK',
+          duration: '4Days / 3Nights',
+          group_size: '2-4 People(Private)',
+          rating: '5',
+          reviews: '62',
+          type: 'domestic',
+          level: 'premium',
+          city: 'Bagan',
+          country: 'Myanmar',
 
-    //  All Tab search bar
-    const filteredAllPackages = computed(() => {
-      if (!searchQuery.value) return packagesData.value
-      
-      const query = searchQuery.value.toLowerCase()
-      return packagesData.value.filter(pkg => {
-        return pkg.title.toLowerCase().includes(query) || 
-               pkg.city.toLowerCase().includes(query) || 
-               pkg.country.toLowerCase().includes(query) ||
-               pkg.price.toLowerCase().includes(query) ||
-               pkg.duration.toLowerCase().includes(query) ||
-               pkg.group_size.toLowerCase().includes(query) ||
-               pkg.level.toLowerCase().includes(query)
-      })
-    })
+          image:
+            'https://media.istockphoto.com/id/614446038/photo/hot-air-balloons-in-bagan-myanmar.jpg?s=612x612&w=0&k=20&c=nlxHdhqgEUUw_5M0dRlfhzHvjQG_epUqzLyUjcJJKmw=',
+          available_tickets: 10,
+        },
+        // --- Ngwe Saung Trips ---
+        {
+          id: 7,
+          title: 'Ngwe Saung Costal Escape',
+          price: '750,000 MMK',
+          duration: '4Days / 3Nights',
+          group_size: '2-20 People',
+          rating: '4.5',
+          reviews: '126',
+          type: 'domestic',
+          level: 'budget',
+          city: 'Ngwe Saung',
+          country: 'Myanmar',
+          image: 'https://www.mcs-myanmartravel.com/wp-content/uploads/2015/07/ngwesaung.jpg',
+          available_tickets: 20,
+        },
+        {
+          id: 8,
+          title: 'Ngwe Saung Coastal Experience',
+          price: '1,200,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-15 People',
+          rating: '4.8',
+          reviews: '246',
+          type: 'domestic',
+          level: 'standard',
+          city: 'Ngwe Saung',
+          country: 'Myanmar',
+          image:
+            'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/22/30/d2/d1/eskala-hotels-resorts.jpg?w=1200&h=-1&s=1',
+          available_tickets: 18,
+        },
+        {
+          id: 9,
+          title: 'Ngwe Saung Ocean Prestige',
+          price: '2,200,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-8 People',
+          rating: '4.9',
+          reviews: '89',
+          type: 'domestic',
+          level: 'premium',
+          city: 'Ngwe Saung',
+          country: 'Myanmar',
+          image:
+            'https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 10,
+        },
+        // --- Kalaw Trips ---
+        {
+          id: 10,
+          title: 'Kalaw Nature & Trekking Experience',
+          price: '420,000 MMK',
+          duration: '3Days / 2Nigts',
+          group_size: '2-12 People',
+          rating: '4.7',
+          reviews: '135',
+          type: 'domestic',
+          level: 'budget',
+          city: 'Kalaw',
+          country: 'Myanmar',
+          image:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSRG9FCoqjY-LUvTY_RQJ2EDSYiZIuv5pdTN22nhTS-g&s=10',
+          available_tickets: 20,
+        },
+        {
+          id: 11,
+          title: 'Kalaw & Inle Scenic Adventure',
+          price: '720,000 MMK',
+          duration: '4Days / 3Nights',
+          group_size: '2-10 People',
+          rating: '4.9',
+          reviews: '185',
+          type: 'domestic',
+          level: 'standard',
+          city: 'Kalaw',
+          country: 'Myanmar',
+          image:
+            'https://indochinatreks.com/wp-content/uploads/2022/12/12.-Kalaw-inle-lake-fishermen-istock.jpg',
+          available_tickets: 18,
+        },
+        {
+          id: 12,
+          title: 'Kalaw Luxury Mountain Retreat',
+          price: '1,250,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-6 People',
+          rating: '5',
+          reviews: '29',
+          type: 'domestic',
+          level: 'premium',
+          city: 'Kalaw',
+          country: 'Myanmar',
+          image:
+            'https://i.travelapi.com/lodging/16000000/15660000/15651600/15651577/182bbc8c_z.jpg',
+          available_tickets: 10,
+        },
+        // --- Thailand Trips ---
+        {
+          id: 13,
+          title: 'Bangkok City Tour',
+          price: '1,650,000 MMK',
+          duration: '4Days / 3Nights',
+          group_size: '2-12 People',
+          rating: '4.6',
+          reviews: '112',
+          type: 'international',
+          level: 'budget',
+          city: 'Bangkok',
+          country: 'Thailand',
+          image:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZcLJa-cWwqzjwGQIJuINkTQ1ccor6N8ADP42u7BMhHZTdZmuumbOGCN_y&s=10',
+          available_tickets: 20,
+        },
+        {
+          id: 14,
+          title: 'Chiang Mai Cultural Heritage',
+          price: '2,550,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-10 People',
+          rating: '4.8',
+          reviews: '150',
+          type: 'international',
+          level: 'standard',
+          city: 'Chiang Mai',
+          country: 'Thailand',
+          image:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsuqSWfs1NiHiKGMVxXP2vsi7f942K7nR-Pl7jYYKLuyFpTEKALyz1DdY&s=10',
+          available_tickets: 18,
+        },
+        {
+          id: 15,
+          title: 'Phuket Luxury Island Resort',
+          price: '4,450,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-4 People',
+          rating: '5.0',
+          reviews: '85',
+          type: 'international',
+          level: 'premium',
+          city: 'Phuket',
+          country: 'Thailand',
+          image:
+            'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?q=80&w=801&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          available_tickets: 10,
+        },
+        // --- Japan Trips ---
+        {
+          id: 16,
+          title: 'Tokyo City Explore',
+          price: '3,250,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-10 People',
+          rating: '4.8',
+          reviews: '142',
+          type: 'international',
+          level: 'budget',
+          city: 'Tokyo',
+          country: 'Japan',
+          image:
+            'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 20,
+        },
+        {
+          id: 17,
+          title: 'Tokyo Mount Fuji Advanture',
+          price: '4,250,000 MMK',
+          duration: '6Days / 5Nights',
+          group_size: '2-10 People',
+          rating: '4.9',
+          reviews: '198',
+          type: 'international',
+          level: 'standard',
+          city: 'Tokyo',
+          country: 'Japan',
+          image:
+            'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 18,
+        },
+        {
+          id: 18,
+          title: 'Osaka & Kyoto Cherry Blossom Tour',
+          price: '6,850,000 MMK',
+          duration: '6Days / 5Nights',
+          group_size: '2-6 People',
+          rating: '5.0',
+          reviews: '53',
+          type: 'international',
+          level: 'premium',
+          city: 'Osaka',
+          country: 'Japan',
+          image:
+            'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 10,
+        },
+        // --- Singapore Trips ---
+        {
+          id: 19,
+          title: 'Singapore City Escape',
+          price: '2,850,000 MMK',
+          duration: '4Days / 3Nights',
+          group_size: '2-25 People',
+          rating: '4.6',
+          reviews: '112',
+          type: 'international',
+          level: 'budget',
+          city: 'Singapore',
+          country: 'Singapore',
+          image:
+            'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 20,
+        },
+        {
+          id: 20,
+          title: 'Singapore Advanture',
+          price: '3,850,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-20 People',
+          rating: '4.8',
+          reviews: '128',
+          type: 'international',
+          level: 'standard',
+          city: 'Singapore',
+          country: 'Singapore',
+          image:
+            'https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 18,
+        },
+        {
+          id: 21,
+          title: 'Singapore Luxury Prestige Escape',
+          price: '6,500,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-6 People',
+          rating: '4.9',
+          reviews: '156',
+          type: 'international',
+          level: 'premium',
+          city: 'Singapore',
+          country: 'Singapore',
+          image:
+            'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 10,
+        },
+        // --- China Trips ---
+        {
+          id: 22,
+          title: 'Shanghai City Explore',
+          price: '1,950,000 MMK',
+          duration: '4Days / 3Nights',
+          group_size: '2-12 People',
+          rating: '4.7',
+          reviews: '165',
+          type: 'international',
+          level: 'budget',
+          city: 'Shanghai',
+          country: 'China',
+          image:
+            'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?auto=format&fit=crop&w=800&q=80',
+          available_tickets: 20,
+        },
+        {
+          id: 23,
+          title: 'Shanghai & Suzhou Cultural Discovery',
+          price: '2,950,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-10 People',
+          rating: '4.9',
+          reviews: '240',
+          type: 'international',
+          level: 'standard',
+          city: 'Shanghai',
+          country: 'China',
+          image:
+            'https://plus.unsplash.com/premium_photo-1664299326174-f73b66496733?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+          available_tickets: 18,
+        },
+        {
+          id: 24,
+          title: 'Shanghai Luxury Skyline ',
+          price: '4,850,000 MMK',
+          duration: '5Days / 4Nights',
+          group_size: '2-4 People',
+          rating: '5.0',
+          reviews: '95',
+          type: 'international',
+          level: 'premium',
+          city: 'Shanghai',
+          country: 'China',
+          image:
+            'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?auto=format&fit=crop&q=80&w=600',
+          available_tickets: 10,
+        },
+      ]
+      this.packagesData = defaultPackages;
+      localStorage.setItem('travel_packages', JSON.stringify(defaultPackages));
+    }
+  },
+  computed: {
+    // All Tab search bar
+    filteredAllPackages() {
+      if (!this.searchQuery) return this.packagesData
 
-    // Domestic ,International Group ခွဲပြီး ရှာ
-    const filteredGroupedPackages = computed(() => {
-      if (activeTab.value === 'all') return {}
-      
-      // လက်ရှိဖွင့်ထားသော Tab အလိုက် Type ကို အရင်ခွဲထုတ်
-      let filtered = packagesData.value.filter(pkg => pkg.type === activeTab.value)
-      
-      // Search Box ထဲ စာရိုက်ရင် ထပ်စစ်ပြီး Filter လုပ်
-      if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase()
-        filtered = filtered.filter(pkg => 
-          pkg.title.toLowerCase().includes(query) || 
-          pkg.city.toLowerCase().includes(query) || 
+      const query = this.searchQuery.toLowerCase()
+      return this.packagesData.filter((pkg) => {
+        return (
+          pkg.title.toLowerCase().includes(query) ||
+          pkg.city.toLowerCase().includes(query) ||
           pkg.country.toLowerCase().includes(query) ||
           pkg.price.toLowerCase().includes(query) ||
           pkg.duration.toLowerCase().includes(query) ||
           pkg.group_size.toLowerCase().includes(query) ||
           pkg.level.toLowerCase().includes(query)
         )
+      })
+    },
+    // Domestic, International Group ခွဲပြီး ရှာ
+    filteredGroupedPackages() {
+      if (this.activeTab === 'all') return {}
+
+      // လက်ရှိဖွင့်ထားသော Tab အလိုက် Type ကို အရင်ခွဲထုတ်
+      let filtered = this.packagesData.filter((pkg) => pkg.type === this.activeTab)
+
+      // Search Box ထဲ စာရိုက်ရင် ထပ်စစ်ပြီး Filter လုပ်
+      if (this.searchQuery) {
+        const query = this.searchQuery.toLowerCase()
+        filtered = filtered.filter(
+          (pkg) =>
+            pkg.title.toLowerCase().includes(query) ||
+            pkg.city.toLowerCase().includes(query) ||
+            pkg.country.toLowerCase().includes(query) ||
+            pkg.price.toLowerCase().includes(query) ||
+            pkg.duration.toLowerCase().includes(query) ||
+            pkg.group_size.toLowerCase().includes(query) ||
+            pkg.level.toLowerCase().includes(query),
+        )
       }
 
       const groups = {}
-      filtered.forEach(pkg => {
+      filtered.forEach((pkg) => {
         // Domestic ဆိုရင် 'city' (မြို့) အလိုက်၊ International ဆိုလျှင် 'country'အလိုက် ခေါင်းစဉ်ခွဲရန်
-        const key = activeTab.value === 'domestic' ? pkg.city : pkg.country
+        const key = this.activeTab === 'domestic' ? pkg.city : pkg.country
         if (!groups[key]) {
           groups[key] = []
         }
         groups[key].push(pkg)
       })
       return groups
-    })
-
-    const setActiveTab = (tab) => {
-      activeTab.value = tab
-    }
-
-    const checkRouteQuery = () => {
-      if (route.query.type === 'domestic' || route.query.type === 'international' || route.query.type === 'all') {
-        activeTab.value = route.query.type
+    },
+  },
+  mounted() {
+    this.checkRouteQuery()
+  },
+  methods: {
+    setActiveTab(tab) {
+      this.activeTab = tab
+    },
+    checkRouteQuery() {
+      if (
+        this.$route.query.type === 'domestic' ||
+        this.$route.query.type === 'international' ||
+        this.$route.query.type === 'all'
+      ) {
+        this.activeTab = this.$route.query.type
       }
-    }
-
-    onMounted(() => {
-      checkRouteQuery()
-    })
-
-    watch(() => route.query.type, () => {
-      checkRouteQuery()
-    })
-
-    return {
-      activeTab,
-      searchQuery,
-      filteredAllPackages,
-      filteredGroupedPackages,
-      setActiveTab
-    }
-  }
+    },
+  },
+  watch: {
+    '$route.query.type'() {
+      this.checkRouteQuery()
+    },
+  },
 }
 </script>
 
@@ -600,7 +681,7 @@ export default {
 .packages-hero-banner {
   position: relative;
   height: 340px;
-  background: #0B192C;
+  background: #0b192c;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -642,16 +723,16 @@ export default {
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px;
-  color: #64748B;
+  color: #64748b;
 }
 
 .search-input {
   width: 100%;
   padding: 15px 16px 15px 48px;
   border-radius: 50px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #e2e8f0;
   background: white;
-  color: #0F172A;
+  color: #0f172a;
   font-size: 14px;
   font-weight: 500;
   outline: none;
@@ -661,7 +742,7 @@ export default {
 
 .search-input:focus {
   box-shadow: 0 4px 22px rgba(37, 99, 235, 0.25);
-  border-color: #2563EB;
+  border-color: #2563eb;
 }
 
 .filter-controls-section {
@@ -670,7 +751,7 @@ export default {
   max-width: 1200px;
   margin: 30px auto 10px auto;
   padding: 0 24px;
-  border-bottom: 1px solid #E2E8F0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .tabs-wrapper {
@@ -684,7 +765,7 @@ export default {
   padding: 12px 10px;
   font-size: 15px;
   font-weight: 600;
-  color: #64748B;
+  color: #64748b;
   cursor: pointer;
   position: relative;
   display: flex;
@@ -693,7 +774,7 @@ export default {
 }
 
 .filter-tab-btn.active {
-  color: #1E3A8A;
+  color: #1e3a8a;
   font-weight: 700;
 }
 
@@ -704,7 +785,7 @@ export default {
   left: 0;
   width: 100%;
   height: 3px;
-  background: #1E3A8A;
+  background: #1e3a8a;
   border-radius: 2px 2px 0 0;
 }
 
@@ -727,14 +808,14 @@ export default {
 .location-title {
   font-size: 22px;
   font-weight: 800;
-  color: #0F172A;
+  color: #0f172a;
   margin: 0;
 }
 
 .location-country {
   font-size: 12px;
-  color: #2563EB;
-  background: #EFF6FF;
+  color: #2563eb;
+  background: #eff6ff;
   padding: 2px 8px;
   border-radius: 4px;
   font-weight: 600;
@@ -770,15 +851,26 @@ export default {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
-  border: 1px solid #E2E8F0;
+  border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
+
+  /* ✨ add this */
+  transition: all 0.25s ease;
 }
 
-.card-image-box {
-  position: relative;
-  height: 190px;
-  width: 100%;
+/* 👇 hover effect */
+.package-premium-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  border-color: #cbd5e1;
+}
+.card-image-box img {
+  transition: transform 0.3s ease;
+}
+
+.package-premium-card:hover .card-image-box img {
+  transform: scale(1.05);
 }
 
 .pkg-display-img {
@@ -799,8 +891,12 @@ export default {
   color: white;
 }
 
-.pkg-type-badge.domestic { background: #10B981; }
-.pkg-type-badge.international { background: #3B82F6; }
+.pkg-type-badge.domestic {
+  background: #10b981;
+}
+.pkg-type-badge.international {
+  background: #3b82f6;
+}
 
 .pkg-level-badge {
   position: absolute;
@@ -813,9 +909,18 @@ export default {
   text-transform: uppercase;
 }
 
-.pkg-level-badge.budget { background: #FEF3C7; color: #D97706; }
-.pkg-level-badge.standard { background: #DBEAFE; color: #2563EB; }
-.pkg-level-badge.premium { background: #F3E8FF; color: #9333EA; }
+.pkg-level-badge.budget {
+  background: #fef3c7;
+  color: #d97706;
+}
+.pkg-level-badge.standard {
+  background: #dbeafe;
+  color: #2563eb;
+}
+.pkg-level-badge.premium {
+  background: #f3e8ff;
+  color: #9333ea;
+}
 
 .card-body-content {
   padding: 16px;
@@ -827,13 +932,13 @@ export default {
 .pkg-card-title {
   font-size: 16px;
   font-weight: 700;
-  color: #0F172A;
+  color: #0f172a;
   margin: 0 0 6px 0;
 }
 
 .pkg-location-row {
   font-size: 13px;
-  color: #64748B;
+  color: #64748b;
   margin-bottom: 10px;
 }
 
@@ -841,7 +946,7 @@ export default {
   display: flex;
   gap: 15px;
   font-size: 12px;
-  color: #64748B;
+  color: #64748b;
   margin-bottom: 8px;
 }
 
@@ -855,11 +960,11 @@ export default {
 
 .rating-val {
   font-weight: 700;
-  color: #1E293B;
+  color: #1e293b;
 }
 
 .review-count {
-  color: #94A3B8;
+  color: #94a3b8;
 }
 
 .pkg-card-footer {
@@ -868,7 +973,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid #F1F5F9;
+  border-top: 1px solid #f1f5f9;
 }
 
 .price-container {
@@ -880,16 +985,16 @@ export default {
 .price-amount {
   font-size: 15px;
   font-weight: 800;
-  color: #10B981;
+  color: #10b981;
 }
 
 .price-label {
   font-size: 11px;
-  color: #94A3B8;
+  color: #94a3b8;
 }
 
 .btn-view-details {
-  background: #2563EB;
+  background: #2563eb;
   color: white;
   border: none;
   padding: 8px 14px;
@@ -902,13 +1007,13 @@ export default {
 }
 
 .btn-view-details:hover {
-  background: #1D4ED8;
+  background: #1d4ed8;
 }
 
 .no-packages-found {
   text-align: center;
   padding: 60px 0;
-  color: #64748B;
+  color: #64748b;
   font-weight: 600;
 }
 </style>

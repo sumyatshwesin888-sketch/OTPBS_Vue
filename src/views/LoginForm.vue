@@ -114,19 +114,35 @@ export default {
         alert('Logged In Successfully!')
         
         localStorage.setItem('is_logged_in', 'true')
-                const loginData = {
-          ...user,
-          name: user.username || user.name || 'User',
-          email: user.email
-        }
+
+               const loginData = {
+      fullName: user.fullName || user.username || user.name || 'User',
+      email: user.email,
+      phone: user.phone || ''
+    }
         
         this.$store.commit('SET_USER', loginData)
-        
-        this.$router.push('/')
+        localStorage.setItem(
+  "current_user",
+  JSON.stringify(loginData)
+)
+
+localStorage.setItem(
+  "user",
+  JSON.stringify(loginData)
+)
+      this.$router.push('/')  
+//        this.$router.push({
+//   name: "Login",
+//   query: {
+//     packageId: this.pkg.id
+//   }
+// })
       } else {
         alert('Invalid Email or Password! Please try again.')
       }
     },
+    
     loginWithSocial(platform) {
       console.log(`Logging in with ${platform}`)
     },
