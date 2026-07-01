@@ -1,5 +1,5 @@
 <template>
-  <div class="travelgo-premium-app">
+  <v-app class="travelgo-premium-app">
     <nav class="navbar">
       <div class="nav-container">
         <div class="nav-brand">
@@ -32,35 +32,63 @@
             </button>
             <button class="btn-signup" @click="$router.replace('/signup')">Sign Up</button>
           </template>
-<template v-else>
-  <v-menu min-width="150px" max-width="170px" rounded="lg" offset-y content-class="small-profile-menu-card">
-    <template v-slot:activator="{ props }">
-      <v-btn variant="text" class="profile-trigger-btn" v-bind="props">
-        
-        <v-avatar color="primary" size="32" class="mr-2 text-white font-weight-bold">
-          {{ ($store.state.user.full_name || 'U').charAt(0).toUpperCase() }}
-        </v-avatar>
+          <template v-else>
+            <v-menu
+              min-width="150px"
+              max-width="170px"
+              rounded="lg"
+              offset-y
+              content-class="small-profile-menu-card"
+            >
+              <template v-slot:activator="{ props }">
+                <v-btn variant="text" class="profile-trigger-btn" v-bind="props">
+                  <v-avatar color="primary" size="32" class="mr-2 text-white font-weight-bold">
+                    {{
+                      ($store.state.user.name || $store.state.user.full_name || 'U')
+                        .charAt(0)
+                        .toUpperCase()
+                    }}
+                  </v-avatar>
 
-        <span class="user-display-name">
-          {{ $store.state.user.full_name || 'User' }}
-        </span>
-        <v-icon icon="mdi-chevron-down" size="small" class="ml-1 text-white" />
-      </v-btn>
-    </template>
+                  <span class="user-display-name">
+                    {{ $store.state.user.name || $store.state.user.full_name || 'User' }}
+                  </span>
+                  <v-icon icon="mdi-chevron-down" size="small" class="ml-1 text-white" />
+                </v-btn>
+              </template>
 
-    <v-list class="mt-1 dropdown-card-list" density="compact" style="padding: 6px 0 !important;">
-      
-      <v-list-item to="/profile" prepend-icon="mdi-account-outline" min-height="36px" class="px-4">
-        <v-list-item-title class="font-weight-medium" style="font-size: 0.9rem; color: #334155;">My Profile</v-list-item-title>
-      </v-list-item>
+              <v-list
+                class="mt-1 dropdown-card-list"
+                density="compact"
+                style="padding: 6px 0 !important"
+              >
+                <v-list-item
+                  :to="profileRoute"
+                  prepend-icon="mdi-account-outline"
+                  min-height="36px"
+                  class="px-4"
+                >
+                  <v-list-item-title
+                    class="font-weight-medium"
+                    style="font-size: 0.9rem; color: #334155"
+                  >
+                    My Profile
+                  </v-list-item-title>
+                </v-list-item>
 
-      <v-list-item @click="handleLogout" prepend-icon="mdi-logout" class="text-red-darken-1 px-4" min-height="36px">
-        <v-list-item-title class="font-weight-medium" style="font-size: 0.9rem;">Logout</v-list-item-title>
-      </v-list-item>
-
-    </v-list>
-  </v-menu>
-</template>
+                <v-list-item
+                  @click="handleLogout"
+                  prepend-icon="mdi-logout"
+                  class="text-red-darken-1 px-4"
+                  min-height="36px"
+                >
+                  <v-list-item-title class="font-weight-medium" style="font-size: 0.9rem"
+                    >Logout</v-list-item-title
+                  >
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </template>
         </div>
       </div>
     </nav>
@@ -68,12 +96,13 @@
     <main class="main-router-content">
       <router-view />
     </main>
-  </div>
+  </v-app>
 </template>
 
 <script>
 export default {
   name: 'App',
+<<<<<<< HEAD
   created() {
     const savedUser = localStorage.getItem("user");
 
@@ -82,6 +111,22 @@ export default {
     }
   },
 
+=======
+  computed: {
+    // 💡 အသစ်ထည့်သွင်းလိုက်သည့် Computed Property ဖြစ်ပါသည်
+    profileRoute() {
+      const user = this.$store.state.user;
+      
+      // အကယ်၍ user ရှိပြီး role က ADMIN ဖြစ်နေလျှင် admin dashboard သို့ လွှတ်မည်
+      if (user && user.role === 'ADMIN') {
+        return '/admin/dashboard';
+      }
+      
+      // ပုံမှန် user ဖြစ်လျှင် user profile သို့ သွားမည်
+      return '/profile';
+    }
+  },
+>>>>>>> 5451f28041e7e291ceb676b99865bb1e8a5f583a
   methods: {
     handleLogout() {
       this.$store.dispatch('logout').then(() => {
@@ -95,19 +140,6 @@ export default {
 </script>
 
 <style>
-/* VUETIFY OVERRIDE FIX */
-.v-application,
-.v-application__wrap,
-.v-main,
-.v-container {
-  padding: 0 !important;
-  margin: 0 !important;
-  max-width: 100% !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: #f8fafc !important;
-}
-
 body,
 html {
   margin: 0 !important;
@@ -152,6 +184,12 @@ html {
   width: 100%;
   z-index: 100;
   padding: 20px 0;
+  background-color: #0f172a !important; /* နမူနာ - AdminLayout ထဲကလို Dark Slate အရောင် */
+
+  /* Solid ဖြစ်သွားတဲ့အတွက် အောက်က content တွေနဲ့ ကွဲပြားအောင် shadow လေး ထည့်ပေးနိုင်ပါတယ် */
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .nav-container {
