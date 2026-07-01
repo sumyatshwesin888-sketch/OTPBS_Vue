@@ -103,11 +103,11 @@
 export default {
   name: 'App',
   computed: {
-    // 💡 အသစ်ထည့်သွင်းလိုက်သည့် Computed Property ဖြစ်ပါသည်
+    // 💡 လမ်းကြောင်းခွဲပေးမယ့် ဒီ computed property ရှိနေဖို့ လိုအပ်ပါတယ်ဗျာ
     profileRoute() {
       const user = this.$store.state.user;
       
-      // အကယ်၍ user ရှိပြီး role က ADMIN ဖြစ်နေလျှင် admin dashboard သို့ လွှတ်မည်
+      // user ရှိပြီး role က ADMIN ဖြစ်နေလျှင် admin dashboard သို့ လွှတ်မည်
       if (user && user.role === 'ADMIN') {
         return '/admin/dashboard';
       }
@@ -116,8 +116,46 @@ export default {
       return '/profile';
     }
   },
+  created() {
+    // 💡 Browser ကို refresh လုပ်ရင် LocalStorage ထဲကနေ data ပြန်ဆွဲတင်ခြင်း
+    const isLoggedIn = localStorage.getItem('is_logged_in')
+    const userRole = localStorage.getItem('user_role')
+
+    if (isLoggedIn === 'true') {
+      if (userRole === 'ADMIN') {
+        const adminDataStr = localStorage.getItem('travelAdminUser') || sessionStorage.getItem('travelAdminUser')
+        if (adminDataStr) {
+          const admin = JSON.parse(adminDataStr)
+          // Store ထဲထည့်တဲ့အခါ role: 'ADMIN' ပါဝင်ကြောင်း သေချာအောင် explicit ထည့်ပေးပါမယ်
+          this.$store.commit('SET_USER', {
+            ...admin,
+            role: 'ADMIN'
+          })
+        }
+      } else if (userRole === 'CUSTOMER') {
+        const userDataStr = localStorage.getItem('user_account')
+        if (userDataStr) {
+          const user = JSON.parse(userDataStr)
+          this.$store.commit('SET_USER', {
+            ...user,
+            name: user.username || user.name || 'User',
+            full_name: user.username || user.name || 'User',
+            email: user.email,
+            role: 'CUSTOMER'
+          })
+        }
+      }
+    }
+  },
   methods: {
     handleLogout() {
+      localStorage.removeItem('is_logged_in')
+      localStorage.removeItem('user_role')
+      localStorage.removeItem('travelAdminAuth')
+      localStorage.removeItem('travelAdminUser')
+      sessionStorage.removeItem('travelAdminAuth')
+      sessionStorage.removeItem('travelAdminUser')
+
       this.$store.dispatch('logout').then(() => {
         if (this.$route.path !== '/') {
           this.$router.push('/')
@@ -167,13 +205,13 @@ html {
 
 /* Navbar styles */
 .navbar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 100;
   padding: 20px 0;
-  background-color: #0f172a !important; /* နမူနာ - AdminLayout ထဲကလို Dark Slate အရောင် */
+  background-color: #15254b !important; /* နမူနာ - AdminLayout ထဲကလို Dark Slate အရောင် */
 
   /* Solid ဖြစ်သွားတဲ့အတွက် အောက်က content တွေနဲ့ ကွဲပြားအောင် shadow လေး ထည့်ပေးနိုင်ပါတယ် */
   box-shadow:
@@ -194,6 +232,8 @@ html {
   display: flex;
   align-items: center;
   gap: 10px;
+position: relative !important;
+  left: -100px !important;
 }
 
 .brand-logo-svg {
@@ -224,7 +264,7 @@ html {
   text-decoration: none;
   color: white;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
