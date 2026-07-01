@@ -41,33 +41,6 @@
         </p>
 
       </div>
-
-      <div class="quick-info">
-
-        <h3>Quick Info</h3>
-
-        <div class="info-row">
-          <span>🌎 Country</span>
-          <span>{{ destination.quickInfo.country }}</span>
-        </div>
-
-        <div class="info-row">
-          <span>📍 Region</span>
-          <span>{{ destination.quickInfo.region }}</span>
-        </div>
-
-        <div class="info-row">
-          <span>☀️ Best Season</span>
-          <span>{{ destination.quickInfo.season }}</span>
-        </div>
-
-        <div class="info-row">
-          <span>🕒 Duration</span>
-          <span>{{ destination.quickInfo.duration }}</span>
-        </div>
-
-      </div>
-
     </div>
 
   </section>
@@ -153,15 +126,7 @@ Bagan is one of Myanmar's most iconic cultural destinations and a UNESCO World H
 ပုဂံသည် မြန်မာနိုင်ငံ၏ အထင်ကရ ယဉ်ကျေးမှုခရီးသွားဒေသတစ်ခုဖြစ်ပြီး UNESCO World Heritage Site အဖြစ် သတ်မှတ်ခံထားရသော သမိုင်းဝင်မြို့တော်တစ်ခု ဖြစ်ပါသည်။ ဧရာဝတီမြစ်ကမ်းနားတွင် တည်ရှိပြီး ရှေးဟောင်းဘုရားပုထိုးများ၊ နေထွက်နှင့် နေဝင်ချိန် ရှုခင်းများကြောင့် ကမ္ဘာလှည့်ခရီးသွားများကို ဆွဲဆောင်လျက်ရှိပါသည်။
 `,
 
-    quickInfo: {
-      country: 'Myanmar',
-      region: 'Mandalay Region',
-      season: 'Nov - Feb',
-      duration: '3 - 5 Days'
-    },
-
-    
-
+   
     packages: [
       {
         type: 'Budget',
@@ -203,15 +168,7 @@ Kalaw is a peaceful hill town located in Shan State, Myanmar, and is well known 
 ကလောမြို့သည် ရှမ်းပြည်နယ်တွင် တည်ရှိသော အေးချမ်းလှပသည့် တောင်ပေါ်မြို့တစ်မြို့ဖြစ်ပြီး အေးမြသောရာသီဥတု၊ ထင်းရှူးတောများနှင့် သဘာဝတောင်တန်းရှုခင်းများကြောင့် လူသိများပါသည်။
 `,
 
-    quickInfo: {
-      country: 'Myanmar',
-      region: 'Shan State',
-      season: 'Nov - Feb',
-      duration: '3 - 5 Days'
-    },
-
    
-  
     packages: [
       {
         type: 'Budget',
@@ -253,14 +210,7 @@ Hpa-An is one of Myanmar's most beautiful natural destinations, famous for its l
 ဘားအံမြို့သည် ကရင်ပြည်နယ်၏ အလှဆုံးခရီးသွားဒေသများထဲမှ တစ်ခုဖြစ်ပြီး ကျောက်တောင်များ၊ ဂူများနှင့် သဘာဝရှုခင်းအလှများကြောင့် လူသိများပါသည်။
 `,
 
-  quickInfo: {
-    country: 'Myanmar',
-    region: 'Kayin State',
-    season: 'Nov - Feb',
-    duration: '3 - 4 Days'
-  },
-
-  
+ 
   packages: [
     {
       type: 'Budget',
@@ -301,13 +251,6 @@ Ngwe Saung Beach is one of Myanmar's most popular coastal destinations, known fo
 
 ငွေဆောင်ကမ်းခြေသည် မြန်မာနိုင်ငံ၏ အကျော်ကြားဆုံး ပင်လယ်ကမ်းခြေခရီးသွားဒေသများထဲမှ တစ်ခုဖြစ်ပြီး သဲဖြူကမ်းခြေရှည်ကြီးများနှင့် အေးချမ်းသော ပတ်ဝန်းကျင်ကြောင့် လူသိများပါသည်။
 `,
-
-  quickInfo: {
-    country: 'Myanmar',
-    region: 'Ayeyarwady Region',
-    season: 'Oct - Mar',
-    duration: '4 - 5 Days'
-  },
 
  
   packages: [
@@ -351,14 +294,7 @@ Thailand is one of Southeast Asia’s most popular travel destinations, known fo
 ထိုင်းနိုင်ငံသည် အရှေ့တောင်အာရှ၏ အကျော်ကြားဆုံး ခရီးသွားနိုင်ငံများထဲမှ တစ်နိုင်ငံဖြစ်ပြီး စည်ကားသောမြို့ပြများ၊ ယဉ်ကျေးမှုအမွေအနှစ်များနှင့် နာမည်ကျော် ဧည့်ဝတ်ကျေပွန်မှုတို့ကြောင့် လူသိများပါသည်။
 `,
 
-    quickInfo: {
-      country: 'Thailand',
-      region: 'Bangkok',
-      season: 'Nov - Mar',
-      duration: '4 - 5 Days'
-    },
-
-   
+    
     packages: [
       {
         type: 'Budget',
@@ -399,17 +335,6 @@ Japan is a fascinating destination where ancient traditions blend seamlessly wit
 
 ဂျပန်နိုင်ငံသည် ရိုးရာယဉ်ကျေးမှုနှင့် ခေတ်မီနည်းပညာများ ပေါင်းစပ်တည်ရှိနေသော အထူးဆွဲဆောင်မှုရှိသည့် ခရီးသွားနိုင်ငံဖြစ်ပါသည်။
 `,
-
-    quickInfo: {
-      country: 'Japan',
-      region: 'Tokyo',
-      season: 'Mar - May',
-      duration: '5 - 7 Days'
-    },
-
-    
-    
-  
 
     packages: [
       {
@@ -453,16 +378,6 @@ China is a diverse and culturally rich destination that combines thousands of ye
 တရုတ်နိုင်ငံသည် နှစ်ထောင်ပေါင်းများစွာသော သမိုင်းအမွေအနှစ်များနှင့် ခေတ်မီဖွံ့ဖြိုးတိုးတက်မှုများကို ပေါင်းစပ်ထားသည့် ယဉ်ကျေးမှုကြွယ်ဝသော နိုင်ငံတစ်နိုင်ငံဖြစ်ပါသည်။
 `,
 
-    quickInfo: {
-      country: 'China',
-      region: 'Shanghai',
-      season: 'Mar - May',
-      duration: '4 - 5 Days'
-    },
-
- 
-  
-
     packages: [
       {
         type: 'Budget',
@@ -504,16 +419,7 @@ Singapore is a modern and dynamic city-state renowned for its iconic skyline, wo
 စင်ကာပူနိုင်ငံသည် ခေတ်မီမြို့ပြဖွံ့ဖြိုးတိုးတက်မှု၊ ကမ္ဘာကျော်အထင်ကရနေရာများနှင့် ယဉ်ကျေးမှုမျိုးစုံ ပေါင်းစပ်နေထိုင်မှုတို့ကြောင့် လူသိများသော မြို့ပြနိုင်ငံတစ်နိုင်ငံဖြစ်ပါသည်။
 `,
 
-    quickInfo: {
-      country: 'Singapore',
-      region: 'Singapore City',
-      season: 'All Year',
-      duration: '4 - 5 Days'
-    },
-
    
-  
-
     packages: [
       {
         type: 'Budget',

@@ -854,12 +854,23 @@ export default {
   border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
+
+  /* ✨ add this */
+  transition: all 0.25s ease;
 }
 
-.card-image-box {
-  position: relative;
-  height: 190px;
-  width: 100%;
+/* 👇 hover effect */
+.package-premium-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  border-color: #cbd5e1;
+}
+.card-image-box img {
+  transition: transform 0.3s ease;
+}
+
+.package-premium-card:hover .card-image-box img {
+  transform: scale(1.05);
 }
 
 .pkg-display-img {

@@ -22,19 +22,24 @@
     <div class="checkout-grid">
       <section class="payment-section">
         <div class="card">
-          <h2>Payment Method</h2>
+          <h2 class="section-title mb-4">Payment Method</h2>
+          
           <div class="payment-options">
-            <label 
+            <div 
               v-for="method in paymentMethods" 
               :key="method.id" 
-              :class="['payment-card', { selected: selectedMethod === method.id }]"
+              class="payment-option"
+              :class="{ selected: selectedMethod === method.id }"
+              @click="selectedMethod = method.id"
             >
-              <input type="radio" :value="method.id" v-model="selectedMethod" />
-              <div class="method-info">
-                <span class="icon">{{ method.icon }}</span>
-                <span>{{ method.name }}</span>
+              <div class="radio-circle">
+                <div v-if="selectedMethod === method.id" class="radio-dot" />
               </div>
-            </label>
+              <span class="method-name">{{ method.name }}</span>
+              <div class="method-logo" :style="{ background: method.color }">
+                <span class="method-logo-text">{{ method.abbr }}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -69,13 +74,12 @@
 export default {
   data() {
     return {
-      selectedMethod: 'kbz',
+      selectedMethod: 'kbzpay',
       booking: null,
       paymentMethods: [
-       
-        { id: 'kbz', name: 'KBZ Pay', icon: '📱' },
-        { id: 'wave', name: 'Wave Pay', icon: '🌊' },
-        { id: 'cb', name: 'CB Pay', icon: '💵' }
+        { id: 'kbzpay', name: 'KBZPay', abbr: 'KBZ', color: '#2563EB' },
+        { id: 'wavepay', name: 'WavePay', abbr: 'Wave', color: '#F59E0B' },
+        { id: 'ayapay', name: 'AYAPay', abbr: 'AYA', color: '#7C3AED' },
       ]
     };
   },
@@ -108,119 +112,280 @@ export default {
       return this.booking.package.price * this.booking.travelerInfo.travelers;
     }
   },
+
   methods: {
     handlePayment() {
-      
       if (!this.selectedMethod) {
-    alert("Please select a payment method.");
-    return;
-  }
+        alert("Please select a payment method.");
+        return;
+      }
 
-  // ၂။ LocalStorage ထဲက ရှိပြီးသား Booking Data ကို အရင်ယူခြင်း
-  const savedData = localStorage.getItem('booking_data');
-  let booking = savedData ? JSON.parse(savedData) : {};
+      const savedData = localStorage.getItem('booking_data');
+      let booking = savedData ? JSON.parse(savedData) : {};
 
-  // ၃။ ရှိပြီးသား Data ထဲသို့ Payment အချက်အလက်များ ထပ်ပေါင်းထည့်ခြင်း
-  booking.paymentMethod = this.selectedMethod;
-  booking.id = "BK-" + Math.floor(Math.random() * 90000 + 10000); // ID အသစ်တစ်ခု generate လုပ်ပေးခြင်း
-  booking.status = 'confirmed';
-  booking.timestamp = new Date().toISOString();
+      booking.paymentMethod = this.selectedMethod;
+      booking.id = "BK-" + Math.floor(Math.random() * 90000 + 10000);
+      booking.status = 'confirmed';
+      booking.timestamp = new Date().toISOString();
 
-  // ၄။ Data အားလုံးကို LocalStorage ထဲသို့ ပြန်သိမ်းခြင်း
-  localStorage.setItem('booking_data', JSON.stringify(booking));
+      localStorage.setItem('booking_data', JSON.stringify(booking));
 
-  // ၅။ အောင်မြင်ကြောင်း အကြောင်းကြားပြီး Confirmation Page သို့ သွားခြင်း
-  alert('Payment Confirmed!');
-  
-  // Router name 'Confirmation' သို့မဟုတ် path '/confirmation' သုံးပြီးသွားပါ
-  this.$router.push({ name: 'Confirmation' });
+      alert('Payment Confirmed!');
+      this.$router.push({ name: 'Confirmation' });
     }
   }
 };
 </script>
 
 <style scoped>
-.page-wrapper { max-width: 1100px; margin: 0 auto; padding: 20px; font-family: sans-serif; }
-.payment-wrapper { max-width: 1000px; margin: 40px auto; padding: 20px; font-family: 'Segoe UI', sans-serif; }
+.page-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: "Inter", sans-serif;
+  background: #f5f9ff;
+}
 
-/* Stepper CSS */
-/* Stepper Container */
-/* Stepper Container - အလယ်တည့်တည့် ထားရန် */
+/* STEP PROGRESS (modern blue gradient) */
 .stepper-container {
   display: flex;
   justify-content: center;
-  align-items: center;
   margin: 40px 0;
-  width: 100%;
 }
 
 .stepper {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
+  padding: 14px 24px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(30, 64, 175, 0.12);
 }
 
-/* တစ်ခုချင်းစီအတွက် Style */
 .step {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  color: #9ca3af; /* မပြီးသေးတဲ့ step အတွက် မီးခိုးရောင် */
+  gap: 6px;
+  color: #94a3b8;
   font-weight: 500;
 }
 
-/* Circle ပုံစံ */
 .circle {
-  width: 45px;
-  height: 45px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  border: 2px solid #d1d5db;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid #cbd5e1;
+  background: white;
   font-weight: 700;
-  background: #ffffff;
   transition: all 0.3s ease;
 }
 
-/* Active Step (အစိမ်းရောင်) */
 .step.active .circle {
-  background: #22c55e; /* Tailwind green-500 */
-  border-color: #22c55e;
-  color: #ffffff;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color: #2563eb;
+  color: white;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
 }
-.step.active span {
-  color: #22c55e;
+
+.step.completed .circle {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: white;
+}
+
+.step.active span,
+.step.completed span {
+  color: #1d4ed8;
   font-weight: 700;
 }
 
-/* Connect Line */
 .line {
-  width: 100px;
+  width: 90px;
   height: 2px;
-  background: #d1d5db;
-  margin-top: -20px; /* Label နဲ့ Circle အလယ်တည့်တည့်ဖြစ်အောင် ချိန်ညှိပါ */
+  background: linear-gradient(to right, #cbd5e1, #93c5fd);
 }
-/* Layout & Cards */
-.checkout-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; }
-.card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
-/* Payment Methods */
-.payment-card { display: flex; align-items: center; padding: 18px; border: 2px solid #e5e7eb; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; }
-.payment-card:hover { border-color: #22c55e; }
-.payment-card.selected { border-color: #22c55e; background: #f0fdf4; }
-.method-info { display: flex; align-items: center; gap: 15px; }
+/* GRID */
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 28px;
+}
 
-/* Buttons */
-.actions { display: flex; gap: 15px; margin-top: 20px; }
-.pay-btn { flex: 1; padding: 18px; background: #22c55e; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
-.back-btn { padding: 18px 30px; border: 1px solid #d1d5db; background: transparent; border-radius: 12px; cursor: pointer; }
+/* CARD (glass + blue accent) */
+.card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  padding: 26px;
+  border-radius: 18px;
+  box-shadow: 0 12px 35px rgba(29, 78, 216, 0.08);
+  backdrop-filter: blur(10px);
+}
 
-/* Summary */
-.summary-img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; }
-.row { display: flex; justify-content: space-between; margin: 12px 0; }
-.total { color: #22c55e; font-size: 1.2rem; }
+.section-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin-bottom: 18px;
+}
 
-@media (max-width: 768px) { .checkout-grid { grid-template-columns: 1fr; } }
+/* PAYMENT OPTIONS (modern selectable cards) */
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  border: 1px solid #dbeafe;
+  background: white;
+  transition: all 0.25s ease;
+}
+
+.payment-option:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
+}
+
+.payment-option.selected {
+  border-color: #2563eb;
+  background: linear-gradient(135deg, #eff6ff, #ffffff);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+}
+
+.radio-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #93c5fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-option.selected .radio-circle {
+  border-color: #2563eb;
+}
+
+.radio-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2563eb;
+}
+
+.method-name {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.method-logo {
+  width: 64px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2563eb, #60a5fa);
+}
+
+.method-logo-text {
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* BUTTONS */
+.actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.pay-btn {
+  flex: 1;
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  color: white;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+  transition: all 0.2s ease;
+}
+
+.pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.45);
+}
+
+.back-btn {
+  padding: 16px 26px;
+  border-radius: 14px;
+  border: 1px solid #bfdbfe;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  color: #1d4ed8;
+  transition: 0.2s;
+}
+
+.back-btn:hover {
+  background: #eff6ff;
+}
+
+/* SUMMARY */
+.summary-img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.summary-card h3 {
+  margin-top: 14px;
+  color: #1e3a8a;
+  font-weight: 800;
+}
+
+.destination {
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  color: #334155;
+}
+
+.total {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #2563eb;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .checkout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stepper {
+    flex-wrap: wrap;
+    border-radius: 20px;
+  }
+}
 </style>

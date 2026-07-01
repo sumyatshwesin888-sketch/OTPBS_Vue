@@ -1,56 +1,51 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { supabase } from '../lib/supabase'
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref(null)
-  const profile = ref(null)
-  const loading = ref(true)
-  const isLoggedIn = computed(() => !!user.value)
+  // State: 'user' is the active session, 'registered_user' is the account storage
+  const user = ref(JSON.parse(localStorage.getItem('user')) || null);
+  const profile = ref(null); // Kept for compatibility with your existing components
+  
+  const isLoggedIn = computed(() => !!user.value);
 
-  async function fetchProfile() {
-    if (!user.value) return
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.value.id)
-      .maybeSingle()
-    profile.value = data
+  // 1. Sign Up: Saves account credentials and automatically logs in
+  function signUp(email, password, fullName, phone) {
+    const newUser = { email, password, fullName, phone };
+    // Save account data
+    localStorage.setItem('user_credentials', JSON.stringify(newUser));
+    // Auto-login by setting session
+    setUser(newUser);
   }
 
-  async function init() {
-    const { data } = await supabase.auth.getSession()
-    user.value = data.session?.user ?? null
-    if (user.value) {
-      await fetchProfile()
+  // 2. Sign In: Validates against registered account
+  function signIn(email, password) {
+    const savedUser = JSON.parse(localStorage.getItem('user_credentials'));
+    if (savedUser && savedUser.email === email && savedUser.password === password) {
+      setUser(savedUser);
+      return true;
     }
-    loading.value = false
-
-    supabase.auth.onAuthStateChange((event, session) => {
-      user.value = session?.user ?? null
-      if (!user.value) {
-        profile.value = null
-      }
-    })
+    throw new Error('Invalid email or password.');
   }
 
-  async function signOut() {
-    await supabase.auth.signOut()
-    user.value = null
-    profile.value = null
+  // 3. Set User: Helper to save the active login session
+  function setUser(userData) {
+    user.value = userData;
+    localStorage.setItem('user', JSON.stringify(userData));
   }
 
-  async function updateProfile(updates) {
-    if (!user.value) return
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', user.value.id)
-      .select()
-      .maybeSingle()
-    if (error) throw error
-    if (data) profile.value = { ...profile.value, ...data }
+  // 4. Logout: Removes only the login session, keeps account data
+  function logout() {
+    user.value = null;
+    profile.value = null;
+    localStorage.removeItem('user');
+    localStorage.removeItem("is_logged_in");
+localStorage.removeItem("current_user");
   }
 
-  return { user, profile, loading, isLoggedIn, init, signOut, updateProfile, fetchProfile }
-})
+  // Placeholder for compatibility if your components call this
+  async function fetchProfile() {
+    return profile.value;
+  }
+
+  return { user, profile, isLoggedIn, signUp, signIn, setUser, logout, fetchProfile };
+});

@@ -102,6 +102,16 @@
 <script>
 export default {
   name: 'App',
+<<<<<<< HEAD
+  created() {
+    const savedUser = localStorage.getItem("user");
+
+    if (savedUser && !this.$store.state.user) {
+      this.$store.commit("SET_USER", JSON.parse(savedUser));
+    }
+  },
+
+=======
   computed: {
     // 💡 လမ်းကြောင်းခွဲပေးမယ့် ဒီ computed property ရှိနေဖို့ လိုအပ်ပါတယ်ဗျာ
     profileRoute() {
@@ -114,37 +124,6 @@ export default {
       
       // ပုံမှန် user ဖြစ်လျှင် user profile သို့ သွားမည်
       return '/profile';
-    }
-  },
-  created() {
-    // 💡 Browser ကို refresh လုပ်ရင် LocalStorage ထဲကနေ data ပြန်ဆွဲတင်ခြင်း
-    const isLoggedIn = localStorage.getItem('is_logged_in')
-    const userRole = localStorage.getItem('user_role')
-
-    if (isLoggedIn === 'true') {
-      if (userRole === 'ADMIN') {
-        const adminDataStr = localStorage.getItem('travelAdminUser') || sessionStorage.getItem('travelAdminUser')
-        if (adminDataStr) {
-          const admin = JSON.parse(adminDataStr)
-          // Store ထဲထည့်တဲ့အခါ role: 'ADMIN' ပါဝင်ကြောင်း သေချာအောင် explicit ထည့်ပေးပါမယ်
-          this.$store.commit('SET_USER', {
-            ...admin,
-            role: 'ADMIN'
-          })
-        }
-      } else if (userRole === 'CUSTOMER') {
-        const userDataStr = localStorage.getItem('user_account')
-        if (userDataStr) {
-          const user = JSON.parse(userDataStr)
-          this.$store.commit('SET_USER', {
-            ...user,
-            name: user.username || user.name || 'User',
-            full_name: user.username || user.name || 'User',
-            email: user.email,
-            role: 'CUSTOMER'
-          })
-        }
-      }
     }
   },
   methods: {

@@ -35,10 +35,13 @@ export default createStore({
     increment({ commit }) {
       commit('increment')
     },
-    logout({ commit }) {
-      commit('CLEAR_USER')
-      localStorage.removeItem('is_logged_in')
-    }
+   logout({ commit }) {
+  commit('CLEAR_USER')
+
+  localStorage.removeItem('is_logged_in')
+  localStorage.removeItem('current_user')
+  localStorage.removeItem('user')
+}
   },
 
   getters: {

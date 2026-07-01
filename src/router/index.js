@@ -1,6 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+<<<<<<< HEAD
+import { useAuthStore } from '../store/auth';
+=======
 import AdminLayout from '../components/layouts/AdminLayout.vue'
+>>>>>>> 5451f28041e7e291ceb676b99865bb1e8a5f583a
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -145,5 +149,10 @@ const router = createRouter({
     }
   ],
 })
-
+router.beforeEach((to) => {
+  const authStore = useAuthStore();
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    return { name: 'Login' };
+  }
+});
 export default router

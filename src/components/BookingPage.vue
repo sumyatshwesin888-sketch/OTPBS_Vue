@@ -45,7 +45,7 @@
             <div class="form-group">
               <label>Number of Travelers</label>
               <select v-model="form.travelers">
-                <option v-for="n in 10" :key="n" :value="n">{{ n }} Traveler(s)</option>
+                <option v-for="n in 15" :key="n" :value="n">{{ n }} Traveler(s)</option>
               </select>
             </div>
             <div class="form-group">
@@ -54,7 +54,10 @@
             </div>
           </div>
 
+          <div class="actions">
+          <button class="back-btn" @click="$router.go(-1)">Back</button>
           <button type="submit" class="btn-submit" v-on:click="proceedToPayment" >Continue to Payment</button>
+          </div>
         </form>
       </div>
 
@@ -90,11 +93,20 @@
   
 </template>
 <script>
+import { useAuthStore } from '../store/auth';
 export default {
   data() {
     return {
 
+      errors: {},
        selectedPackage: null,
+       form: { 
+        name: '', 
+        email: '', 
+        phone: '', 
+        travelers: 1, 
+        date: '' 
+      },
       packagesDataset: [
         
     {id: 1,
@@ -1126,6 +1138,22 @@ currentStep: 1,
       return this.selectedPackage.price * this.form.travelers;
     }
   },
+
+  created() {
+    const authStore = useAuthStore();
+
+    // 1. Authentication Check: Redirect to login if not logged in
+    if (!authStore.isLoggedIn) {
+      this.$router.push('/login');
+      return;
+    }
+    const user = authStore.user || JSON.parse(localStorage.getItem('current_user') || '{}')
+    if (user) {
+      this.form.name = user.fullName || ''
+    this.form.phone = user.phone || ''
+    this.form.email = user.email || ''
+    }
+  },
   mounted() {
     this.loadSelectedPackage();
     const today = new Date().toISOString().split('T')[0];
@@ -1157,32 +1185,14 @@ currentStep: 1,
   // 3. Validation စစ်ဆေးခြင်း
   validateForm() {
     this.errors = {};
-    if (!this.form.name) this.errors.name = "Full Name is required";
-    if (!/^\S+@\S+\.\S+$/.test(this.form.email)) this.errors.email = "Invalid email";
-    
-    // Errors မရှိပါက သိမ်းဆည်းပြီး Payment Page သို့သွားပါ
-    if (Object.keys(this.errors).length === 0) {
-      const bookingData = {
-        id: "BK-" + Math.floor(Math.random() * 90000 + 10000),
-        package: this.selectedPackage, // package object အပြည့်အစုံ
-  travelerInfo: {
-    name: this.form.name,
-    phone: this.form.phone,
-    email: this.form.email,
-    travelers: this.form.travelers,
-    date: this.form.date
-  },
-  package: {
-        title: this.selectedPackage.title,     // The package title
-        duration: this.selectedPackage.duration, // The package duration
-        image: this.selectedPackage.image
-      },
-  totalAmount: this.totalPrice
-      };
-      localStorage.setItem('booking_data', JSON.stringify(bookingData));
-      this.saveBookingData();
-      this.$router.push('/payment');
-    }
+      if (!this.form.name) this.errors.name = 'Full name is required';
+      if (!this.form.email) this.errors.email = 'Email is required'
+  if (!this.form.phone) this.errors.phone = 'Phone is required'
+      
+      if (Object.keys(this.errors).length === 0) {
+       this.saveBookingData()
+    this.$router.push('/payment')
+      }
   },
 
   // 4. Button နှိပ်သည့်အခါ ခေါ်မည့် Function
@@ -1201,156 +1211,260 @@ currentStep: 1,
 
 </script>
 <style scoped>
-.checkout-container { max-width: 1000px; margin: 40px auto; padding: 20px; font-family: sans-serif; }
-.checkout-layout { display: flex; 
-  gap: 30px; 
-  align-items: flex-start; }
-.form-section { flex: 70%; background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-/* Summary Section Styling */
-.summary-section {
-  flex: 1; /* Layout အချိုးကို ချိန်ညှိရန် */
-  min-width: 300px;
+.page-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: "Inter", sans-serif;
+  background: radial-gradient(circle at top, #eaf3ff, #f6f9ff);
 }
 
-.summary-card {
-  background: #ffffff;
-  border-radius: 20px;
-  overflow: hidden; /* ပုံကို ထောင့်ဝိုင်းအောင် လုပ်ပေးသည် */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); /* ပိုမိုနက်ရှိုင်းသော Shadow */
-  border: 1px solid #f0f0f0;
-  transition: transform 0.3s ease;
-}
-
-.summary-card:hover {
-  transform: translateY(-5px); /* Hover လုပ်ရင် အနည်းငယ်တက်လာမည် */
-}
-
-.package-img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover; /* ပုံမပျက်အောင် ဖြတ်ညှိပေးသည် */
-}
-
-.card-body {
-  padding: 24px;
-}
-
-.card-body h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.5rem;
-  color: #1f2937;
-}
-
-.card-body p {
-  color: #6b7280;
-  margin-bottom: 20px;
-  font-size: 0.95rem;
-}
-
-/* Price Rows */
-.price-row {
+.actions {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  font-size: 1rem;
-  color: #374151;
+  gap: 14px;
+  margin-top: 22px;
 }
 
-hr {
-  border: 0;
-  border-top: 1px solid #e5e7eb;
-  margin: 16px 0;
+.back-btn {
+  padding: 16px 26px;
+  border-radius: 14px;
+  border: 1px solid #bfdbfe;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  color: #1d4ed8;
+  transition: 0.2s;
 }
-
-/* Total Amount Styling */
-.total-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1.25rem;
-  color: #16a34a; /* အစိမ်းရောင်ဖြင့် Highlight လုပ်သည် */
-  font-weight: 700;
-}
-.page-wrapper { max-width: 800px; margin: 0 auto; padding: 20px; }
-/* Stepper Layout */
-.stepper-container { 
- 
-  display: flex; 
-  justify-content: center; 
-  margin: 40px 0; 
-}
-
-/* Stepper Container - အလယ်တည့်တည့် ထားရန် */
+/* =========================
+   ✨ MODERN STEPPER (BLUE GLASS)
+========================= */
 .stepper-container {
   display: flex;
   justify-content: center;
-  align-items: center;
   margin: 40px 0;
-  width: 100%;
 }
 
 .stepper {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12);
 }
 
-/* တစ်ခုချင်းစီအတွက် Style */
 .step {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  color: #9ca3af; /* မပြီးသေးတဲ့ step အတွက် မီးခိုးရောင် */
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
 }
 
-/* Circle ပုံစံ */
 .circle {
-  width: 45px;
-  height: 45px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  border: 2px solid #d1d5db;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: white;
+  border: 2px solid #dbeafe;
   font-weight: 700;
-  background: #ffffff;
   transition: all 0.3s ease;
+  color: #64748b;
 }
 
-/* Active Step (အစိမ်းရောင်) */
+/* ACTIVE STEP */
 .step.active .circle {
-  background: #22c55e; /* Tailwind green-500 */
-  border-color: #22c55e;
-  color: #ffffff;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.35);
+  transform: scale(1.05);
 }
+
 .step.active span {
-  color: #22c55e;
+  color: #1d4ed8;
   font-weight: 700;
 }
 
-/* Connect Line */
-.line {
-  width: 100px;
-  height: 2px;
-  background: #d1d5db;
-  margin-top: -20px; /* Label နဲ့ Circle အလယ်တည့်တည့်ဖြစ်အောင် ချိန်ညှိပါ */
+/* COMPLETED STEP */
+.step.completed .circle {
+  background: #1d4ed8;
+  color: white;
+  border-color: #1d4ed8;
 }
-/* Form Elements */
-.form-group { margin-bottom: 15px; width: 100%; }
-.form-row { display: flex; gap: 15px; }
-input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
-.btn-submit { background: #16A34A; color: white; padding: 15px; border: none; border-radius: 8px; cursor: pointer; width: 100%; }
 
-/* Summary Card */
-.summary-card { background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; }
-.summary-card img { width: 100%; height: 200px; object-fit: cover; }
-.card-body { padding: 20px; }
-.price-row, .total-row { display: flex; justify-content: space-between; margin: 10px 0; }
-.total-row { color: #16A34A; font-size: 1.2rem; }
+/* CONNECT LINE */
+.line {
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(to right, #dbeafe, #93c5fd);
+  border-radius: 10px;
+}
 
-@media (max-width: 768px) { .checkout-layout { flex-direction: column; } }
+/* =========================
+   ✨ LAYOUT
+========================= */
+.checkout-layout {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+/* =========================
+   ✨ FORM CARD (GLASS STYLE)
+========================= */
+.form-section {
+  flex: 2;
+  padding: 28px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(37, 99, 235, 0.08);
+  box-shadow: 0 18px 45px rgba(30, 64, 175, 0.12);
+}
+
+.form-section h3 {
+  color: #1e3a8a;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+/* INPUTS */
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #dbeafe;
+  margin-top: 6px;
+  outline: none;
+  transition: 0.2s;
+  background: white;
+}
+
+input:focus,
+select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* FORM ROW */
+.form-row {
+  display: flex;
+  gap: 14px;
+}
+
+/* BUTTON */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+}
+
+/* =========================
+   ✨ SUMMARY CARD (TICKET STYLE)
+========================= */
+.summary-section {
+  flex: 1;
+}
+
+.summary-card {
+  border-radius: 22px;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #e0e7ff;
+  box-shadow: 0 18px 45px rgba(30, 64, 175, 0.12);
+  transition: 0.3s;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+}
+
+.package-img {
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 22px;
+}
+
+.card-body h3 {
+  color: #0f172a;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.card-body p {
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+/* PRICE ROW */
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  color: #334155;
+}
+
+/* TOTAL */
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1d4ed8;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .checkout-layout {
+    flex-direction: column;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .stepper {
+    flex-wrap: wrap;
+    border-radius: 20px;
+  }
+}
 </style>
 
 ""

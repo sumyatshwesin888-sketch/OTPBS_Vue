@@ -310,10 +310,13 @@
       <p>Package not found.</p>
       <router-link to="/packages" class="not-found-link">Browse Packages</router-link>
     </div>
+    
   </div>
 </template>
 
 <script>
+import { supabase } from '../lib/supabase'
+import { useAuthStore } from '../store/auth'
 export default {
   name: 'PackageDetailView',
 
@@ -324,6 +327,7 @@ export default {
       loading: true,
       selectedImg: '',
       inWishlist: false,
+
 
       newRating: 0,
       newComment: '',
@@ -1453,6 +1457,22 @@ export default {
     }
   },
 
+  computed: {
+    auth() {
+      return useAuthStore()
+    },
+    
+    isLoggedIn() {
+       return !!localStorage.getItem("user")
+      // သင်၏ Project ရှိ Auth state စစ်ဆေးပုံအတိုင်း ပြင်ဆင်ပါ
+//       !!this.$store.state.user ||
+//       localStorage.getItem("is_logged_in") === "true"
+//       localStorage.removeItem("is_logged_in")
+// localStorage.removeItem("current_user")
+// this.$store.commit("SET_USER", null)
+    }
+  },
+
   // ၂။ Methods
   methods: {
     //database ချိတ်ရင်သုံးဖို့
@@ -1542,7 +1562,44 @@ export default {
       this.loading = false
     },
     handleBooking() {
-      alert(`Booking process started for: ${this.pkg?.title}`)
+       
+    if (!this.isLoggedIn) {
+
+    const confirmLogin = confirm(
+      "You need to login to book this package. Do you want to go to login page?"
+    )
+
+    if (confirmLogin) {
+      this.$router.push({
+  path: "/login",
+  query: {
+    redirect: this.$route.fullPath
+  }
+})
+    }
+
+    return
+  }
+
+  this.$router.push({
+    name: "Booking",
+    params: {
+      id: this.pkg.id
+    }
+  })
+    // if (!this.authStore.isLoggedIn) {
+    //     // Login မဝင်ရသေးလျှင်
+    //     const confirmLogin = confirm("You need to login to book this package. Do you want to go to login page?");
+    //     if (confirmLogin) {
+    //       this.$router.push({ name: 'login' });
+    //     }}else {
+    //     // 4. Login ဝင်ပြီးသားဆိုလျှင် Booking Page သို့ Navigate လုပ်ခြင်း
+    //     // Route Name 'Booking' ကို index.js ထဲကအတိုင်း သေချာစစ်ဆေးပါ
+    //     this.$router.push({
+    //       name: 'Booking', 
+    //       params: { id: this.pkg.id }
+    //     });
+    //   }
     },
     setImage(img) {
       this.selectedImg = img
@@ -1564,6 +1621,21 @@ export default {
   },
   // Title အောက်က ကြယ်ပွင့်တွက်ချက်ရန်
   computed: {
+    pkg() {
+      const id = this.$route.params.id;
+      return this.packagesDataset.find((p) => p.id == id);
+    },
+    auth() {
+    return useAuthStore()
+  },
+
+  isLoggedIn() {
+    return (
+      this.$store.state.user ||
+      localStorage.getItem("is_logged_in") === "true"
+    )
+  },
+
     averageRating() {
       if (this.commentsDataset.length === 0) return 0
       const sum = this.commentsDataset.reduce((acc, rev) => acc + rev.rating, 0)
