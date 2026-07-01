@@ -102,7 +102,6 @@
 <script>
 export default {
   name: 'App',
-<<<<<<< HEAD
   created() {
     const savedUser = localStorage.getItem("user");
 
@@ -110,8 +109,6 @@ export default {
       this.$store.commit("SET_USER", JSON.parse(savedUser));
     }
   },
-
-=======
   computed: {
     // 💡 လမ်းကြောင်းခွဲပေးမယ့် ဒီ computed property ရှိနေဖို့ လိုအပ်ပါတယ်ဗျာ
     profileRoute() {

@@ -101,11 +101,10 @@ export default {
         rememberMe: false,
       },
       isPasswordVisible: false,
-      loading: false, // UI မှာ  Loading state ပြရန်
+      loading: false, // UI မှာ Loading state ပြရန်
     }
   },
   computed: {
-    
     formValid() {
       return !!(this.formData.email && this.formData.password && this.formData.password.length >= 6)
     },
@@ -118,116 +117,87 @@ export default {
     handleSubmit() {
       this.loading = true
 
-      
       setTimeout(() => {
         // ------------------ ၁။ ADMIN ACCOUNT LOGIN CHECK ------------------
-        if (this.formData.email === 'admin@gmail.com') {
-          if (this.formData.password === '123456') {
-            alert('Admin Logged In Successfully!')
+        if (this.formData.email === 'admin@gmail.com' && this.formData.password === '123456') {
+          alert('Admin Logged In Successfully!')
 
-            const adminData = {
-              email: this.formData.email,
-              name: 'Admin',
-              full_name: 'Admin',
-              role: 'ADMIN',
+          const adminData = {
+            email: this.formData.email,
+            name: 'Admin',
+            full_name: 'Admin',
+            role: 'ADMIN',
+          }
+          
+          this.$store.commit('SET_USER', adminData)
+          localStorage.setItem('is_logged_in', 'true')
+          localStorage.setItem('user', JSON.stringify(adminData))
+          localStorage.setItem('current_user', JSON.stringify(adminData))
+          
+          this.loading = false
+          this.$router.push('/')
+          return
+        }
+
+        // ------------------ ၂။ REGULAR USER LOGIN CHECK ------------------
+       if (this.formData.email === 'admin@gmail.com' && this.formData.password === '123456') {
+          alert('Admin Logged In Successfully!')
+          const adminData = { email: this.formData.email, name: 'Admin', full_name: 'Admin', role: 'ADMIN' }
+          this.$store.commit('SET_USER', adminData)
+          localStorage.setItem('is_logged_in', 'true')
+          localStorage.setItem('user', JSON.stringify(adminData))
+          this.loading = false
+          this.$router.push('/')
+          return
+        }
+
+        // ------------------ ၂။ REGULAR USER LOGIN CHECK ------------------
+        // 'user' သို့မဟုတ် 'users' key နှစ်ခုလုံးကို ဖတ်ကြည့်မယ်
+        const savedUser = localStorage.getItem('user') || localStorage.getItem('users')
+        
+        if (savedUser) {
+          const parsedData = JSON.parse(savedUser)
+          let matchedUser = null
+
+          // အကယ်၍ SignUp က Data ကို Array အနေနဲ့ သိမ်းခဲ့ရင် လိုက်ရှာမယ်
+          if (Array.isArray(parsedData)) {
+            matchedUser = parsedData.find(u => u.email === this.formData.email && u.password === this.formData.password)
+          } 
+          // အကယ်၍ Single Object အနေနဲ့ သိမ်းခဲ့ရင် တိုက်ရိုက်စစ်မယ်
+          else if (parsedData.email === this.formData.email && parsedData.password === this.formData.password) {
+            matchedUser = parsedData
+          }
+
+          if (matchedUser) {
+            alert('Logged In Successfully!')
+            localStorage.setItem('is_logged_in', 'true')
+
+            const loginData = {
+              fullName: matchedUser.fullName || matchedUser.username || matchedUser.name || 'User',
+              email: matchedUser.email,
+              phone: matchedUser.phone || '',
+              role: 'USER'
             }
+            
+            this.$store.commit('SET_USER', loginData)
+            localStorage.setItem('user', JSON.stringify(loginData))
+            localStorage.setItem('current_user', JSON.stringify(loginData))
+            
+            this.loading = false
+            this.$router.push('/')
+            return
+          }
+        }
 
-<<<<<<< HEAD
-      if (this.formData.email === user.email && this.formData.password === user.password) {
-        alert('Logged In Successfully!')
-        
-        localStorage.setItem('is_logged_in', 'true')
-
-               const loginData = {
-      fullName: user.fullName || user.username || user.name || 'User',
-      email: user.email,
-      phone: user.phone || ''
-    }
-        
-        this.$store.commit('SET_USER', loginData)
-        localStorage.setItem(
-  "current_user",
-  JSON.stringify(loginData)
-)
-
-localStorage.setItem(
-  "user",
-  JSON.stringify(loginData)
-)
-      this.$router.push('/')  
-//        this.$router.push({
-//   name: "Login",
-//   query: {
-//     packageId: this.pkg.id
-//   }
-// })
-      } else {
+        // အချက်အလက် မှားယွင်းခဲ့လျှင်
         alert('Invalid Email or Password! Please try again.')
-      }
+        this.loading = false
+
+      }, 1000)
     },
     
     loginWithSocial(platform) {
       console.log(`Logging in with ${platform}`)
-=======
-            
-            this.$store.commit('SET_USER', adminData)
-
-            // Remember Me ပေါ်မူတည်ပြီး သိမ်း
-            if (this.formData.rememberMe) {
-              localStorage.setItem('travelAdminAuth', 'true')
-              localStorage.setItem('travelAdminUser', JSON.stringify(adminData))
-            } else {
-              sessionStorage.setItem('travelAdminAuth', 'true')
-              sessionStorage.setItem('travelAdminUser', JSON.stringify(adminData))
-            }
-
-            localStorage.setItem('user_role', 'ADMIN')
-            localStorage.setItem('is_logged_in', 'true')
-
-            this.loading = false
-            this.$router.push('/admin/dashboard')
-          } else {
-            this.loading = false
-            alert('Invalid Admin Password! Please try again.')
-          }
-          return
-        }
-
-        // ------------------ ၂။ CUSTOMER/USER LOGIN CHECK ------------------
-        const savedUser = localStorage.getItem('user_account')
-
-        if (!savedUser) {
-          this.loading = false
-          alert('No account found! Please Sign Up first.')
-          this.$router.push('/signup')
-          return
-        }
-
-        const user = JSON.parse(savedUser)
-
-        if (this.formData.email === user.email && this.formData.password === user.password) {
-          alert('Logged In Successfully!')
-
-          localStorage.setItem('user_role', 'CUSTOMER')
-          localStorage.setItem('is_logged_in', 'true')
-
-          // User Information များကို App State Management (Vuex) ထဲသို့ စနစ်တကျ ထည့်သွင်းခြင်း
-          const loginData = {
-            ...user,
-            name: user.username || user.name || 'User',
-            full_name: user.username || user.name || 'User', // ဤလိုင်းအသစ် ထည့်ထားသည်
-            email: user.email,
-          }
-          this.$store.commit('SET_USER', loginData)
-
-          this.loading = false
-          this.$router.push('/')
-        } else {
-          this.loading = false
-          alert('Invalid Email or Password! Please try again.')
-        }
-      }, 600)
->>>>>>> 5451f28041e7e291ceb676b99865bb1e8a5f583a
     },
 
     handleForgotPassword() {
