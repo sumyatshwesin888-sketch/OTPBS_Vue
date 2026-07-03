@@ -131,19 +131,22 @@ export default {
       localStorage.setItem('booking_data', JSON.stringify(booking));
 
       alert('Payment Confirmed!');
-      this.$router.push({ name: 'Confirmation' });
+      this.$router.push('/confirmation')
     }
   }
 };
 </script>
 
 <style scoped>
+.template{
+  background: #f5f9ff;
+}
 .page-wrapper {
   max-width: 1100px;
   margin: 0 auto;
   padding: 24px;
   font-family: "Inter", sans-serif;
-  background: #f5f9ff;
+  
 }
 
 /* STEP PROGRESS (modern blue gradient) */

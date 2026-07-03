@@ -23,7 +23,7 @@
     <div class="checkout-layout">
       <div class="form-section">
         <h3>Traveler Information</h3>
-        <form @submit.prevent="validateForm">
+        <form @submit.prevent="proceedToPayment">
           <div class="form-group">
             <label>Full Name</label>
             <input v-model="form.name" type="text" placeholder="Enter your name" />
@@ -56,7 +56,7 @@
 
           <div class="actions">
           <button class="back-btn" @click="$router.go(-1)">Back</button>
-          <button type="submit" class="btn-submit" v-on:click="proceedToPayment" >Continue to Payment</button>
+          <button type="submit" class="btn-submit" @click="proceedToPayment"  >Continue to Payment</button> 
           </div>
         </form>
       </div>
@@ -94,11 +94,13 @@
 </template>
 <script>
 import { useAuthStore } from '../store/auth';
+
+ 
 export default {
   data() {
     return {
 
-      errors: {},
+      
        selectedPackage: null,
        form: { 
         name: '', 
@@ -117,6 +119,10 @@ export default {
     duration: '3 Days / 2 Nights',
     group_size: '2 - 10 People',
     rating: '4.7',
+
+
+
+
     reviews: '45',
     type: 'domestic',
     level: 'budget',
@@ -1122,7 +1128,7 @@ export default {
        
 currentStep: 1,
       steps: ['Traveler Info', 'Payment', 'Confirmation'],
-      form: { name: '', phone: '', email: '', travelers: 1, date: '' },
+    
       errors: {},
       
 
@@ -1132,27 +1138,39 @@ currentStep: 1,
 
   computed: {
 
+   
 
     totalPrice() {
-      if (!this.selectedPackage) return 0;
-      return this.selectedPackage.price * this.form.travelers;
+      if (!this.selectedPackage) return 0
+  return this.selectedPackage.price * (this.form.travelers || 1)
     }
   },
 
   created() {
-    const authStore = useAuthStore();
-
-    // 1. Authentication Check: Redirect to login if not logged in
+     const authStore = useAuthStore();
     if (!authStore.isLoggedIn) {
+      localStorage.setItem("redirect_after_login", this.$route.fullPath)
       this.$router.push('/login');
       return;
-    }
-    const user = authStore.user || JSON.parse(localStorage.getItem('current_user') || '{}')
-    if (user) {
-      this.form.name = user.fullName || ''
-    this.form.phone = user.phone || ''
-    this.form.email = user.email || ''
-    }
+    } const user = authStore.user
+
+if (user) {
+  this.form.name = user.fullName || ""
+  this.form.phone = user.phone || ""
+  this.form.email = user.email || ""
+}
+   
+    //   const authStore = useAuthStore();
+    //  const route = this.$route
+
+ 
+    // console.log("Booking for Package ID:", this.$route.params.id); //new
+
+    // 1. Authentication Check: Redirect to login if not logged in
+    
+   
+
+  
   },
   mounted() {
     this.loadSelectedPackage();
@@ -1184,20 +1202,24 @@ currentStep: 1,
 
   // 3. Validation စစ်ဆေးခြင်း
   validateForm() {
-    this.errors = {};
-      if (!this.form.name) this.errors.name = 'Full name is required';
-      if (!this.form.email) this.errors.email = 'Email is required'
+     this.errors = {}
+    if (!this.form.name) this.errors.name = 'Full name is required'
+  if (!this.form.email) this.errors.email = 'Email is required'
   if (!this.form.phone) this.errors.phone = 'Phone is required'
-      
-      if (Object.keys(this.errors).length === 0) {
-       this.saveBookingData()
-    this.$router.push('/payment')
-      }
+
+  if (Object.keys(this.errors).length > 0) {
+    return false
+  }
+
+  this.saveBookingData()
+  this.$router.push('/payment')
+
   },
 
   // 4. Button နှိပ်သည့်အခါ ခေါ်မည့် Function
   proceedToPayment() {
-    this.validateForm();
+     const ok = this.validateForm()
+  if (!ok) return
   }
 }
   };
@@ -1211,13 +1233,17 @@ currentStep: 1,
 
 </script>
 <style scoped>
+.template{
+    background: radial-gradient(circle at top, #eaf3ff, #f6f9ff);
+}
 .page-wrapper {
   max-width: 1100px;
   margin: 0 auto;
   padding: 40px 20px;
   font-family: "Inter", sans-serif;
-  background: radial-gradient(circle at top, #eaf3ff, #f6f9ff);
+
 }
+
 
 .actions {
   display: flex;
@@ -1448,9 +1474,6 @@ select:focus {
   color: #1d4ed8;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
 @media (max-width: 768px) {
   .checkout-layout {
     flex-direction: column;

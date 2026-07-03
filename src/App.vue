@@ -22,7 +22,7 @@
         </div>
 
         <div class="nav-actions">
-          <template v-if="!$store.state.user">
+         <template v-if="!authStore.user">
             <button
               class="btn-login"
               @click="$router.replace('/login')"
@@ -44,14 +44,14 @@
                 <v-btn variant="text" class="profile-trigger-btn" v-bind="props">
                   <v-avatar color="primary" size="32" class="mr-2 text-white font-weight-bold">
                     {{
-                      ($store.state.user.name || $store.state.user.full_name || 'U')
+                      (authStore.user.fullName || authStore.user.name || 'U')
                         .charAt(0)
                         .toUpperCase()
                     }}
                   </v-avatar>
 
                   <span class="user-display-name">
-                    {{ $store.state.user.name || $store.state.user.full_name || 'User' }}
+                   {{ authStore.user.fullName || authStore.user.name || 'User' }}
                   </span>
                   <v-icon icon="mdi-chevron-down" size="small" class="ml-1 text-white" />
                 </v-btn>
@@ -100,31 +100,39 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/store/auth'
+
 export default {
   name: 'App',
-  created() {
-    const savedUser = localStorage.getItem("user");
-
-    if (savedUser && !this.$store.state.user) {
-      this.$store.commit("SET_USER", JSON.parse(savedUser));
+  data() {
+    return {
+     
+      authStore: useAuthStore()
     }
   },
+  created() {
+   this.authStore.loadUser()
+  },
+ 
   computed: {
     // 💡 လမ်းကြောင်းခွဲပေးမယ့် ဒီ computed property ရှိနေဖို့ လိုအပ်ပါတယ်ဗျာ
-    profileRoute() {
-      const user = this.$store.state.user;
-      
-      // user ရှိပြီး role က ADMIN ဖြစ်နေလျှင် admin dashboard သို့ လွှတ်မည်
-      if (user && user.role === 'ADMIN') {
-        return '/admin/dashboard';
-      }
-      
-      // ပုံမှန် user ဖြစ်လျှင် user profile သို့ သွားမည်
-      return '/profile';
+   
+
+  profileRoute() {
+    const user = this.authStore.user
+
+    if (user && user.role === 'ADMIN') {
+      return '/admin/dashboard'
     }
+
+    return '/profile'
+  }
+
   },
   methods: {
     handleLogout() {
+       localStorage.removeItem('user')
+  localStorage.removeItem('user_credentials')
       localStorage.removeItem('is_logged_in')
       localStorage.removeItem('user_role')
       localStorage.removeItem('travelAdminAuth')
@@ -132,11 +140,11 @@ export default {
       sessionStorage.removeItem('travelAdminAuth')
       sessionStorage.removeItem('travelAdminUser')
 
-      this.$store.dispatch('logout').then(() => {
-        if (this.$route.path !== '/') {
-          this.$router.push('/')
-        }
-      })
+      this.authStore.logout()
+
+if (this.$route.path !== '/') {
+    this.$router.push('/')
+}
     },
   },
 }

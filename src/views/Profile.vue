@@ -183,8 +183,8 @@ export default {
   },
   methods: {
     loadUserData() {
-      const savedUser = localStorage.getItem('user_account')
-      const isLoggedIn = localStorage.getItem('is_logged_in')
+     const savedUser = localStorage.getItem('user')
+const isLoggedIn = localStorage.getItem('user')
 
       if (savedUser && isLoggedIn === 'true') {
         const user = JSON.parse(savedUser)
@@ -196,12 +196,12 @@ export default {
         this.editForm.full_name = user.full_name || ''
         this.editForm.phone = user.phone || ''
       } else {
-        alert('Please Create an Account or Log In first.')
-        this.$router.push('/signup')
+        
+        this.$router.push('/login')
       }
     },
     handleUpdateProfile() {
-      const savedUser = localStorage.getItem('user_account')
+      const savedUser = localStorage.getItem('user')
       if (savedUser) {
         const user = JSON.parse(savedUser)
         user.full_name = this.editForm.full_name
@@ -345,6 +345,7 @@ export default {
   font-weight: 800;
   background: linear-gradient(135deg, #1d4ed8 0%, #0369a1 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

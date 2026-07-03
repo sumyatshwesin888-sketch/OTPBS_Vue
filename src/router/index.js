@@ -72,6 +72,12 @@ const router = createRouter({
 
       component: () => import('../views/Packages.vue'),
     },
+        {
+      path: '/infopackages',
+      name: 'infopackages',
+
+      component: () => import('../views/InfoPackages.vue'),
+    },
     {
       path: '/packagedetail/:id',
       name: 'packagedetail',

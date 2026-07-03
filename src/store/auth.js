@@ -1,12 +1,18 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 
+
 export const useAuthStore = defineStore('auth', () => {
-  // State: 'user' is the active session, 'registered_user' is the account storage
+  // State: 'user' is the active session, 'registered_user'
+  // 
+  //  is the account storage
+
+  
   const user = ref(JSON.parse(localStorage.getItem('user')) || null);
   const profile = ref(null); // Kept for compatibility with your existing components
   
   const isLoggedIn = computed(() => !!user.value);
+  const currentUser = computed(() => user.value);
 
   // 1. Sign Up: Saves account credentials and automatically logs in
   function signUp(email, password, fullName, phone) {
@@ -27,12 +33,26 @@ export const useAuthStore = defineStore('auth', () => {
     throw new Error('Invalid email or password.');
   }
 
+  function loadUser() { //new
+  const savedUser = JSON.parse(localStorage.getItem('user'));
+
+  if (savedUser) {
+    user.value = savedUser;
+  }
+}
+
   // 3. Set User: Helper to save the active login session
   function setUser(userData) {
-    user.value = userData;
-    localStorage.setItem('user', JSON.stringify(userData));
+ user.value = {
+    name: userData.name || userData.fullName || '',
+    fullName: userData.fullName || userData.name || '',
+    phone: userData.phone || '',
+    email: userData.email || '',
+    role: userData.role || 'USER'
   }
 
+  localStorage.setItem('user', JSON.stringify(user.value))
+}
   // 4. Logout: Removes only the login session, keeps account data
   function logout() {
     user.value = null;
@@ -47,5 +67,5 @@ localStorage.removeItem("current_user");
     return profile.value;
   }
 
-  return { user, profile, isLoggedIn, signUp, signIn, setUser, logout, fetchProfile };
+  return { user, profile, isLoggedIn,currentUser, signUp, signIn, setUser, logout, fetchProfile ,loadUser};
 });

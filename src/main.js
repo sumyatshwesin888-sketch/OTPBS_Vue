@@ -15,6 +15,8 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { mdi } from 'vuetify/iconsets/mdi'
 import '@mdi/font/css/materialdesignicons.css'
+import axios from "axios";
+import VueAxios from "vue-axios";
 
 const vuetify = createVuetify({
   components,
@@ -30,6 +32,8 @@ const app = createApp(App)
 
 // Middleware တွေကို သုံးမယ် (use)
 app.use(createPinia())
+app.use(axios)
+app.use(VueAxios)
 app.use(router)
 app.use(vuetify)
 app.use(store)
