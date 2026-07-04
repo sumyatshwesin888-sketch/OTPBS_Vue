@@ -116,29 +116,35 @@ export default {
         }
 
         // 🔥 NORMAL USER LOGIN (localStorage check)
-        const saved = localStorage.getItem('user_credentials')
-        if (!saved) throw new Error('No user found')
+        // const saved = localStorage.getItem('user_credentials')
+        // if (!saved) throw new Error('No user found')
 
-        const user = JSON.parse(saved)
+        // const user = JSON.parse(saved)
 
-        if (user.email !== this.email || user.password !== this.password) {
-          throw new Error('Invalid credentials')
+        // if (user.email !== this.email || user.password !== this.password) {
+        //   throw new Error('Invalid credentials')
 
-        }
+        // }
 
 
-        this.authStore.setUser({
-  // name: user.fullName,
-  fullName: user.fullName,
-  email: user.email,
-  phone: user.phone,
-  role: 'USER'
-})
+//         this.authStore.setUser({
+//   // name: user.fullName,
+//   fullName: user.fullName,
+//   email: user.email,
+//   phone: user.phone,
+//   role: 'USER'
+// })
 
-this.redirectAfterLogin('USER')
+// this.redirectAfterLogin('USER')
         
 
-       
+       await this.authStore.signIn(
+          this.email,
+          this.password
+        )
+
+        this.redirectAfterLogin('USER')
+
 
       } catch (err) {
         alert(err.message || 'Login failed')

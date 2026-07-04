@@ -120,22 +120,23 @@ export default {
       }
 
       // ❗ basic validation
-      if (!this.email || !this.password) {
+      if (!this.fullName || !this.phone || !this.email || !this.password)  {
         alert('Please fill all fields')
         return
       }
 
-      const users = JSON.parse(localStorage.getItem('users')) || []
-      // ❗ duplicate check
-      const existing = localStorage.getItem('user_credentials')
-      if (existing) {
-        const user = JSON.parse(existing)
-        if (user.email === this.email) {
-          alert('User already exists. Please login.')
-          this.$router.push('/login')
-          return
-        }
-      }
+       const users = JSON.parse(localStorage.getItem('users')) || []
+      // // ❗ duplicate check
+      // const existing = localStorage.getItem('user_credentials')
+     const existing = users.find(
+  user => user.email.toLowerCase() === this.email.toLowerCase()
+)
+
+if (existing) {
+  alert('User already exists. Please login.')
+  this.$router.push('/login')
+  return
+}
 
       // 🔥 create user object
       const newUser = {
@@ -148,6 +149,7 @@ export default {
 
       users.push(newUser)
       localStorage.setItem('users', JSON.stringify(users))
+      // localStorage.setItem('user_credentials', JSON.stringify(newUser))
       // 💾 store credentials
 
 
