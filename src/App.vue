@@ -22,7 +22,7 @@
         </div>
 
         <div class="nav-actions">
-          <template v-if="!$store.state.user">
+         <template v-if="!authStore.user">
             <button
               class="btn-login"
               @click="$router.replace('/login')"
@@ -44,14 +44,14 @@
                 <v-btn variant="text" class="profile-trigger-btn" v-bind="props">
                   <v-avatar color="primary" size="32" class="mr-2 text-white font-weight-bold">
                     {{
-                      ($store.state.user.name || $store.state.user.full_name || 'U')
+                      (authStore.user.fullName || authStore.user.name || 'U')
                         .charAt(0)
                         .toUpperCase()
                     }}
                   </v-avatar>
 
                   <span class="user-display-name">
-                    {{ $store.state.user.name || $store.state.user.full_name || 'User' }}
+                   {{ authStore.user.fullName || authStore.user.name || 'User' }}
                   </span>
                   <v-icon icon="mdi-chevron-down" size="small" class="ml-1 text-white" />
                 </v-btn>
@@ -100,40 +100,51 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/store/auth'
+
 export default {
   name: 'App',
-<<<<<<< HEAD
+  data() {
+    return {
+     
+      authStore: useAuthStore()
+    }
+  },
   created() {
-    const savedUser = localStorage.getItem("user");
-
-    if (savedUser && !this.$store.state.user) {
-      this.$store.commit("SET_USER", JSON.parse(savedUser));
-    }
+   this.authStore.loadUser()
   },
-
-=======
+ 
   computed: {
-    // 💡 အသစ်ထည့်သွင်းလိုက်သည့် Computed Property ဖြစ်ပါသည်
-    profileRoute() {
-      const user = this.$store.state.user;
-      
-      // အကယ်၍ user ရှိပြီး role က ADMIN ဖြစ်နေလျှင် admin dashboard သို့ လွှတ်မည်
-      if (user && user.role === 'ADMIN') {
-        return '/admin/dashboard';
-      }
-      
-      // ပုံမှန် user ဖြစ်လျှင် user profile သို့ သွားမည်
-      return '/profile';
+    // 💡 လမ်းကြောင်းခွဲပေးမယ့် ဒီ computed property ရှိနေဖို့ လိုအပ်ပါတယ်ဗျာ
+   
+
+  profileRoute() {
+    const user = this.authStore.user
+
+    if (user && user.role === 'ADMIN') {
+      return '/admin/dashboard'
     }
+
+    return '/profile'
+  }
+
   },
->>>>>>> 5451f28041e7e291ceb676b99865bb1e8a5f583a
   methods: {
     handleLogout() {
-      this.$store.dispatch('logout').then(() => {
-        if (this.$route.path !== '/') {
-          this.$router.push('/')
-        }
-      })
+       localStorage.removeItem('user')
+  localStorage.removeItem('user_credentials')
+      localStorage.removeItem('is_logged_in')
+      localStorage.removeItem('user_role')
+      localStorage.removeItem('travelAdminAuth')
+      localStorage.removeItem('travelAdminUser')
+      sessionStorage.removeItem('travelAdminAuth')
+      sessionStorage.removeItem('travelAdminUser')
+
+      this.authStore.logout()
+
+if (this.$route.path !== '/') {
+    this.$router.push('/')
+}
     },
   },
 }
@@ -178,13 +189,13 @@ html {
 
 /* Navbar styles */
 .navbar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 100;
   padding: 20px 0;
-  background-color: #0f172a !important; /* နမူနာ - AdminLayout ထဲကလို Dark Slate အရောင် */
+  background-color: #15254b !important; /* နမူနာ - AdminLayout ထဲကလို Dark Slate အရောင် */
 
   /* Solid ဖြစ်သွားတဲ့အတွက် အောက်က content တွေနဲ့ ကွဲပြားအောင် shadow လေး ထည့်ပေးနိုင်ပါတယ် */
   box-shadow:
@@ -205,6 +216,8 @@ html {
   display: flex;
   align-items: center;
   gap: 10px;
+position: relative !important;
+  left: -100px !important;
 }
 
 .brand-logo-svg {
@@ -235,7 +248,7 @@ html {
   text-decoration: none;
   color: white;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 

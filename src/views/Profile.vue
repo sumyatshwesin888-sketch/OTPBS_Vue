@@ -7,13 +7,13 @@
             <div class="avatar-circle">{{ initial }}</div>
           </div>
           <div class="profile-details">
-            <h1 class="user-fullname">{{ auth.profile.full_name || 'Traveler' }}</h1>
+            <h1 class="user-fullname">{{ authStore.user?.fullName || 'Traveler' }}</h1>
             <p class="user-meta-text">
-              <i class="fa-solid fa-envelope input-icon"></i> {{ auth.user.email }}
+              <i class="fa-solid fa-envelope input-icon"></i> {{ authStore.user?.email }}
             </p>
             <p class="user-meta-text">
               <i class="fas fa-phone-alt input-icon"></i>
-              {{ auth.profile.phone || 'No phone added' }}
+             {{ authStore.user?.phone || 'No phone added' }}
             </p>
           </div>
           <v-btn
@@ -103,7 +103,7 @@
           <label class="modern-input-label">Full Name</label>
           <input
             type="text"
-            v-model="editForm.full_name"
+            v-model="editForm.fullName"
             placeholder="Enter your full name"
             class="modern-input-field"
             required
@@ -154,18 +154,18 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/store/auth'
+
 export default {
   name: 'UserProfile',
   data() {
     return {
+      authStore:useAuthStore(),
       showEdit: false,
       activeTab: 'bookings',
-      auth: {
-        user: { email: '' },
-        profile: { full_name: '', phone: '' },
-      },
+      
       editForm: {
-        full_name: '',
+        fullName: '',
         phone: '',
       },
       bookings: [],
@@ -174,56 +174,72 @@ export default {
   },
   computed: {
     initial() {
-      const name = this.auth.profile.full_name || 'T'
-      return name.charAt(0).toUpperCase()
+      const name =
+    this.authStore.user?.fullName ||
+    this.authStore.user?.name ||
+    'Traveler'
+
+  return name.charAt(0).toUpperCase()
     },
   },
   created() {
-    this.loadUserData()
+  this.authStore.loadUser()
+  this.loadUserData()
+
   },
   methods: {
+    handleLogout() {
+  this.authStore.logout()
+  this.$router.push('/login')
+},
+
     loadUserData() {
-      const savedUser = localStorage.getItem('user_account')
-      const isLoggedIn = localStorage.getItem('is_logged_in')
+    const savedUser = localStorage.getItem('user')
 
-      if (savedUser && isLoggedIn === 'true') {
-        const user = JSON.parse(savedUser)
+  if (!savedUser) {
+    this.$router.push('/login')
+    return
+  }
+const user = JSON.parse(savedUser)
 
-        this.auth.user.email = user.email || ''
-        this.auth.profile.full_name = user.full_name || ''
-        this.auth.profile.phone = user.phone || ''
+this.authStore.setUser(user)
 
-        this.editForm.full_name = user.full_name || ''
-        this.editForm.phone = user.phone || ''
-      } else {
-        alert('Please Create an Account or Log In first.')
-        this.$router.push('/signup')
-      }
+  // this.authStore.user?.email = user.email || ''
+  // this.authStore.user?.fullName  =
+  //   user.fullName || user.fullName || ''
+
+  // this.authStore.user?.phone  = user.phone || ''
+
+  this.editForm.fullName = user.fullName || ''
+this.editForm.phone = user.phone || ''
+
     },
     handleUpdateProfile() {
-      const savedUser = localStorage.getItem('user_account')
-      if (savedUser) {
-        const user = JSON.parse(savedUser)
-        user.full_name = this.editForm.full_name
-        user.phone = this.editForm.phone
+  const savedUser = localStorage.getItem('user')
 
-        localStorage.setItem('user_account', JSON.stringify(user))
+  if (savedUser) {
+    const user = JSON.parse(savedUser)
 
-        this.auth.profile.full_name = this.editForm.full_name
-        this.auth.profile.phone = this.editForm.phone
+    user.fullName = this.editForm.fullName
+    user.phone = this.editForm.phone
 
-        alert('Profile Updated Successfully!')
-        this.showEdit = false
-      }
-    },
-    handleLogout() {
-      localStorage.removeItem('is_logged_in')
-      alert('Logged Out Successfully!')
-      this.$router.push('/login')
-    },
-  },
+    // Update localStorage
+    localStorage.setItem('user', JSON.stringify(user))
+
+    // ✅ Update Pinia Store
+    this.authStore.setUser(user)
+
+    // Update current page
+    // this.auth.profile.fullName = user.fullName
+    // this.auth.profile.phone = user.phone
+
+    alert('Profile Updated Successfully!')
+    this.showEdit = false
+  }
+}  },
 }
 </script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');

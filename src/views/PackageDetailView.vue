@@ -1457,21 +1457,7 @@ export default {
     }
   },
 
-  computed: {
-    auth() {
-      return useAuthStore()
-    },
-    
-    isLoggedIn() {
-       return !!localStorage.getItem("user")
-      // သင်၏ Project ရှိ Auth state စစ်ဆေးပုံအတိုင်း ပြင်ဆင်ပါ
-//       !!this.$store.state.user ||
-//       localStorage.getItem("is_logged_in") === "true"
-//       localStorage.removeItem("is_logged_in")
-// localStorage.removeItem("current_user")
-// this.$store.commit("SET_USER", null)
-    }
-  },
+ 
 
   // ၂။ Methods
   methods: {
@@ -1519,7 +1505,10 @@ export default {
 
       // 🔑 LocalStorage ထဲကနေ login ဝင်ထားတဲ့ user info ကို လှမ်းယူတာ (သင့် system ပေါ်မူတည်ပြီး ပြောင်းလဲနိုင်ပါတယ်)
       const currentUser = JSON.parse(localStorage.getItem('current_user'))
-      const currentUserName = currentUser ? currentUser.name : 'Anonymous Traveller'
+      const currentUserName =
+currentUser
+? currentUser.fullName
+: "Anonymous Traveller";
 
       // ၁။ လက်ရှိ list ထဲ ထည့်တယ်
       this.commentsDataset.unshift({
@@ -1562,31 +1551,51 @@ export default {
       this.loading = false
     },
     handleBooking() {
-       
-    if (!this.isLoggedIn) {
+   const authStore = useAuthStore()
 
-    const confirmLogin = confirm(
-      "You need to login to book this package. Do you want to go to login page?"
+  // ❌ not logged in
+  if (!authStore.isLoggedIn) {
+    const goLogin = confirm(
+      "You need to login to book this package. Go to login page?"
     )
 
-    if (confirmLogin) {
-      this.$router.push({
-  path: "/login",
-  query: {
-    redirect: this.$route.fullPath
-  }
-})
+    if (goLogin) {
+      // redirect after login ပြန်လာအောင် save
+      localStorage.setItem("redirect_after_login", this.$route.fullPath)
+
+      this.$router.push('/login')
     }
 
     return
   }
 
-  this.$router.push({
-    name: "Booking",
-    params: {
-      id: this.pkg.id
-    }
-  })
+  // ✅ logged in → go booking
+  this.$router.push(`/booking/${this.pkg.id}`)
+       
+//     if (!this.isLoggedIn) {
+
+//     const confirmLogin = confirm(
+//       "You need to login to book this package. Do you want to go to login page?"
+//     )
+
+//     if (confirmLogin) {
+//       this.$router.push({
+//   path: "/login",
+//   query: {
+//     redirect: this.$route.fullPath
+//   }
+// })
+//     }
+
+//     return
+//   }
+
+//   this.$router.push({
+//     name: "Booking",
+//     params: {
+//       id: this.pkg.id
+//     }
+//   })
     // if (!this.authStore.isLoggedIn) {
     //     // Login မဝင်ရသေးလျှင်
     //     const confirmLogin = confirm("You need to login to book this package. Do you want to go to login page?");
@@ -1630,10 +1639,8 @@ export default {
   },
 
   isLoggedIn() {
-    return (
-      this.$store.state.user ||
-      localStorage.getItem("is_logged_in") === "true"
-    )
+      return this.auth.isLoggedIn;
+
   },
 
     averageRating() {

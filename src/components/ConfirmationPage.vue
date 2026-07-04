@@ -75,12 +75,16 @@ export default {
 
 <style scoped>
 
+
+.template{
+   background: radial-gradient(circle at top, #eaf3ff, #f6f9ff);
+}
 .page-wrapper {
   max-width: 1050px;
   margin: 0 auto;
   padding: 42px 20px;
   font-family: "Inter", sans-serif;
-  background: radial-gradient(circle at top, #eaf3ff, #f6f9ff);
+ 
 }
 
 /* STEP PROGRESS (premium blue glass) */

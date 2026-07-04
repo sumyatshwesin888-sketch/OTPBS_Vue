@@ -2,88 +2,69 @@
   <div class="login-container">
     <main class="login-card">
       <h2 class="card-title">Welcome Back!</h2>
-      <p class="card-subtitle">Unlock exclusive travel deals & book your dream trip!</p>
+      <p class="card-subtitle">
+        Unlock exclusive travel deals & book your dream trip!
+      </p>
 
       <form @submit.prevent="handleSubmit" class="form-content">
+
+        <!-- EMAIL -->
         <div class="input-group">
           <i class="fa-solid fa-envelope input-icon"></i>
           <input
             type="email"
-            v-model="formData.email"
+            v-model="email"
             placeholder="Email Address"
             :disabled="loading"
             required
           />
         </div>
 
+        <!-- PASSWORD -->
         <div class="input-group">
           <i class="fa-solid fa-lock input-icon"></i>
+
           <input
-            :type="isPasswordVisible ? 'text' : 'password'"
-            v-model="formData.password"
+            :type="showPassword ? 'text' : 'password'"
+            v-model="password"
             placeholder="Password"
             :disabled="loading"
             required
           />
-          <span class="toggle-password" @click.stop="togglePasswordVisibility">
-            <svg
-              v-if="isPasswordVisible"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-              class="svg-icon"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 1-4.243-4.243m4.242 4.242L9.88 9.88"
-              />
-            </svg>
 
-            <svg
-              v-else
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-              class="svg-icon"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
+          <span class="toggle-password" @click="showPassword = !showPassword">
+            👁
           </span>
         </div>
 
+        <!-- OPTIONS -->
         <div class="form-options">
           <label class="remember-me">
-            <input type="checkbox" v-model="formData.rememberMe" :disabled="loading" />
+            <input type="checkbox" v-model="rememberMe" />
             <span>Remember Me</span>
           </label>
-          <a href="#" @click.prevent="handleForgotPassword" class="forgot-password">
+
+          <a href="#" @click.prevent="forgotPassword">
             Forgot Password?
           </a>
         </div>
 
-        <button type="submit" class="btn-submit" :disabled="loading || !formValid">
-          <span v-if="loading" class="spinner"></span>
-          <span v-else>Log In <span class="arrow">→</span></span>
+        <!-- SUBMIT -->
+        <button
+          type="submit"
+          class="btn-submit"
+          :disabled="loading || !formValid"
+        >
+          <span v-if="loading">Loading...</span>
+          <span v-else>Login →</span>
         </button>
+
       </form>
 
       <footer class="card-footer">
         <p>
-          Don't have an account? <a href="/signup" @click.prevent="navigateToSignUp">Sign Up</a>
+          Don't have an account?
+          <a @click.prevent="$router.push('/signup')">Sign Up</a>
         </p>
       </footer>
     </main>
@@ -91,208 +72,163 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/store/auth'
+
 export default {
   name: 'LoginForm',
+
   data() {
     return {
-      formData: {
-        email: '',
-        password: '',
-        rememberMe: false,
-      },
-      isPasswordVisible: false,
-      loading: false, // UI မှာ  Loading state ပြရန်
+      email: '',
+      password: '',
+      rememberMe: false,
+      showPassword: false,
+      loading: false,
+      authStore: useAuthStore()
     }
   },
-  computed: {
-    
-    formValid() {
-      return !!(this.formData.email && this.formData.password && this.formData.password.length >= 6)
-    },
-  },
-  methods: {
-    togglePasswordVisibility() {
-      this.isPasswordVisible = !this.isPasswordVisible
-    },
 
-    handleSubmit() {
+  computed: {
+    formValid() {
+      return this.email && this.password.length >= 6
+    }
+  },
+
+  methods: {
+
+    async handleSubmit() {
       this.loading = true
 
-      
-      setTimeout(() => {
-        // ------------------ ၁။ ADMIN ACCOUNT LOGIN CHECK ------------------
-        if (this.formData.email === 'admin@gmail.com') {
-          if (this.formData.password === '123456') {
-            alert('Admin Logged In Successfully!')
+      try {
 
-            const adminData = {
-              email: this.formData.email,
-              name: 'Admin',
-              full_name: 'Admin',
-              role: 'ADMIN',
-            }
+        // 🔥 ADMIN LOGIN (hardcoded)
+        if (this.email === 'admin@gmail.com' && this.password === '123456') {
+          const adminUser = {
+            name: 'Admin',
+            email: this.email,
+            role: 'ADMIN'
+          }
 
-<<<<<<< HEAD
-      if (this.formData.email === user.email && this.formData.password === user.password) {
-        alert('Logged In Successfully!')
+          this.authStore.setUser(adminUser)
+
+          this.redirectAfterLogin(adminUser.role)
+          return
+        }
+
+        // 🔥 NORMAL USER LOGIN (localStorage check)
+        const saved = localStorage.getItem('user_credentials')
+        if (!saved) throw new Error('No user found')
+
+        const user = JSON.parse(saved)
+
+        if (user.email !== this.email || user.password !== this.password) {
+          throw new Error('Invalid credentials')
+
+        }
+
+
+        this.authStore.setUser({
+  // name: user.fullName,
+  fullName: user.fullName,
+  email: user.email,
+  phone: user.phone,
+  role: 'USER'
+})
+
+this.redirectAfterLogin('USER')
         
-        localStorage.setItem('is_logged_in', 'true')
 
-               const loginData = {
-      fullName: user.fullName || user.username || user.name || 'User',
-      email: user.email,
-      phone: user.phone || ''
-    }
-        
-        this.$store.commit('SET_USER', loginData)
-        localStorage.setItem(
-  "current_user",
-  JSON.stringify(loginData)
-)
+       
 
-localStorage.setItem(
-  "user",
-  JSON.stringify(loginData)
-)
-      this.$router.push('/')  
-//        this.$router.push({
-//   name: "Login",
-//   query: {
-//     packageId: this.pkg.id
-//   }
-// })
-      } else {
-        alert('Invalid Email or Password! Please try again.')
+      } catch (err) {
+        alert(err.message || 'Login failed')
+      } finally {
+        this.loading = false
       }
     },
-    
-    loginWithSocial(platform) {
-      console.log(`Logging in with ${platform}`)
-=======
-            
-            this.$store.commit('SET_USER', adminData)
 
-            // Remember Me ပေါ်မူတည်ပြီး သိမ်း
-            if (this.formData.rememberMe) {
-              localStorage.setItem('travelAdminAuth', 'true')
-              localStorage.setItem('travelAdminUser', JSON.stringify(adminData))
-            } else {
-              sessionStorage.setItem('travelAdminAuth', 'true')
-              sessionStorage.setItem('travelAdminUser', JSON.stringify(adminData))
-            }
+    redirectAfterLogin(role) {
+     const goBooking = localStorage.getItem('goBooking')
 
-            localStorage.setItem('user_role', 'ADMIN')
-            localStorage.setItem('is_logged_in', 'true')
+  if (goBooking) {
+    localStorage.removeItem('goBooking')
+    this.$router.push(`/booking/${goBooking}`)
+    return
+  }
 
-            this.loading = false
-            this.$router.push('/admin/dashboard')
-          } else {
-            this.loading = false
-            alert('Invalid Admin Password! Please try again.')
-          }
-          return
-        }
+  if (role === 'ADMIN') {
+    this.$router.push('/admin/dashboard')
+    return
+  }
 
-        // ------------------ ၂။ CUSTOMER/USER LOGIN CHECK ------------------
-        const savedUser = localStorage.getItem('user_account')
+  const redirect = this.$route.query.redirect || '/'
+  this.$router.push(redirect)
+ },
 
-        if (!savedUser) {
-          this.loading = false
-          alert('No account found! Please Sign Up first.')
-          this.$router.push('/signup')
-          return
-        }
-
-        const user = JSON.parse(savedUser)
-
-        if (this.formData.email === user.email && this.formData.password === user.password) {
-          alert('Logged In Successfully!')
-
-          localStorage.setItem('user_role', 'CUSTOMER')
-          localStorage.setItem('is_logged_in', 'true')
-
-          // User Information များကို App State Management (Vuex) ထဲသို့ စနစ်တကျ ထည့်သွင်းခြင်း
-          const loginData = {
-            ...user,
-            name: user.username || user.name || 'User',
-            full_name: user.username || user.name || 'User', // ဤလိုင်းအသစ် ထည့်ထားသည်
-            email: user.email,
-          }
-          this.$store.commit('SET_USER', loginData)
-
-          this.loading = false
-          this.$router.push('/')
-        } else {
-          this.loading = false
-          alert('Invalid Email or Password! Please try again.')
-        }
-      }, 600)
->>>>>>> 5451f28041e7e291ceb676b99865bb1e8a5f583a
-    },
-
-    handleForgotPassword() {
-      console.log('Redirect to Forgot Password Page')
-    },
-
-    navigateToSignUp() {
-      this.$router.push('/signup')
-    },
-  },
+    forgotPassword() {
+      alert('Forgot password feature coming soon')
+    }
+  }
 }
 </script>
-
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
   font-family: 'Poppins', sans-serif;
 }
 
 .login-container {
   width: 100%;
   min-height: 100vh;
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('public/login.avif');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  padding: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+
+  /* 🔥 Background image + dark overlay */
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.55)
+    ),
+    url('/login.avif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 20px;
 }
 
 .login-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   width: 100%;
-  max-width: 450px;
-  border-radius: 24px;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+
+  border-radius: 20px;
   padding: 40px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+
+  animation: fadeIn 0.5s ease-in-out;
 }
 
+/* TITLE */
 .card-title {
-  color: #0b1a30;
-  font-size: 1.8rem;
+  font-size: 26px;
   font-weight: 700;
   text-align: center;
+  color: #0f172a;
   margin-bottom: 8px;
 }
 
 .card-subtitle {
-  color: #4a5568;
-  font-size: 0.85rem;
+  font-size: 13px;
   text-align: center;
+  color: #64748b;
   margin-bottom: 25px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
+/* INPUTS */
 .form-content {
   display: flex;
   flex-direction: column;
@@ -301,180 +237,127 @@ localStorage.setItem(
 
 .input-group {
   position: relative;
-  width: 100%;
-}
-
-.input-icon {
-  position: absolute;
-  left: 16px;
-  color: #a0aec0;
-  font-size: 1.1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  z-index: 2;
 }
 
 .input-group input {
   width: 100%;
-  padding: 14px 45px 14px 45px;
-  border: 1.5px solid #cbd5e1;
+  padding: 14px 45px;
+  border: 1px solid #cbd5e1;
   border-radius: 12px;
-  font-size: 0.95rem;
-  color: #334155;
-  background-color: #f8fafc;
+  font-size: 14px;
+  background: #f8fafc;
   outline: none;
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 1;
+  transition: 0.3s;
 }
 
 .input-group input:focus {
   border-color: #00bcd4;
-  background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(0, 188, 212, 0.1);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.15);
 }
 
-.input-group input:disabled {
-  background-color: #e2e8f0;
-  cursor: not-allowed;
+/* ICON */
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
 }
 
+/* PASSWORD TOGGLE */
 .toggle-password {
   position: absolute;
-  right: 16px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  z-index: 3;
+  font-size: 18px;
 }
 
-.svg-icon {
-  width: 22px;
-  height: 22px;
-  color: #a0aec0;
-  transition: color 0.2s;
-}
-
-.toggle-password:hover .svg-icon {
-  color: #00bcd4;
-}
-
+/* OPTIONS */
 .form-options {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font-size: 0.85rem;
-  margin-top: 4px;
+  font-size: 13px;
+  margin-top: 5px;
 }
 
 .remember-me {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   color: #334155;
-  cursor: pointer;
 }
 
-.remember-me input {
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
-  accent-color: #00bcd4;
-}
-
-.forgot-password {
-  color: #000000;
+.form-options a {
+  color: #00bcd4;
   text-decoration: none;
-  font-weight: 500;
 }
 
-.forgot-password:hover {
+.form-options a:hover {
   text-decoration: underline;
 }
 
+/* BUTTON */
 .btn-submit {
-  background: #00bcd4;
-  color: #ffffff;
+  width: 100%;
+  padding: 14px;
   border: none;
   border-radius: 12px;
-  padding: 14px;
-  font-size: 1rem;
+  background: linear-gradient(135deg, #00bcd4, #0097a7);
+  color: white;
   font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
+  transition: 0.3s;
   margin-top: 10px;
-  transition:
-    background 0.2s,
-    transform 0.1s;
 }
 
 .btn-submit:hover:not(:disabled) {
-  background: #00acc1;
-}
-
-.btn-submit:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 188, 212, 0.3);
 }
 
 .btn-submit:disabled {
   background: #cbd5e1;
-  color: #94a3b8;
   cursor: not-allowed;
 }
 
-/* Button အတွင်းမှာ လည်မည့် Loading CSS */
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.arrow {
-  font-size: 1.1rem;
-}
-
+/* FOOTER */
 .card-footer {
   text-align: center;
-  margin-top: 25px;
-  font-size: 0.9rem;
-  color: #4a5568;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #475569;
 }
 
 .card-footer a {
   color: #00bcd4;
-  text-decoration: none;
   font-weight: 600;
+  cursor: pointer;
 }
 
-.card-footer a:hover {
-  text-decoration: underline;
-}
-
-@media (max-width: 480px) {
-  .login-container {
-    padding: 20px;
+/* ANIMATION */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
   .login-card {
-    padding: 25px 20px;
+    padding: 25px;
+  }
+
+  .card-title {
+    font-size: 22px;
   }
 }
 </style>
