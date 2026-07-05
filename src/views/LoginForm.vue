@@ -128,7 +128,7 @@ export default {
 
 
         this.authStore.setUser({
-  name: user.fullName,
+  // name: user.fullName,
   fullName: user.fullName,
   email: user.email,
   phone: user.phone,

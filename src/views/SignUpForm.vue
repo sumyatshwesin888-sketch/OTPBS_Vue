@@ -89,6 +89,8 @@
 </template>
 
 <script>
+
+
 import { useAuthStore } from '@/store/auth'
 
 export default {
@@ -123,6 +125,7 @@ export default {
         return
       }
 
+      const users = JSON.parse(localStorage.getItem('users')) || []
       // ❗ duplicate check
       const existing = localStorage.getItem('user_credentials')
       if (existing) {
@@ -143,15 +146,17 @@ export default {
         role: 'USER'
       }
 
+      users.push(newUser)
+      localStorage.setItem('users', JSON.stringify(users))
       // 💾 store credentials
-      localStorage.setItem('user_credentials', JSON.stringify(newUser))
+
 
       // 🔥 auto login (IMPORTANT)
       this.authStore.setUser({
        fullName: newUser.fullName,
   phone: newUser.phone,
   email: newUser.email,
-  role: 'USER'
+  role: newUser.role || 'USER', //new
       })
 
       localStorage.setItem('user', JSON.stringify({
