@@ -110,9 +110,9 @@ export default {
       authStore: useAuthStore()
     }
   },
-  created() {
-   this.authStore.loadUser()
-  },
+  // created() {
+  //  this.authStore.loadUser()
+  // },
  
   computed: {
     // 💡 လမ်းကြောင်းခွဲပေးမယ့် ဒီ computed property ရှိနေဖို့ လိုအပ်ပါတယ်ဗျာ

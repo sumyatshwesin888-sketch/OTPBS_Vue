@@ -115,29 +115,6 @@ export default {
           return
         }
 
-        // 🔥 NORMAL USER LOGIN (localStorage check)
-        // const saved = localStorage.getItem('user_credentials')
-        // if (!saved) throw new Error('No user found')
-
-        // const user = JSON.parse(saved)
-
-        // if (user.email !== this.email || user.password !== this.password) {
-        //   throw new Error('Invalid credentials')
-
-        // }
-
-
-//         this.authStore.setUser({
-//   // name: user.fullName,
-//   fullName: user.fullName,
-//   email: user.email,
-//   phone: user.phone,
-//   role: 'USER'
-// })
-
-// this.redirectAfterLogin('USER')
-        
-
        await this.authStore.signIn(
           this.email,
           this.password

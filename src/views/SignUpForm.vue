@@ -26,8 +26,6 @@
         </div>
 
         <!-- PHONE -->
-
-        <!-- PHONE -->
         <div class="input-group">
           <i class="fa-solid fa-phone input-icon"></i>
           <input
@@ -37,8 +35,6 @@
             required
           />
         </div>
-
-        <!-- EMAIL -->
         <!-- EMAIL -->
         <div class="input-group">
           <i class="fa-solid fa-envelope input-icon"></i>
@@ -50,7 +46,6 @@
           />
         </div>
 
-        <!-- PASSWORD -->
         <!-- PASSWORD -->
         <div class="input-group">
           <i class="fa-solid fa-lock input-icon"></i>
@@ -80,7 +75,6 @@
         </div>
 
         <!-- SUBMIT -->
-        <!-- SUBMIT -->
         <button type="submit" class="btn-submit">
           Create Account →
         </button>
@@ -97,19 +91,11 @@
         
         </p>
             </footer>
-
-
     </main>
   </div>
 </template>
 
 <script>
-
-
-import { useAuthStore } from '@/store/auth'
-
-
-
 import { useAuthStore } from '@/store/auth'
 
 export default {
@@ -217,9 +203,6 @@ export default {
 
 .input-group {
   position: relative;
-}
-
-.input-group input {
 }
 
 .input-group input {
