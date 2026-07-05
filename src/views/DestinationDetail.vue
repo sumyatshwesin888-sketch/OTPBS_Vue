@@ -1,6 +1,7 @@
 <template>
 
 <div class="detail-page">
+  
 
   <!-- Hero Banner -->
 
@@ -31,6 +32,20 @@
     <div class="about-grid">
 
       <div>
+        <button class="back-btn" @click="$router.back()">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+        >
+          <path d="M19 12H5M12 5l-7 7 7 7" />
+        </svg>
+        Back 
+      </button>
 
         <h2>
           About {{ destination.name }}
@@ -86,10 +101,13 @@
           <p>
             {{ pkg.duration }}
           </p>
-
-          <button class="package-btn">
-            View Package Details
-          </button>
+<br>
+          <router-link 
+  :to="{ name: 'packagedetail', params: { id: pkg.id } }" 
+  class="package-btn"
+>
+  View Package Details
+</router-link>
 
         </div>
 
@@ -104,13 +122,16 @@
 </template>
 <script setup>
 import { computed } from 'vue'
+
 import { useRoute } from 'vue-router'
+
 
 const route = useRoute()
 
 const destinations = {
 
   Bagan: {
+    
 
     name: 'Bagan',
 
@@ -129,6 +150,7 @@ Bagan is one of Myanmar's most iconic cultural destinations and a UNESCO World H
    
     packages: [
       {
+        id: 4,
         type: 'Budget',
         title: '3 Days Bagan Heritage & Sunset Explorer',
         price: '650,000 MMK',
@@ -136,6 +158,7 @@ Bagan is one of Myanmar's most iconic cultural destinations and a UNESCO World H
         image: 'https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcRwzODua4lxLbJHTqYY8jd2KjNqLmb8VCq5KF5zYX6bTFEtjTqZk4pcksCqgGjgdVJ3Hfahoy3C1Qvjuqu7T-72KQQ&s=19'
       },
       {
+         id: 5,
         type: 'Standard',
         title: '4 Days Bagan Cultural Discovery',
         price: '950,000 MMK',
@@ -143,6 +166,7 @@ Bagan is one of Myanmar's most iconic cultural destinations and a UNESCO World H
         image: 'https://images.unsplash.com/photo-1599403275295-57bca684efd3?q=80&w=1041&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
       },
       {
+         id: 6,
         type: 'Luxury',
         title: '4 Days Bagan Royal Balloon Escape',
         price: '1,850,000 MMK',
@@ -171,6 +195,7 @@ Kalaw is a peaceful hill town located in Shan State, Myanmar, and is well known 
    
     packages: [
       {
+         id: 10,
         type: 'Budget',
         title: '3 Days Kalaw Nature & Trekking Experience',
         price: '420,000 MMK',
@@ -178,6 +203,7 @@ Kalaw is a peaceful hill town located in Shan State, Myanmar, and is well known 
         image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSRG9FCoqjY-LUvTY_RQJ2EDSYiZIuv5pdTN22nhTS-g&s=10'
       },
       {
+         id: 11,
         type: 'Standard',
         title: '4 Days Kalaw & Inle Scenic Adventure',
         price: '720,000 MMK',
@@ -185,6 +211,7 @@ Kalaw is a peaceful hill town located in Shan State, Myanmar, and is well known 
         image: 'https://indochinatreks.com/wp-content/uploads/2022/12/12.-Kalaw-inle-lake-fishermen-istock.jpg'
       },
       {
+         id: 12,
         type: 'Luxury',
         title: '5 Days Kalaw Luxury Mountain Retreat',
         price: '1,250,000 MMK',
@@ -213,6 +240,7 @@ Hpa-An is one of Myanmar's most beautiful natural destinations, famous for its l
  
   packages: [
     {
+       id: 1,
       type: 'Budget',
       title: '3 Days Hpa-An Explore',
       price: '350,000 MMK',
@@ -220,6 +248,7 @@ Hpa-An is one of Myanmar's most beautiful natural destinations, famous for its l
         image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM47OeGkz0jR-u1pXERcqjcANzdiJW8Qwlf-ADoF4QGplTaPI9TLIppc&s=10'
     },
     {
+       id: 2,
       type: 'Standard',
       title: '4 Days Hpa-An Adventure',
       price: '650,000 MMK',
@@ -227,6 +256,7 @@ Hpa-An is one of Myanmar's most beautiful natural destinations, famous for its l
         image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM47OeGkz0jR-u1pXERcqjcANzdiJW8Qwlf-ADoF4QGplTaPI9TLIppc&s=10'
     },
     {
+       id: 3,
       type: 'Luxury',
       title: '5 Days Hpa-An Luxury Retreat',
       price: '1,250,000 MMK',
@@ -255,6 +285,7 @@ Ngwe Saung Beach is one of Myanmar's most popular coastal destinations, known fo
  
   packages: [
     {
+       id: 7,
       type: 'Budget',
       title: 'Coastal Escape',
       price: '750,000 MMK',
@@ -262,6 +293,7 @@ Ngwe Saung Beach is one of Myanmar's most popular coastal destinations, known fo
         image: 'https://www.mcs-myanmartravel.com/wp-content/uploads/2015/07/ngwesaung.jpg'
     },
     {
+       id: 8,
       type: 'Standard',
       title: 'Coastal Experience',
       price: '1,200,000 MMK',
@@ -269,6 +301,7 @@ Ngwe Saung Beach is one of Myanmar's most popular coastal destinations, known fo
         image: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/22/30/d2/d1/eskala-hotels-resorts.jpg?w=1200&h=-1&s=1'
     },
     {
+       id: 9,
       type: 'Luxury',
       title: 'Ocean Prestige',
       price: '2,200,000 MMK',
@@ -297,6 +330,7 @@ Thailand is one of Southeast Asia’s most popular travel destinations, known fo
     
     packages: [
       {
+         id: 13,
         type: 'Budget',
         title: '4 Days Bangkok Retail Therapy & Street Food Tour',
         price: '1,650,000 MMK',
@@ -304,6 +338,7 @@ Thailand is one of Southeast Asia’s most popular travel destinations, known fo
         image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZcLJa-cWwqzjwGQIJuINkTQ1ccor6N8ADP42u7BMhHZTdZmuumbOGCN_y&s=10'
       },
       {
+         id: 14,
         type: 'Standard',
         title: '5 Days Bangkok & Pattaya Family Fun Vacation',
         price: '2,550,000 MMK',
@@ -311,6 +346,7 @@ Thailand is one of Southeast Asia’s most popular travel destinations, known fo
         image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsuqSWfs1NiHiKGMVxXP2vsi7f942K7nR-Pl7jYYKLuyFpTEKALyz1DdY&s=10'
       },
       {
+         id: 15,
         type: 'Luxury',
         title: '5 Days Phuket Ultra-Luxury Private Pool Villa Escape',
         price: '4,450,000 MMK',
@@ -338,6 +374,7 @@ Japan is a fascinating destination where ancient traditions blend seamlessly wit
 
     packages: [
       {
+         id: 16,
         type: 'Budget',
         title: '5 Days Tokyo City Explorer & Cultural Tour',
         price: '3,250,000 MMK',
@@ -346,6 +383,7 @@ Japan is a fascinating destination where ancient traditions blend seamlessly wit
 
       },
       {
+         id: 17,
         type: 'Standard',
         title: '6 Days Tokyo & Mount Fuji Scenic Adventure',
         price: '4,250,000 MMK',
@@ -353,6 +391,7 @@ Japan is a fascinating destination where ancient traditions blend seamlessly wit
         image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&q=80&w=600'
       },
       {
+         id: 18,
         type: 'Luxury',
         title: '7 Days Kyoto, Osaka & Tokyo Premium Experience',
         price: '6,850,000 MMK',
@@ -380,6 +419,7 @@ China is a diverse and culturally rich destination that combines thousands of ye
 
     packages: [
       {
+         id: 22,
         type: 'Budget',
         title: '4 Days Shanghai City Highlights & Street Food Explorer',
         price: '1,950,000 MMK',
@@ -387,6 +427,7 @@ China is a diverse and culturally rich destination that combines thousands of ye
         image: 'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?auto=format&fit=crop&w=800&q=80'
       },
       {
+         id: 23,
         type: 'Standard',
         title: '5 Days Shanghai & Suzhou Cultural Discovery',
         price: '2,950,000 MMK',
@@ -394,6 +435,7 @@ China is a diverse and culturally rich destination that combines thousands of ye
         image: 'https://plus.unsplash.com/premium_photo-1664299326174-f73b66496733?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
       },
       {
+         id: 24,
         type: 'Luxury',
         title: '5 Days Shanghai Luxury Skyline & VIP Experience',
         price: '4,850,000 MMK',
@@ -422,6 +464,7 @@ Singapore is a modern and dynamic city-state renowned for its iconic skyline, wo
    
     packages: [
       {
+         id: 19,
         type: 'Budget',
         title: 'City Escape',
         price: '2,850,000 MMK',
@@ -429,6 +472,7 @@ Singapore is a modern and dynamic city-state renowned for its iconic skyline, wo
         image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&q=80&w=600'
       },
       {
+         id: 20,
         type: 'Standard',
         title: 'Adventure Experience',
         price: '3,850,000 MMK',
@@ -436,6 +480,7 @@ Singapore is a modern and dynamic city-state renowned for its iconic skyline, wo
         image: 'https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&q=80&w=600'
       },
       {
+         id: 21,
         type: 'Luxury',
         title: 'Prestige Escape',
         price: '6,500,000 MMK',
@@ -454,12 +499,27 @@ const destination = computed(() =>
 const openWebsite = () => {
   window.open(destination.value.website, '_blank')
 }
+
 </script>
 <style set up>
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
+}
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  padding: 0;
+  margin-bottom: 20px;
+  transition: color 0.2s;
 }
 
 .detail-page{
@@ -646,12 +706,14 @@ const openWebsite = () => {
 }
 
 .package-btn{
-  margin-top:15px;
-
+text-align:center;
+  margin-top:15px auto 0;
+display: block;
+width: fit-content;
   width:100%;
 
   border:none;
-
+text-decoration: none;
   background:#2563eb;
   color:white;
 

@@ -2,12 +2,17 @@
   <div class="signup-container">
     <main class="signup-card">
 
+
       <h2 class="card-title">Create Your Account</h2>
       <p class="card-subtitle">
+        
         Unlock exclusive travel deals & book your dream trip!
+      
       </p>
 
       <form @submit.prevent="handleSubmit" class="form-content">
+
+        <!-- FULL NAME -->
 
         <!-- FULL NAME -->
         <div class="input-group">
@@ -21,6 +26,8 @@
         </div>
 
         <!-- PHONE -->
+
+        <!-- PHONE -->
         <div class="input-group">
           <i class="fa-solid fa-phone input-icon"></i>
           <input
@@ -32,6 +39,7 @@
         </div>
 
         <!-- EMAIL -->
+        <!-- EMAIL -->
         <div class="input-group">
           <i class="fa-solid fa-envelope input-icon"></i>
           <input
@@ -42,6 +50,7 @@
           />
         </div>
 
+        <!-- PASSWORD -->
         <!-- PASSWORD -->
         <div class="input-group">
           <i class="fa-solid fa-lock input-icon"></i>
@@ -71,18 +80,24 @@
         </div>
 
         <!-- SUBMIT -->
+        <!-- SUBMIT -->
         <button type="submit" class="btn-submit">
           Create Account →
         </button>
 
+
       </form>
 
       <footer class="card-footer">
-        <p>
+              <p>
+          
           Already have an account?
+         
           <router-link to="/login">Login</router-link>
+        
         </p>
-      </footer>
+            </footer>
+
 
     </main>
   </div>
@@ -93,8 +108,13 @@
 
 import { useAuthStore } from '@/store/auth'
 
+
+
+import { useAuthStore } from '@/store/auth'
+
 export default {
   name: 'SignUpForm',
+
 
   data() {
     return {
@@ -119,53 +139,28 @@ export default {
         return
       }
 
-      // ❗ basic validation
-      if (!this.email || !this.password) {
-        alert('Please fill all fields')
-        return
-      }
-
-      const users = JSON.parse(localStorage.getItem('users')) || []
-      // ❗ duplicate check
-      const existing = localStorage.getItem('user_credentials')
-      if (existing) {
-        const user = JSON.parse(existing)
-        if (user.email === this.email) {
-          alert('User already exists. Please login.')
+      const existingUser = localStorage.getItem('user_account')
+      if (existingUser) {
+        const savedUser = JSON.parse(existingUser)
+        if (this.formData.email === savedUser.email) {
+          alert('Account already exists! Please log in instead.')
           this.$router.push('/login')
           return
         }
       }
 
-      // 🔥 create user object
-      const newUser = {
-        fullName: this.fullName,
-        phone: this.phone,
-        email: this.email,
-        password: this.password,
-        role: 'USER'
+      const userData = {
+        full_name: this.formData.fullName,
+        phone: this.formData.phone,
+        email: this.formData.email,
+        password: this.formData.password
       }
-
-      users.push(newUser)
-      localStorage.setItem('users', JSON.stringify(users))
-      // 💾 store credentials
-
-
-      // 🔥 auto login (IMPORTANT)
-      this.authStore.setUser({
-       fullName: newUser.fullName,
-  phone: newUser.phone,
-  email: newUser.email,
-  role: newUser.role || 'USER', //new
-      })
-
-      localStorage.setItem('user', JSON.stringify({
-  fullName: newUser.fullName,
-  phone: newUser.phone,
-  email: newUser.email,
-  role: 'USER'
-}))
-
+      localStorage.setItem('user_account', JSON.stringify(userData))
+      
+      localStorage.setItem('is_logged_in', 'true')
+      
+      this.$store.commit('SET_USER', userData)
+      
       alert('Account Created Successfully!')
 
       // 🚀 redirect logic
@@ -222,6 +217,9 @@ export default {
 
 .input-group {
   position: relative;
+}
+
+.input-group input {
 }
 
 .input-group input {
