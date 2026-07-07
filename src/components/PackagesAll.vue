@@ -12,7 +12,15 @@
           <v-col cols="12" md="12">
             <span class="text-headline-large"> {{ item.location }} </span>
           </v-col>
-          
+          <v-col cols="12" md="4">
+            <span class="text-headline-large"> {{ item.day}}/ {{ item.night}}</span>
+          </v-col>
+          <v-col cols="12" md="8">
+            <span class="text-headline-large"> {{ item.groupSize }} </span>
+          </v-col>
+          <v-col cols="12" md="12">
+            <span class="text-headline-large"> {{ item.rating }} </span>
+          </v-col>
         </v-row>
       </v-card>
     </v-col>
@@ -20,7 +28,7 @@
 </template>
 <script>
 import packageService from '../service/PackagesService.js'
-import axios from "@/config";
+import axios from '@/config'
 export default {
   data: () => ({
     packageList: [],
@@ -41,13 +49,13 @@ export default {
           this.$swal('Fail!', error.response.data.message, 'error')
         })
     },
-    imageUrl:function(photo){
-      console.log("photo");
-      console.log(photo);
-      
-      const baseURL = axios?.defaults?.baseURL || "";
-      return photo ? `${baseURL}/productphoto/${photo}` : "";
-    }
+    imageUrl: function (photo) {
+      console.log('photo')
+      console.log(photo)
+
+      const baseURL = axios?.defaults?.baseURL || ''
+      return photo ? `${baseURL}/productphoto/${photo}` : ''
+    },
   },
   watch: {},
   computed: {},

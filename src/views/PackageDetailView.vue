@@ -315,12 +315,12 @@
 </template>
 
 <script>
-import { supabase } from '../lib/supabase'
+import packageDetailService from '@/service/PackageDetailService'
+// import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/auth'
 export default {
   name: 'PackageDetailView',
 
-  // ၁။ State Variables (Data)
   data() {
     return {
       pkg: null,
@@ -331,1129 +331,1129 @@ export default {
 
       newRating: 0,
       newComment: '',
-      // Database ကနေ လှမ်းယူရမှာလက်ရှိစမ်းဖို့ Array ပုံစံသိမ်းထားနိုင်
+      // Database ကနေ လှမ်းယူရမှာလက်ရှိစမ်းဖို့ Array ပုံစံသိမ်းထား
       commentsDataset: [],
 
-      // မူရင်း Dataset ထဲက ID 1 ကနေ 24 အထိ အားလုံးကို ပုံစံလုံးဝမပျက်ဘဲ ဒီအတိုင်း သိမ်းထား
-      packagesDataset: [
-        {
-          id: 1,
-          title: 'Hpa-An Explore',
-          overview:
-            'This basic itinerary is highly suitable for budget-conscious travelers and groups of friends who want to joyfully explore the main landmark caves of Hpa-An.',
-          price: '195,000 MMK',
-          duration: '3 Days / 2 Nights',
-          group_size: '2 - 10 People',
-          hotel: '',
-          rating: '4.7',
-          review_count: '45',
-          type: 'domestic',
-          level: 'budget',
-          city: 'Hpa An',
-          country: 'Myanmar',
-          departure_date: '30.06.2026', // Card ထဲမှာ ပြသရန် Date
-          max_tickets: 20, // စုစုပေါင်းဆံ့သည့် ဦးရေ
-          available_tickets: 18, //လက်ကျန်ဦးရေ
-          image:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM47OeGkz0jR-u1pXERcqjcANzdiJW8Qwlf-ADoF4QGplTaPI9TLIppc&s=10',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1543731068-7e0f5beff43a?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Arrive via Express bus and check-in to your cozy standard guesthouse in downtown Hpa-An.',
-            },
-            {
-              title: 'Tuk-Tuk Tour',
-              description:
-                'Enjoy a full-day Tuk-Tuk adventure visiting Kawgun Cave, Sadan Cave, Lumbini Garden, and Kyauk Ka Lat.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Shop for traditional Karen textiles and souvenirs before boarding your return bus to Yangon.',
-            },
-          ],
-        },
-        {
-          id: 2,
-          title: 'Hpa-An Mt.Zwegabin Adventure & Nature Tour',
-          overview:
-            'The best itinerary for nature lovers who want to personally climb Mt. Zwegabin and create lasting memories filled with adventure.',
-          price: '390,000 MMK',
-          duration: '4Days / 3Nights',
-          group_size: '2-8 People',
-          hotel: '',
-          rating: '4.8',
-          review_count: '72',
-          type: 'domestic',
-          level: 'standard',
-          city: 'Hpa An',
-          country: 'Myanmar',
-          image:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC2F6dkl--5ZgGST33-gDENeFeDjfWokz5G0caN9E_sHarjggPWSNBUe0&s=10',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Hpa-An Drive',
-              description:
-                'Get picked up by private minivan and enjoy watching the sunset over Kan Tharyar Lake.',
-            },
-            {
-              title: 'Hiking',
-              description:
-                'Wake up early to climb Mount Zwegabin and enjoy a magnificent sea-of-clouds sunrise from the summit.',
-            },
-            {
-              title: 'Nature Cave',
-              description:
-                'Cool off at the Yaedagon natural mountain pool and explore historic carvings inside Kawgun Cave.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Complete your eco-resort check-out and enjoy a smooth, scenic drive back to Yangon.',
-            },
-          ],
-        },
-        {
-          id: 3,
-          title: 'Hpa-An Thanlwin Riverside Luxury Retreat',
-          overview:
-            'A premium itinerary for relaxing peacefully at a high-end VIP resort by the Thanlwin River, while traveling luxuriously with a private VIP car and private boats.',
-          price: '950,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-8 People',
-          hotel: '',
-          rating: '5.0',
-          review_count: '38',
-          type: 'domestic',
-          level: 'premium',
-          city: 'Hpa An',
-          country: 'Myanmar',
-          image:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhKjPwzLJT5EpxUj3ligmXhDLn6WOAxCdc3aoTQSiz8MhKwdmJxb3xOIkU&s=10',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'VIP Arrival',
-              description:
-                'Arrive via a high-roof VIP van, check-in to your 5-star riverside resort, and receive a spa treatment.',
-            },
-            {
-              title: 'River Cruise',
-              description:
-                'Board an exclusive private wooden boat for a scenic sunset cruise along the mighty Thanlwin River.',
-            },
-            {
-              title: 'Custom Tour',
-              description:
-                'Take a private guided tour of Kyauk Ka Lat followed by an elite traditional VIP dinner show.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Enjoy a slow, lazy morning at the resort pool before your private VIP vehicle transfers you home.',
-            },
-          ],
-        },
-        {
-          id: 4,
-          title: 'Bagan Heritage & Sunset Explore',
-          overview:
-            'An affordable tour exploring ancient Bagan pagodas, famous sunset viewpoints, and rich Myanmar cultural heritage.',
-          price: '650,000 MMK',
-          duration: '3Days / 2Nights',
-          group_size: '2-15 People',
-          hotel: '',
-          rating: '4.8',
-          review_count: '180',
-          type: 'domestic',
-          level: 'budget',
-          city: 'Bagan',
-          country: 'Myanmar',
-          image:
-            'https://images.unsplash.com/photo-1599403275295-57bca684efd3?q=80&w=1041&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-          thumbnail_images: [
-            'https://media.istockphoto.com/id/472682036/photo/hot-air-balloon-flying-over-bagan-temples-at-sunrise.jpg?s=612x612&w=0&k=20&c=_l13hAh5wzFA8cA0cErnm1_jBl8aH8xoEA9AKxs4c_w=',
-            'https://images.unsplash.com/photo-1675927308423-72dc9c525d8e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGJhZ2FuJTIwc3VucmlzZXxlbnwwfHwwfHx8MA%3D%3D',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival & Sunset Temple Watch',
-              description:
-                'Arrive at Bagan airport, check-in to hotel and head out to experience the iconic panoramic golden sunset.',
-            },
-            {
-              title: 'Full Day Temple Exploration',
-              description:
-                'Visit Ananda Temple, Shwezigon Pagoda, and Dhammayangyi Temple with a professional local guide.',
-            },
-            {
-              title: 'Local Crafts & Departure',
-              description:
-                'Explore traditional lacquerware workshops and enjoy a smooth departure back home.',
-            },
-          ],
-        },
-        {
-          id: 5,
-          title: 'Bagan Cultural Discovery & River Experience',
-          overview:
-            "A suitable package for families and friends to fully experience Bagan's ancient temples, local culture, and Ayeyarwady scenic river views.",
-          price: '950,000 MMK',
-          duration: '4Days / 3Nights',
-          group_size: '2-12 People',
-          hotel: '',
-          rating: '4.9',
-          review_count: '220',
-          type: 'domestic',
-          level: 'standard',
-          city: 'Bagan',
-          country: 'Myanmar',
-          image:
-            'https://images.unsplash.com/photo-1515900959941-d1cce424f5c4?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1609847860270-efa8c3ad583d?q=80&w=580&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            'https://images.unsplash.com/photo-1528648105451-3d52d912762d?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            'https://media.istockphoto.com/id/178071920/photo/golden-palace-in-old-bagan-mandalay-burma.webp?a=1&b=1&s=612x612&w=0&k=20&c=IKvUX7hu6KH1DjR4UlImXCwrnifaXT2hvm-_xoWpJgQ=',
-            'https://images.unsplash.com/photo-1497601089782-06319e8be3a0?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Enjoy an airport pickup and check-in to a beautiful resort nestled right by the river.',
-            },
-            {
-              title: 'Heritage Tour',
-              description:
-                'Visit the golden Shwezigon Pagoda, iconic temples, and the fascinating Archaeological Museum.',
-            },
-            {
-              title: 'River Cruise',
-              description:
-                'Set out on a relaxing Ayeyarwady sunset boat cruise and visit a traditional riverbank village.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Shop for authentic Bagan lacquerware souvenirs before checking out for your departure.',
-            },
-          ],
-        },
-        {
-          id: 6,
-          title: 'Bagan Royal Balloon & Luxury Escape',
-          overview:
-            'A premium package featuring a breathtaking sunrise hot-air balloon flight, luxury resort stay, and private guided tours for an unforgettable escape.',
-          price: '1,850,000 MMK',
-          duration: '4Days / 3Nights',
-          group_size: '2-4 People(Private)',
-          hotel: '',
-          rating: '5',
-          review_count: '62',
-          type: 'domestic',
-          level: 'premium',
-          city: 'Bagan',
-          country: 'Myanmar',
-          image:
-            'https://media.istockphoto.com/id/614446038/photo/hot-air-balloons-in-bagan-myanmar.jpg?s=612x612&w=0&k=20&c=nlxHdhqgEUUw_5M0dRlfhzHvjQG_epUqzLyUjcJJKmw=',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1674043549356-8dff137408bb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YmFnYW4lMjBzdW5yaXNlfGVufDB8fDB8fHww',
-            'https://media.istockphoto.com/id/1288905205/photo/dhammayazika-pagoda-temple-and-hot-air-balloons-in-myanmar.webp?a=1&b=1&s=612x612&w=0&k=20&c=mxZh-Nu6iz90FfJlGUnpQWxRrlk4wyQnBHtQxflvLLU=',
-            'https://d2lwt6tidfiof0.cloudfront.net/images/background/bg-myanmar.jpg',
-          ],
-          itinerary: [
-            {
-              title: 'VIP Arrival',
-              description:
-                'Arrive via private transfer and check-in to a luxury 5-star resort and spa sanctuary.',
-            },
-            {
-              title: 'Balloon Adventure',
-              description:
-                'Witness a breathtaking Bagan sunrise from a hot-air balloon followed by a private guided temple tour.',
-            },
-            {
-              title: 'Luxury Experience',
-              description:
-                'Unwind with a premium spa treatment, take a private photography tour, and enjoy a sunset dinner.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Complete your executive check-out and take a private chauffeur transfer back to the airport.',
-            },
-          ],
-        },
-        {
-          id: 7,
-          title: 'Ngwe Saung Coastal Escape',
-          overview:
-            'A budget-friendly coastal escape designed for travelers looking to relax peacefully in the sea breeze and experience natural beach beauty.',
-          price: '750,000 MMK',
-          duration: '4Days / 3Nights',
-          group_size: '2-20 People',
-          hotel: '',
-          rating: '4.5',
-          review_count: '126',
-          type: 'domestic',
-          level: 'budget',
-          city: 'Ngwe Saung',
-          country: 'Myanmar',
-          image: 'https://www.mcs-myanmartravel.com/wp-content/uploads/2015/07/ngwesaung.jpg',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival & Check-in',
-              description:
-                'Arrival at Ngwe Saung Beach and hotel check-in to relax after the journey.',
-            },
-            {
-              title: 'Island Tour',
-              description:
-                'Visit Lovers Island and experience the breathtaking panoramic sunset at the beach.',
-            },
-            {
-              title: 'Leisure',
-              description:
-                'Enjoy free leisure time and indulge in tasting fresh local seafood along the shore.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Check-out from the hotel and begin the smooth return journey back to Mandalay.',
-            },
-          ],
-        },
-        {
-          id: 8,
-          title: 'Ngwe Saung Coastal Experience',
-          overview:
-            'A comfortable travel experience tailored to fully enjoy beach activities, local exploration, and high-quality resort relaxation.',
-          price: '1,200,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-15 People',
-          hotel: '',
-          rating: '4.8',
-          review_count: '246',
-          type: 'domestic',
-          level: 'standard',
-          city: 'Ngwe Saung',
-          country: 'Myanmar',
-          image:
-            'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/22/30/d2/d1/eskala-hotels-resorts.jpg?w=1200&h=-1&s=1',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Arrive at Ngwe Saung Beach and check-in to your selected 4-star beach resort.',
-            },
-            {
-              title: 'Beach Activities',
-              description:
-                'Engage in exciting beach activities or enjoy premium relaxation inside the resort facilities.',
-            },
-            {
-              title: 'Excursion',
-              description:
-                'Take a cultural and nature-filled excursion to visit the nearby Elephant Camp.',
-            },
-            {
-              title: 'Relax',
-              description:
-                'Spend a completely free day for personal relaxation followed by a sunset BBQ dinner.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Complete resort check-out and embark on a comfortable drive back to Mandalay.',
-            },
-          ],
-        },
-        {
-          id: 9,
-          title: 'Ngwe Saung Ocean Prestige',
-          overview:
-            'A premium seaside escape combining tranquility and ultra-luxury experiences, featuring private accommodations and VIP services.',
-          price: '2,200,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-8 People',
-          hotel: '',
-          rating: '4.9',
-          review_count: '89',
-          type: 'domestic',
-          level: 'premium',
-          city: 'Ngwe Saung',
-          country: 'Myanmar',
-          image:
-            'https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=600',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'VIP Arrival',
-              description:
-                'Enjoy a private SUV transfer, receive a VIP welcome, and check-in to your private Ocean Villa.',
-            },
-            {
-              title: 'Spa Relax',
-              description:
-                'Indulge in a premium luxury spa experience and unwind on the exclusive private beach front.',
-            },
-            {
-              title: 'Cruise Experience',
-              description:
-                'Set sail on a private boat cruise to experience the ultimate sea views and ocean breeze.',
-            },
-            {
-              title: 'Romantic Dinner',
-              description:
-                'Spend a premium leisure morning followed by an exclusive romantic dinner on the beach.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Complete executive check-out and take a private SUV transfer directly back home.',
-            },
-          ],
-        },
-        {
-          id: 10,
-          title: 'Kalaw Nature & Trekking Experience',
-          overview:
-            "A suitable package for nature lovers wanting to experience Kalaw's cool climate, pine forests, mountain trekking, and local markets.",
-          price: '420,000 MMK',
-          duration: '3Days / 2Nigts',
-          group_size: '2-12 People',
-          hotel: '',
-          rating: '4.7',
-          review_count: '135',
-          type: 'domestic',
-          level: 'budget',
-          city: 'Kalaw',
-          country: 'Myanmar',
-          image:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSRG9FCoqjY-LUvTY_RQJ2EDSYiZIuv5pdTN22nhTS-g&s=10',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Arrive in chilly Kalaw via VIP Express bus, check-in to your hotel, and explore the evening market.',
-            },
-            {
-              title: 'Trekking',
-              description:
-                'Trek through aromatic pine forests up to a scenic viewpoint and visit a traditional ethnic village.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Sip fresh local mountain coffee, shop for local Shan snacks and tea, and head on your return journey.',
-            },
-          ],
-        },
-        {
-          id: 11,
-          title: 'Kalaw & Inle Scenic Adventure',
-          overview:
-            'A great vacation for families and friends to visit Kalaw and Inle Lake in one trip, exploring natural beauty, tradition, and Intha lifestyle.',
-          price: '720,000 MMK',
-          duration: '4Days / 3Nights',
-          group_size: '2-10 People',
-          hotel: '',
-          rating: '4.9',
-          review_count: '185',
-          type: 'domestic',
-          level: 'standard',
-          city: 'Kalaw',
-          country: 'Myanmar',
-          image:
-            'https://indochinatreks.com/wp-content/uploads/2022/12/12.-Kalaw-inle-lake-fishermen-istock.jpg',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Arrive in the beautiful hill station of Kalaw and check-in to a comfortable 4-star mountain hotel.',
-            },
-            {
-              title: 'Kalaw Tour',
-              description:
-                'Take in mountain views, visit the historic Christ the King Church, and browse the vibrant local market.',
-            },
-            {
-              title: 'Inle Lake',
-              description:
-                'Board a private boat to explore floating gardens, stilt villages, and the historic Phaung Daw Oo Pagoda.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Enjoy a traditional Shan breakfast before checking out for a smooth return drive.',
-            },
-          ],
-        },
-        {
-          id: 12,
-          title: 'Kalaw Luxury Mountain Retreat',
-          overview:
-            'A VIP retreat to relax peacefully in a luxury mountain resort, enjoying private tours, premium dining, and pristine nature.',
-          price: '1,250,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-6 People',
-          hotel: '',
-          rating: '5',
-          review_count: '29',
-          type: 'domestic',
-          level: 'premium',
-          city: 'Kalaw',
-          country: 'Myanmar',
-          image:
-            'https://i.travelapi.com/lodging/16000000/15660000/15651600/15651577/182bbc8c_z.jpg',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'VIP Arrival',
-              description:
-                'Travel by a private SUV with chauffeur service and check-in to a world-class luxury mountain resort.',
-            },
-            {
-              title: 'Nature Escape',
-              description:
-                'Embark on a private guided nature trek through serene pine hills to catch a stunning mountain sunset.',
-            },
-            {
-              title: 'Wellness Day',
-              description:
-                'Spend an entire day focusing on wellness with signature spa treatments and relaxing resort activities.',
-            },
-            {
-              title: 'Local Experience',
-              description:
-                'Tour an organic coffee plantation followed by an exclusive private Shan cultural dinner.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Enjoy breakfast with mountain views before a private chauffeur transfer takes you back home.',
-            },
-          ],
-        },
-        {
-          id: 13,
-          title: 'Bangkok City Tour',
-          overview:
-            'Tailored for travelers who want to stay in a convenient shopping area in downtown Bangkok, go shopping, and explore famous temples and street food.',
-          price: '1,650,000 MMK',
-          duration: '4Days / 3Nights',
-          group_size: '2-12 People',
-          hotel: '',
-          rating: '4.6',
-          review_count: '112',
-          type: 'international',
-          level: 'budget',
-          city: 'Bangkok',
-          country: 'Thailand',
-          image:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZcLJa-cWwqzjwGQIJuINkTQ1ccor6N8ADP42u7BMhHZTdZmuumbOGCN_y&s=10',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Arrive at Bangkok airport, meet your private driver, and check-in to your hotel in Pratunam shopping district.',
-            },
-            {
-              title: 'Temples & Shopping',
-              description:
-                'Visit the spectacular Grand Palace, Wat Arun, and enjoy an evening shopping spree at CentralWorld.',
-            },
-            {
-              title: 'Street Food Explore',
-              description:
-                'Explore Chinatown (Yaowarat Road) for an unforgettable Michelin-starred local street food experience.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Enjoy free leisure time for last-minute shopping before heading to the airport for your flight back.',
-            },
-          ],
-        },
-        {
-          id: 14,
-          title: 'Chiang Mai Cultural Heritage & Mountain Escape',
-          overview:
-            'Perfect itinerary for groups seeking rich cultural experiences, traditional Lanna style temples, and refreshing mountainous nature.',
-          price: '2,550,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-10 People',
-          hotel: '',
-          rating: '4.8',
-          review_count: '150',
-          type: 'international',
-          level: 'standard',
-          city: 'Chiang Mai',
-          country: 'Thailand',
-          image:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsuqSWfs1NiHiKGMVxXP2vsi7f942K7nR-Pl7jYYKLuyFpTEKALyz1DdY&s=10',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Fly into Chiang Mai, receive a warm welcome, and check-in to an elegant boutique Lanna hotel.',
-            },
-            {
-              title: 'Old City Tour',
-              description:
-                'Take a scenic trishaw ride around the Old City moat, visiting Wat Chedi Luang and Wat Phra Singh.',
-            },
-            {
-              title: 'Mountain Sunset',
-              description:
-                'Drive up the mountain to visit Wat Phra That Doi Suthep and catch a breathtaking sunset over the city.',
-            },
-            {
-              title: 'Elephant Sanctuary',
-              description:
-                'Spend a memorable day volunteering at an ethical elephant sanctuary, bathing and feeding them.',
-            },
-            {
-              title: 'Departure',
-              description:
-                'Browse for unique wooden handicrafts at the local market before taking your airport transfer.',
-            },
-          ],
-        },
-        {
-          id: 15,
-          title: 'Phuket Luxury Island Resort Vacation',
-          overview:
-            'Indulge in a premium, ultra-luxurious island escape featuring high-end beachfront pool villas, private yacht cruises, and elite dining.',
-          price: '4,450,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-4 People',
-          hotel: '',
-          rating: '5.0',
-          review_count: '85',
-          type: 'international',
-          level: 'premium',
-          city: 'Phuket',
-          country: 'Thailand',
-          image:
-            'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?q=80&w=801&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'VIP Arrival',
-              description:
-                'Experience VIP airport fast-track service and ride in a luxury car to your 5-star beachfront pool villa.',
-            },
-            {
-              title: 'Private Yacht Cruise',
-              description:
-                'Board an exclusive private catamaran yacht tour to explore the stunning Phi Phi Islands and Maya Bay.',
-            },
-            {
-              title: 'Resort Relaxation',
-              description:
-                'Unwind with a signature 3-hour luxury spa package and enjoy an intimate candlelight dinner by the sea.',
-            },
-            {
-              title: 'Old Town Tour',
-              description:
-                'Explore the charming Sino-Portuguese architecture of Phuket Old Town with a private photographer.',
-            },
-            {
-              title: 'Departure',
-              description:
-                'Savor a floating breakfast in your private pool before your luxury car transfers you to the airport.',
-            },
-          ],
-        },
-        {
-          id: 16,
-          title: 'Tokyo City Explore',
-          overview:
-            'A budget-friendly urban exploration itinerary designed to efficiently visit Tokyo’s main highlights using subways.',
-          price: '3,250,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-10 People',
-          hotel: '',
-          rating: '4.8',
-          review_count: '142',
-          type: 'international',
-          level: 'budget',
-          city: 'Tokyo',
-          country: 'Japan',
-          image:
-            'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&q=80&w=600',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Arrive at Narita Airport, board the express train, and check-in to your capsule or smart city hotel.',
-            },
-            {
-              title: 'Historic & Modern',
-              description:
-                'Visit Tokyo’s oldest Senso-ji Temple in Asakusa, followed by exploring electronics in Akihabara.',
-            },
-            {
-              title: 'Iconic Crossings',
-              description:
-                'Walk across the world-famous Shibuya Crossing and visit the serene Meiji Shrine in Harajuku.',
-            },
-            {
-              title: 'Anime Culture',
-              description:
-                'Spend an exciting day immersed in anime culture at Nakano Broadway and the DiverCity giant Gundam.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Pick up delicious Japanese snacks at Tokyo Station before boarding your airport express train.',
-            },
-          ],
-        },
-        {
-          id: 17,
-          title: 'Tokyo & Mt. Fuji Classic Adventure',
-          overview:
-            'A great standard package combining Tokyo’s vibrant city life with iconic views of Mount Fuji and Hakone hot springs.',
-          price: '4,250,000 MMK',
-          duration: '6Days / 5Nights',
-          group_size: '2-10 People',
-          hotel: '',
-          rating: '4.9',
-          review_count: '198',
-          type: 'international',
-          level: 'standard',
-          city: 'Tokyo',
-          country: 'Japan',
-          image:
-            'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&q=80&w=600',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Land in Tokyo, transfer to a 4-star city hotel, and witness views from Tokyo Tower.',
-            },
-            {
-              title: 'City Highlights',
-              description:
-                'Explore the historic Imperial Palace gardens and go shopping in the upscale Ginza district.',
-            },
-            {
-              title: 'Mt. Fuji Excursion',
-              description:
-                'Take a scenic drive to Mt. Fuji 5th Station and ride the Oshino Hakkai panoramic ropeway.',
-            },
-            {
-              title: 'Hakone Onsen',
-              description:
-                'Cruise across Lake Ashi on a pirate ship and stay overnight at a traditional Ryokan with hot springs.',
-            },
-            {
-              title: 'Theme Park Day',
-              description:
-                'Return to Tokyo and enjoy a full day of magical fun at Tokyo Disneyland or DisneySea.',
-            },
-            {
-              title: 'Departure',
-              description:
-                'Enjoy a morning stroll in Ueno Park before boarding your airport limousine bus home.',
-            },
-          ],
-        },
-        {
-          id: 18,
-          title: 'Osaka & Kyoto Cherry Blossom Premium Tour',
-          overview:
-            'A high-end, luxurious cultural tour through Osaka and ancient Kyoto, featuring five-star traditional Ryokans and VIP bullet trains.',
-          price: '6,850,000 MMK',
-          duration: '6Days / 5Nights',
-          group_size: '2-6 People',
-          hotel: '',
-          rating: '5.0',
-          review_count: '53',
-          type: 'international',
-          level: 'premium',
-          city: 'Osaka',
-          country: 'Japan',
-          image:
-            'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=600',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'VIP Arrival',
-              description:
-                'Receive a private luxury car transfer from Kansai Airport to your 5-star hotel in Osaka.',
-            },
-            {
-              title: 'Osaka Foodie Tour',
-              description:
-                'Visit the historic Osaka Castle, followed by an exclusive private guided gourmet street food tour in Dotonbori.',
-            },
-            {
-              title: 'Bullet Train to Kyoto',
-              description:
-                'Ride first-class on the Shinkansen to Kyoto and check-in to an ultra-luxury traditional Ryokan.',
-            },
-            {
-              title: 'Bamboo & Golden Pavilion',
-              description:
-                'Walk through Arashiyama Bamboo Grove early morning and visit the stunning Kinkaku-ji (Golden Pavilion).',
-            },
-            {
-              title: 'Fushimi Inari VIP',
-              description:
-                'Experience a private evening tour of Fushimi Inari Shrine, followed by an elite traditional multi-course Kaiseki dinner.',
-            },
-            {
-              title: 'Departure',
-              description:
-                'Participate in a private tea ceremony experience before your luxury chauffeur transfer back to the airport.',
-            },
-          ],
-        },
-        {
-          id: 19,
-          title: 'Singapore City Escape',
-          overview:
-            'An affordable urban getaway package tailored to explore Singapore’s ultra-modern landmarks, clean streets, and multi-cultural neighborhoods.',
-          price: '2,850,000 MMK',
-          duration: '4Days / 3Nights',
-          group_size: '2-25 People',
-          hotel: '',
-          rating: '4.6',
-          review_count: '112',
-          type: 'international',
-          level: 'budget',
-          city: 'Singapore',
-          country: 'Singapore',
-          image:
-            'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&q=80&w=600',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Arrive at Jewel Changi Airport to see the Rain Vortex, then transfer to your downtown hotel.',
-            },
-            {
-              title: 'Merlion & Gardens',
-              description:
-                'Take photos at the iconic Merlion Park and explore the futuristic Supertree Grove at Gardens by the Bay.',
-            },
-            {
-              title: 'Cultural Quarters',
-              description:
-                'Visit Chinatown, Little India, and Kampong Glam to experience rich multicultural heritage and local food.',
-            },
-            {
-              title: 'Departure',
-              description:
-                'Enjoy free time for shopping on Orchard Road before your transfer back to Changi Airport.',
-            },
-          ],
-        },
-        {
-          id: 20,
-          title: 'Singapore Island Adventure',
-          overview:
-            'A comprehensive standard package featuring full-day entry tickets to top theme parks, island resorts, and scenic cable car rides.',
-          price: '3,850,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-20 People',
-          hotel: '',
-          rating: '4.8',
-          review_count: '128',
-          type: 'international',
-          level: 'standard',
-          city: 'Singapore',
-          country: 'Singapore',
-          image:
-            'https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&q=80&w=600',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Land in Singapore, check-in to a 4-star hotel, and enjoy a night safari tour at the Singapore Zoo.',
-            },
-            {
-              title: 'Universal Studios',
-              description:
-                'Spend a thrilling, action-packed full day at Universal Studios Singapore on Sentosa Island.',
-            },
-            {
-              title: 'Sentosa Island Fun',
-              description:
-                'Ride the Singapore Cable Car, visit S.E.A. Aquarium, and watch the spectacular Wings of Time show.',
-            },
-            {
-              title: 'Science & Sky',
-              description:
-                'Visit the ArtScience Museum and take a ride on the Singapore Flyer for panoramic city views.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Do some duty-free shopping at Changi Airport before boarding your flight back home.',
-            },
-          ],
-        },
-        {
-          id: 21,
-          title: 'Singapore Luxury Marina Prestige Escape',
-          overview:
-            'An ultimate elite experience staying at the world-famous Marina Bay Sands, featuring private yacht charters and Michelin-starred dining.',
-          price: '6,500,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-6 People',
-          hotel: '',
-          rating: '4.9',
-          review_count: '156',
-          type: 'international',
-          level: 'premium',
-          city: 'Singapore',
-          country: 'Singapore',
-          image:
-            'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'VIP Arrival',
-              description:
-                'Arrive via private luxury limousine and check-in to an executive suite at Marina Bay Sands.',
-            },
-            {
-              title: 'Infinity Pool & SkyPark',
-              description:
-                'Spend a luxurious morning swimming in the world’s largest rooftop Infinity Pool with panoramic skyline views.',
-            },
-            {
-              title: 'Private Yacht Charter',
-              description:
-                'Embark on a private luxury yacht cruise to the Southern Islands, complete with an on-board personal chef barbecue.',
-            },
-            {
-              title: 'Michelin Dining',
-              description:
-                'Enjoy a private VIP guided tour of Flower Dome and Cloud Forest, followed by dinner at a 3-Michelin-starred restaurant.',
-            },
-            {
-              title: 'Departure',
-              description:
-                'Indulge in a premium spa massage treatment at the Banyan Tree Spa before your private limousine transfer to the airport.',
-            },
-          ],
-        },
-        {
-          id: 22,
-          title: 'Shanghai City Explore',
-          overview:
-            'An affordable budget tour focused on discovering Shanghai’s famous historical waterfront, ancient gardens, and towering skyscrapers.',
-          price: '1,950,000 MMK',
-          duration: '4Days / 3Nights',
-          group_size: '2-12 People',
-          hotel: '',
-          rating: '4.7',
-          review_count: '165',
-          type: 'international',
-          level: 'budget',
-          city: 'Shanghai',
-          country: 'China',
-          image:
-            'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?auto=format&fit=crop&w=800&q=80',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Fly into Shanghai, meet your tour guide, and check-in to your comfortable city center hotel.',
-            },
-            {
-              title: 'The Bund & Yu Garden',
-              description:
-                'Stroll along the historic waterfront at The Bund and explore the beautiful classical architecture of Yu Garden.',
-            },
-            {
-              title: 'Nanjing Road Shopping',
-              description:
-                'Experience the vibrant neon lights and extensive shopping opportunities along the Nanjing Road pedestrian street.',
-            },
-            {
-              title: 'Departure',
-              description:
-                'Visit the Jade Buddha Temple before transferring to the airport for your return flight.',
-            },
-          ],
-        },
-        {
-          id: 23,
-          title: 'Shanghai & Suzhou Cultural Discovery',
-          overview:
-            'A wonderful standard package exploring the modern marvels of Shanghai alongside the famous classical water towns and silk heritage of Suzhou.',
-          price: '2,950,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-10 People',
-          hotel: '',
-          rating: '4.9',
-          review_count: '240',
-          type: 'international',
-          level: 'standard',
-          city: 'Shanghai',
-          country: 'China',
-          image:
-            'https://plus.unsplash.com/premium_photo-1664299326174-f73b66496733?q=80&w=870&auto=format&fit=crop',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'Arrival',
-              description:
-                'Arrive in Shanghai, transfer to a 4-star hotel, and enjoy a relaxing evening Huangpu River cruise.',
-            },
-            {
-              title: 'Shanghai Heights',
-              description:
-                'Ascend to the observation deck of the Shanghai Tower and visit the high-tech Oriental Pearl TV Tower.',
-            },
-            {
-              title: 'Suzhou Water Town',
-              description:
-                'Travel to Suzhou to cruise through the historic canals of Zhouzhuang water town and visit the Humble Administrator’s Garden.',
-            },
-            {
-              title: 'Silk & Culture',
-              description:
-                'Tour a traditional Suzhou silk factory and explore the historic Shantang Street in the evening.',
-            },
-            {
-              title: 'Return',
-              description:
-                'Return to Shanghai for last-minute souvenir shopping before heading to the airport for your departure.',
-            },
-          ],
-        },
-        {
-          id: 24,
-          title: 'Shanghai Luxury Skyline & Disney Prestige Vacation',
-          overview:
-            'An ultra-luxury vacation featuring stays at premium skyline-view hotels, private VIP tours of Shanghai Disneyland, and elite dining experiences.',
-          price: '4,850,000 MMK',
-          duration: '5Days / 4Nights',
-          group_size: '2-4 People',
-          hotel: '',
-          rating: '5.0',
-          review_count: '95',
-          type: 'international',
-          level: 'premium',
-          city: 'Shanghai',
-          country: 'China',
-          image:
-            'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?auto=format&fit=crop&q=80&w=600',
-          thumbnail_images: [
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
-          ],
-          itinerary: [
-            {
-              title: 'VIP Arrival',
-              description:
-                'Ride the high-speed Maglev train first class, followed by a private luxury car transfer to your Bund-view 5-star hotel.',
-            },
-            {
-              title: 'Private Skyline Tour',
-              description:
-                'Enjoy an exclusive private guided tour of the French Concession and a luxury VIP dinner overlooking the glowing Bund skyline.',
-            },
-            {
-              title: 'Disney VIP Experience',
-              description:
-                'Spend a magical day at Shanghai Disneyland with a private VIP tour guide, providing fast-pass access to all major rides.',
-            },
-            {
-              title: 'Luxury Relaxation',
-              description:
-                'Indulge in a premium spa wellness treatment and enjoy afternoon tea at a high-end rooftop lounge.',
-            },
-            {
-              title: 'Departure',
-              description:
-                'Complete your luxury check-out and take a private chauffeur transfer directly to the airport for your flight.',
-            },
-          ],
-        },
-      ],
+    
+      // packagesDataset: [
+      //   {
+      //     id: 1,
+      //     title: 'Hpa-An Explore',
+      //     overview:
+      //       'This basic itinerary is highly suitable for budget-conscious travelers and groups of friends who want to joyfully explore the main landmark caves of Hpa-An.',
+      //     price: '195,000 MMK',
+      //     duration: '3 Days / 2 Nights',
+      //     group_size: '2 - 10 People',
+      //     hotel: '',
+      //     rating: '4.7',
+      //     review_count: '45',
+      //     type: 'domestic',
+      //     level: 'budget',
+      //     city: 'Hpa An',
+      //     country: 'Myanmar',
+      //     departure_date: '30.06.2026', // Card ထဲမှာ ပြသရန် Date
+      //     max_tickets: 20, // စုစုပေါင်းဆံ့သည့် ဦးရေ
+      //     available_tickets: 18, //လက်ကျန်ဦးရေ
+      //     image:
+      //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKM47OeGkz0jR-u1pXERcqjcANzdiJW8Qwlf-ADoF4QGplTaPI9TLIppc&s=10',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1543731068-7e0f5beff43a?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Arrive via Express bus and check-in to your cozy standard guesthouse in downtown Hpa-An.',
+      //       },
+      //       {
+      //         title: 'Tuk-Tuk Tour',
+      //         description:
+      //           'Enjoy a full-day Tuk-Tuk adventure visiting Kawgun Cave, Sadan Cave, Lumbini Garden, and Kyauk Ka Lat.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Shop for traditional Karen textiles and souvenirs before boarding your return bus to Yangon.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 2,
+      //     title: 'Hpa-An Mt.Zwegabin Adventure & Nature Tour',
+      //     overview:
+      //       'The best itinerary for nature lovers who want to personally climb Mt. Zwegabin and create lasting memories filled with adventure.',
+      //     price: '390,000 MMK',
+      //     duration: '4Days / 3Nights',
+      //     group_size: '2-8 People',
+      //     hotel: '',
+      //     rating: '4.8',
+      //     review_count: '72',
+      //     type: 'domestic',
+      //     level: 'standard',
+      //     city: 'Hpa An',
+      //     country: 'Myanmar',
+      //     image:
+      //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC2F6dkl--5ZgGST33-gDENeFeDjfWokz5G0caN9E_sHarjggPWSNBUe0&s=10',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Hpa-An Drive',
+      //         description:
+      //           'Get picked up by private minivan and enjoy watching the sunset over Kan Tharyar Lake.',
+      //       },
+      //       {
+      //         title: 'Hiking',
+      //         description:
+      //           'Wake up early to climb Mount Zwegabin and enjoy a magnificent sea-of-clouds sunrise from the summit.',
+      //       },
+      //       {
+      //         title: 'Nature Cave',
+      //         description:
+      //           'Cool off at the Yaedagon natural mountain pool and explore historic carvings inside Kawgun Cave.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Complete your eco-resort check-out and enjoy a smooth, scenic drive back to Yangon.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 3,
+      //     title: 'Hpa-An Thanlwin Riverside Luxury Retreat',
+      //     overview:
+      //       'A premium itinerary for relaxing peacefully at a high-end VIP resort by the Thanlwin River, while traveling luxuriously with a private VIP car and private boats.',
+      //     price: '950,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-8 People',
+      //     hotel: '',
+      //     rating: '5.0',
+      //     review_count: '38',
+      //     type: 'domestic',
+      //     level: 'premium',
+      //     city: 'Hpa An',
+      //     country: 'Myanmar',
+      //     image:
+      //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhKjPwzLJT5EpxUj3ligmXhDLn6WOAxCdc3aoTQSiz8MhKwdmJxb3xOIkU&s=10',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'VIP Arrival',
+      //         description:
+      //           'Arrive via a high-roof VIP van, check-in to your 5-star riverside resort, and receive a spa treatment.',
+      //       },
+      //       {
+      //         title: 'River Cruise',
+      //         description:
+      //           'Board an exclusive private wooden boat for a scenic sunset cruise along the mighty Thanlwin River.',
+      //       },
+      //       {
+      //         title: 'Custom Tour',
+      //         description:
+      //           'Take a private guided tour of Kyauk Ka Lat followed by an elite traditional VIP dinner show.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Enjoy a slow, lazy morning at the resort pool before your private VIP vehicle transfers you home.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 4,
+      //     title: 'Bagan Heritage & Sunset Explore',
+      //     overview:
+      //       'An affordable tour exploring ancient Bagan pagodas, famous sunset viewpoints, and rich Myanmar cultural heritage.',
+      //     price: '650,000 MMK',
+      //     duration: '3Days / 2Nights',
+      //     group_size: '2-15 People',
+      //     hotel: '',
+      //     rating: '4.8',
+      //     review_count: '180',
+      //     type: 'domestic',
+      //     level: 'budget',
+      //     city: 'Bagan',
+      //     country: 'Myanmar',
+      //     image:
+      //       'https://images.unsplash.com/photo-1599403275295-57bca684efd3?q=80&w=1041&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      //     thumbnail_images: [
+      //       'https://media.istockphoto.com/id/472682036/photo/hot-air-balloon-flying-over-bagan-temples-at-sunrise.jpg?s=612x612&w=0&k=20&c=_l13hAh5wzFA8cA0cErnm1_jBl8aH8xoEA9AKxs4c_w=',
+      //       'https://images.unsplash.com/photo-1675927308423-72dc9c525d8e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGJhZ2FuJTIwc3VucmlzZXxlbnwwfHwwfHx8MA%3D%3D',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival & Sunset Temple Watch',
+      //         description:
+      //           'Arrive at Bagan airport, check-in to hotel and head out to experience the iconic panoramic golden sunset.',
+      //       },
+      //       {
+      //         title: 'Full Day Temple Exploration',
+      //         description:
+      //           'Visit Ananda Temple, Shwezigon Pagoda, and Dhammayangyi Temple with a professional local guide.',
+      //       },
+      //       {
+      //         title: 'Local Crafts & Departure',
+      //         description:
+      //           'Explore traditional lacquerware workshops and enjoy a smooth departure back home.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 5,
+      //     title: 'Bagan Cultural Discovery & River Experience',
+      //     overview:
+      //       "A suitable package for families and friends to fully experience Bagan's ancient temples, local culture, and Ayeyarwady scenic river views.",
+      //     price: '950,000 MMK',
+      //     duration: '4Days / 3Nights',
+      //     group_size: '2-12 People',
+      //     hotel: '',
+      //     rating: '4.9',
+      //     review_count: '220',
+      //     type: 'domestic',
+      //     level: 'standard',
+      //     city: 'Bagan',
+      //     country: 'Myanmar',
+      //     image:
+      //       'https://images.unsplash.com/photo-1515900959941-d1cce424f5c4?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1609847860270-efa8c3ad583d?q=80&w=580&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      //       'https://images.unsplash.com/photo-1528648105451-3d52d912762d?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      //       'https://media.istockphoto.com/id/178071920/photo/golden-palace-in-old-bagan-mandalay-burma.webp?a=1&b=1&s=612x612&w=0&k=20&c=IKvUX7hu6KH1DjR4UlImXCwrnifaXT2hvm-_xoWpJgQ=',
+      //       'https://images.unsplash.com/photo-1497601089782-06319e8be3a0?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Enjoy an airport pickup and check-in to a beautiful resort nestled right by the river.',
+      //       },
+      //       {
+      //         title: 'Heritage Tour',
+      //         description:
+      //           'Visit the golden Shwezigon Pagoda, iconic temples, and the fascinating Archaeological Museum.',
+      //       },
+      //       {
+      //         title: 'River Cruise',
+      //         description:
+      //           'Set out on a relaxing Ayeyarwady sunset boat cruise and visit a traditional riverbank village.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Shop for authentic Bagan lacquerware souvenirs before checking out for your departure.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 6,
+      //     title: 'Bagan Royal Balloon & Luxury Escape',
+      //     overview:
+      //       'A premium package featuring a breathtaking sunrise hot-air balloon flight, luxury resort stay, and private guided tours for an unforgettable escape.',
+      //     price: '1,850,000 MMK',
+      //     duration: '4Days / 3Nights',
+      //     group_size: '2-4 People(Private)',
+      //     hotel: '',
+      //     rating: '5',
+      //     review_count: '62',
+      //     type: 'domestic',
+      //     level: 'premium',
+      //     city: 'Bagan',
+      //     country: 'Myanmar',
+      //     image:
+      //       'https://media.istockphoto.com/id/614446038/photo/hot-air-balloons-in-bagan-myanmar.jpg?s=612x612&w=0&k=20&c=nlxHdhqgEUUw_5M0dRlfhzHvjQG_epUqzLyUjcJJKmw=',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1674043549356-8dff137408bb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YmFnYW4lMjBzdW5yaXNlfGVufDB8fDB8fHww',
+      //       'https://media.istockphoto.com/id/1288905205/photo/dhammayazika-pagoda-temple-and-hot-air-balloons-in-myanmar.webp?a=1&b=1&s=612x612&w=0&k=20&c=mxZh-Nu6iz90FfJlGUnpQWxRrlk4wyQnBHtQxflvLLU=',
+      //       'https://d2lwt6tidfiof0.cloudfront.net/images/background/bg-myanmar.jpg',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'VIP Arrival',
+      //         description:
+      //           'Arrive via private transfer and check-in to a luxury 5-star resort and spa sanctuary.',
+      //       },
+      //       {
+      //         title: 'Balloon Adventure',
+      //         description:
+      //           'Witness a breathtaking Bagan sunrise from a hot-air balloon followed by a private guided temple tour.',
+      //       },
+      //       {
+      //         title: 'Luxury Experience',
+      //         description:
+      //           'Unwind with a premium spa treatment, take a private photography tour, and enjoy a sunset dinner.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Complete your executive check-out and take a private chauffeur transfer back to the airport.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 7,
+      //     title: 'Ngwe Saung Coastal Escape',
+      //     overview:
+      //       'A budget-friendly coastal escape designed for travelers looking to relax peacefully in the sea breeze and experience natural beach beauty.',
+      //     price: '750,000 MMK',
+      //     duration: '4Days / 3Nights',
+      //     group_size: '2-20 People',
+      //     hotel: '',
+      //     rating: '4.5',
+      //     review_count: '126',
+      //     type: 'domestic',
+      //     level: 'budget',
+      //     city: 'Ngwe Saung',
+      //     country: 'Myanmar',
+      //     image: 'https://www.mcs-myanmartravel.com/wp-content/uploads/2015/07/ngwesaung.jpg',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival & Check-in',
+      //         description:
+      //           'Arrival at Ngwe Saung Beach and hotel check-in to relax after the journey.',
+      //       },
+      //       {
+      //         title: 'Island Tour',
+      //         description:
+      //           'Visit Lovers Island and experience the breathtaking panoramic sunset at the beach.',
+      //       },
+      //       {
+      //         title: 'Leisure',
+      //         description:
+      //           'Enjoy free leisure time and indulge in tasting fresh local seafood along the shore.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Check-out from the hotel and begin the smooth return journey back to Mandalay.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 8,
+      //     title: 'Ngwe Saung Coastal Experience',
+      //     overview:
+      //       'A comfortable travel experience tailored to fully enjoy beach activities, local exploration, and high-quality resort relaxation.',
+      //     price: '1,200,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-15 People',
+      //     hotel: '',
+      //     rating: '4.8',
+      //     review_count: '246',
+      //     type: 'domestic',
+      //     level: 'standard',
+      //     city: 'Ngwe Saung',
+      //     country: 'Myanmar',
+      //     image:
+      //       'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/22/30/d2/d1/eskala-hotels-resorts.jpg?w=1200&h=-1&s=1',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Arrive at Ngwe Saung Beach and check-in to your selected 4-star beach resort.',
+      //       },
+      //       {
+      //         title: 'Beach Activities',
+      //         description:
+      //           'Engage in exciting beach activities or enjoy premium relaxation inside the resort facilities.',
+      //       },
+      //       {
+      //         title: 'Excursion',
+      //         description:
+      //           'Take a cultural and nature-filled excursion to visit the nearby Elephant Camp.',
+      //       },
+      //       {
+      //         title: 'Relax',
+      //         description:
+      //           'Spend a completely free day for personal relaxation followed by a sunset BBQ dinner.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Complete resort check-out and embark on a comfortable drive back to Mandalay.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 9,
+      //     title: 'Ngwe Saung Ocean Prestige',
+      //     overview:
+      //       'A premium seaside escape combining tranquility and ultra-luxury experiences, featuring private accommodations and VIP services.',
+      //     price: '2,200,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-8 People',
+      //     hotel: '',
+      //     rating: '4.9',
+      //     review_count: '89',
+      //     type: 'domestic',
+      //     level: 'premium',
+      //     city: 'Ngwe Saung',
+      //     country: 'Myanmar',
+      //     image:
+      //       'https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=600',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'VIP Arrival',
+      //         description:
+      //           'Enjoy a private SUV transfer, receive a VIP welcome, and check-in to your private Ocean Villa.',
+      //       },
+      //       {
+      //         title: 'Spa Relax',
+      //         description:
+      //           'Indulge in a premium luxury spa experience and unwind on the exclusive private beach front.',
+      //       },
+      //       {
+      //         title: 'Cruise Experience',
+      //         description:
+      //           'Set sail on a private boat cruise to experience the ultimate sea views and ocean breeze.',
+      //       },
+      //       {
+      //         title: 'Romantic Dinner',
+      //         description:
+      //           'Spend a premium leisure morning followed by an exclusive romantic dinner on the beach.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Complete executive check-out and take a private SUV transfer directly back home.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 10,
+      //     title: 'Kalaw Nature & Trekking Experience',
+      //     overview:
+      //       "A suitable package for nature lovers wanting to experience Kalaw's cool climate, pine forests, mountain trekking, and local markets.",
+      //     price: '420,000 MMK',
+      //     duration: '3Days / 2Nigts',
+      //     group_size: '2-12 People',
+      //     hotel: '',
+      //     rating: '4.7',
+      //     review_count: '135',
+      //     type: 'domestic',
+      //     level: 'budget',
+      //     city: 'Kalaw',
+      //     country: 'Myanmar',
+      //     image:
+      //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSRG9FCoqjY-LUvTY_RQJ2EDSYiZIuv5pdTN22nhTS-g&s=10',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Arrive in chilly Kalaw via VIP Express bus, check-in to your hotel, and explore the evening market.',
+      //       },
+      //       {
+      //         title: 'Trekking',
+      //         description:
+      //           'Trek through aromatic pine forests up to a scenic viewpoint and visit a traditional ethnic village.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Sip fresh local mountain coffee, shop for local Shan snacks and tea, and head on your return journey.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 11,
+      //     title: 'Kalaw & Inle Scenic Adventure',
+      //     overview:
+      //       'A great vacation for families and friends to visit Kalaw and Inle Lake in one trip, exploring natural beauty, tradition, and Intha lifestyle.',
+      //     price: '720,000 MMK',
+      //     duration: '4Days / 3Nights',
+      //     group_size: '2-10 People',
+      //     hotel: '',
+      //     rating: '4.9',
+      //     review_count: '185',
+      //     type: 'domestic',
+      //     level: 'standard',
+      //     city: 'Kalaw',
+      //     country: 'Myanmar',
+      //     image:
+      //       'https://indochinatreks.com/wp-content/uploads/2022/12/12.-Kalaw-inle-lake-fishermen-istock.jpg',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Arrive in the beautiful hill station of Kalaw and check-in to a comfortable 4-star mountain hotel.',
+      //       },
+      //       {
+      //         title: 'Kalaw Tour',
+      //         description:
+      //           'Take in mountain views, visit the historic Christ the King Church, and browse the vibrant local market.',
+      //       },
+      //       {
+      //         title: 'Inle Lake',
+      //         description:
+      //           'Board a private boat to explore floating gardens, stilt villages, and the historic Phaung Daw Oo Pagoda.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Enjoy a traditional Shan breakfast before checking out for a smooth return drive.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 12,
+      //     title: 'Kalaw Luxury Mountain Retreat',
+      //     overview:
+      //       'A VIP retreat to relax peacefully in a luxury mountain resort, enjoying private tours, premium dining, and pristine nature.',
+      //     price: '1,250,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-6 People',
+      //     hotel: '',
+      //     rating: '5',
+      //     review_count: '29',
+      //     type: 'domestic',
+      //     level: 'premium',
+      //     city: 'Kalaw',
+      //     country: 'Myanmar',
+      //     image:
+      //       'https://i.travelapi.com/lodging/16000000/15660000/15651600/15651577/182bbc8c_z.jpg',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'VIP Arrival',
+      //         description:
+      //           'Travel by a private SUV with chauffeur service and check-in to a world-class luxury mountain resort.',
+      //       },
+      //       {
+      //         title: 'Nature Escape',
+      //         description:
+      //           'Embark on a private guided nature trek through serene pine hills to catch a stunning mountain sunset.',
+      //       },
+      //       {
+      //         title: 'Wellness Day',
+      //         description:
+      //           'Spend an entire day focusing on wellness with signature spa treatments and relaxing resort activities.',
+      //       },
+      //       {
+      //         title: 'Local Experience',
+      //         description:
+      //           'Tour an organic coffee plantation followed by an exclusive private Shan cultural dinner.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Enjoy breakfast with mountain views before a private chauffeur transfer takes you back home.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 13,
+      //     title: 'Bangkok City Tour',
+      //     overview:
+      //       'Tailored for travelers who want to stay in a convenient shopping area in downtown Bangkok, go shopping, and explore famous temples and street food.',
+      //     price: '1,650,000 MMK',
+      //     duration: '4Days / 3Nights',
+      //     group_size: '2-12 People',
+      //     hotel: '',
+      //     rating: '4.6',
+      //     review_count: '112',
+      //     type: 'international',
+      //     level: 'budget',
+      //     city: 'Bangkok',
+      //     country: 'Thailand',
+      //     image:
+      //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZcLJa-cWwqzjwGQIJuINkTQ1ccor6N8ADP42u7BMhHZTdZmuumbOGCN_y&s=10',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Arrive at Bangkok airport, meet your private driver, and check-in to your hotel in Pratunam shopping district.',
+      //       },
+      //       {
+      //         title: 'Temples & Shopping',
+      //         description:
+      //           'Visit the spectacular Grand Palace, Wat Arun, and enjoy an evening shopping spree at CentralWorld.',
+      //       },
+      //       {
+      //         title: 'Street Food Explore',
+      //         description:
+      //           'Explore Chinatown (Yaowarat Road) for an unforgettable Michelin-starred local street food experience.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Enjoy free leisure time for last-minute shopping before heading to the airport for your flight back.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 14,
+      //     title: 'Chiang Mai Cultural Heritage & Mountain Escape',
+      //     overview:
+      //       'Perfect itinerary for groups seeking rich cultural experiences, traditional Lanna style temples, and refreshing mountainous nature.',
+      //     price: '2,550,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-10 People',
+      //     hotel: '',
+      //     rating: '4.8',
+      //     review_count: '150',
+      //     type: 'international',
+      //     level: 'standard',
+      //     city: 'Chiang Mai',
+      //     country: 'Thailand',
+      //     image:
+      //       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsuqSWfs1NiHiKGMVxXP2vsi7f942K7nR-Pl7jYYKLuyFpTEKALyz1DdY&s=10',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Fly into Chiang Mai, receive a warm welcome, and check-in to an elegant boutique Lanna hotel.',
+      //       },
+      //       {
+      //         title: 'Old City Tour',
+      //         description:
+      //           'Take a scenic trishaw ride around the Old City moat, visiting Wat Chedi Luang and Wat Phra Singh.',
+      //       },
+      //       {
+      //         title: 'Mountain Sunset',
+      //         description:
+      //           'Drive up the mountain to visit Wat Phra That Doi Suthep and catch a breathtaking sunset over the city.',
+      //       },
+      //       {
+      //         title: 'Elephant Sanctuary',
+      //         description:
+      //           'Spend a memorable day volunteering at an ethical elephant sanctuary, bathing and feeding them.',
+      //       },
+      //       {
+      //         title: 'Departure',
+      //         description:
+      //           'Browse for unique wooden handicrafts at the local market before taking your airport transfer.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 15,
+      //     title: 'Phuket Luxury Island Resort Vacation',
+      //     overview:
+      //       'Indulge in a premium, ultra-luxurious island escape featuring high-end beachfront pool villas, private yacht cruises, and elite dining.',
+      //     price: '4,450,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-4 People',
+      //     hotel: '',
+      //     rating: '5.0',
+      //     review_count: '85',
+      //     type: 'international',
+      //     level: 'premium',
+      //     city: 'Phuket',
+      //     country: 'Thailand',
+      //     image:
+      //       'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?q=80&w=801&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'VIP Arrival',
+      //         description:
+      //           'Experience VIP airport fast-track service and ride in a luxury car to your 5-star beachfront pool villa.',
+      //       },
+      //       {
+      //         title: 'Private Yacht Cruise',
+      //         description:
+      //           'Board an exclusive private catamaran yacht tour to explore the stunning Phi Phi Islands and Maya Bay.',
+      //       },
+      //       {
+      //         title: 'Resort Relaxation',
+      //         description:
+      //           'Unwind with a signature 3-hour luxury spa package and enjoy an intimate candlelight dinner by the sea.',
+      //       },
+      //       {
+      //         title: 'Old Town Tour',
+      //         description:
+      //           'Explore the charming Sino-Portuguese architecture of Phuket Old Town with a private photographer.',
+      //       },
+      //       {
+      //         title: 'Departure',
+      //         description:
+      //           'Savor a floating breakfast in your private pool before your luxury car transfers you to the airport.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 16,
+      //     title: 'Tokyo City Explore',
+      //     overview:
+      //       'A budget-friendly urban exploration itinerary designed to efficiently visit Tokyo’s main highlights using subways.',
+      //     price: '3,250,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-10 People',
+      //     hotel: '',
+      //     rating: '4.8',
+      //     review_count: '142',
+      //     type: 'international',
+      //     level: 'budget',
+      //     city: 'Tokyo',
+      //     country: 'Japan',
+      //     image:
+      //       'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&q=80&w=600',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Arrive at Narita Airport, board the express train, and check-in to your capsule or smart city hotel.',
+      //       },
+      //       {
+      //         title: 'Historic & Modern',
+      //         description:
+      //           'Visit Tokyo’s oldest Senso-ji Temple in Asakusa, followed by exploring electronics in Akihabara.',
+      //       },
+      //       {
+      //         title: 'Iconic Crossings',
+      //         description:
+      //           'Walk across the world-famous Shibuya Crossing and visit the serene Meiji Shrine in Harajuku.',
+      //       },
+      //       {
+      //         title: 'Anime Culture',
+      //         description:
+      //           'Spend an exciting day immersed in anime culture at Nakano Broadway and the DiverCity giant Gundam.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Pick up delicious Japanese snacks at Tokyo Station before boarding your airport express train.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 17,
+      //     title: 'Tokyo & Mt. Fuji Classic Adventure',
+      //     overview:
+      //       'A great standard package combining Tokyo’s vibrant city life with iconic views of Mount Fuji and Hakone hot springs.',
+      //     price: '4,250,000 MMK',
+      //     duration: '6Days / 5Nights',
+      //     group_size: '2-10 People',
+      //     hotel: '',
+      //     rating: '4.9',
+      //     review_count: '198',
+      //     type: 'international',
+      //     level: 'standard',
+      //     city: 'Tokyo',
+      //     country: 'Japan',
+      //     image:
+      //       'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&q=80&w=600',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Land in Tokyo, transfer to a 4-star city hotel, and witness views from Tokyo Tower.',
+      //       },
+      //       {
+      //         title: 'City Highlights',
+      //         description:
+      //           'Explore the historic Imperial Palace gardens and go shopping in the upscale Ginza district.',
+      //       },
+      //       {
+      //         title: 'Mt. Fuji Excursion',
+      //         description:
+      //           'Take a scenic drive to Mt. Fuji 5th Station and ride the Oshino Hakkai panoramic ropeway.',
+      //       },
+      //       {
+      //         title: 'Hakone Onsen',
+      //         description:
+      //           'Cruise across Lake Ashi on a pirate ship and stay overnight at a traditional Ryokan with hot springs.',
+      //       },
+      //       {
+      //         title: 'Theme Park Day',
+      //         description:
+      //           'Return to Tokyo and enjoy a full day of magical fun at Tokyo Disneyland or DisneySea.',
+      //       },
+      //       {
+      //         title: 'Departure',
+      //         description:
+      //           'Enjoy a morning stroll in Ueno Park before boarding your airport limousine bus home.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 18,
+      //     title: 'Osaka & Kyoto Cherry Blossom Premium Tour',
+      //     overview:
+      //       'A high-end, luxurious cultural tour through Osaka and ancient Kyoto, featuring five-star traditional Ryokans and VIP bullet trains.',
+      //     price: '6,850,000 MMK',
+      //     duration: '6Days / 5Nights',
+      //     group_size: '2-6 People',
+      //     hotel: '',
+      //     rating: '5.0',
+      //     review_count: '53',
+      //     type: 'international',
+      //     level: 'premium',
+      //     city: 'Osaka',
+      //     country: 'Japan',
+      //     image:
+      //       'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=600',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'VIP Arrival',
+      //         description:
+      //           'Receive a private luxury car transfer from Kansai Airport to your 5-star hotel in Osaka.',
+      //       },
+      //       {
+      //         title: 'Osaka Foodie Tour',
+      //         description:
+      //           'Visit the historic Osaka Castle, followed by an exclusive private guided gourmet street food tour in Dotonbori.',
+      //       },
+      //       {
+      //         title: 'Bullet Train to Kyoto',
+      //         description:
+      //           'Ride first-class on the Shinkansen to Kyoto and check-in to an ultra-luxury traditional Ryokan.',
+      //       },
+      //       {
+      //         title: 'Bamboo & Golden Pavilion',
+      //         description:
+      //           'Walk through Arashiyama Bamboo Grove early morning and visit the stunning Kinkaku-ji (Golden Pavilion).',
+      //       },
+      //       {
+      //         title: 'Fushimi Inari VIP',
+      //         description:
+      //           'Experience a private evening tour of Fushimi Inari Shrine, followed by an elite traditional multi-course Kaiseki dinner.',
+      //       },
+      //       {
+      //         title: 'Departure',
+      //         description:
+      //           'Participate in a private tea ceremony experience before your luxury chauffeur transfer back to the airport.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 19,
+      //     title: 'Singapore City Escape',
+      //     overview:
+      //       'An affordable urban getaway package tailored to explore Singapore’s ultra-modern landmarks, clean streets, and multi-cultural neighborhoods.',
+      //     price: '2,850,000 MMK',
+      //     duration: '4Days / 3Nights',
+      //     group_size: '2-25 People',
+      //     hotel: '',
+      //     rating: '4.6',
+      //     review_count: '112',
+      //     type: 'international',
+      //     level: 'budget',
+      //     city: 'Singapore',
+      //     country: 'Singapore',
+      //     image:
+      //       'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&q=80&w=600',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Arrive at Jewel Changi Airport to see the Rain Vortex, then transfer to your downtown hotel.',
+      //       },
+      //       {
+      //         title: 'Merlion & Gardens',
+      //         description:
+      //           'Take photos at the iconic Merlion Park and explore the futuristic Supertree Grove at Gardens by the Bay.',
+      //       },
+      //       {
+      //         title: 'Cultural Quarters',
+      //         description:
+      //           'Visit Chinatown, Little India, and Kampong Glam to experience rich multicultural heritage and local food.',
+      //       },
+      //       {
+      //         title: 'Departure',
+      //         description:
+      //           'Enjoy free time for shopping on Orchard Road before your transfer back to Changi Airport.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 20,
+      //     title: 'Singapore Island Adventure',
+      //     overview:
+      //       'A comprehensive standard package featuring full-day entry tickets to top theme parks, island resorts, and scenic cable car rides.',
+      //     price: '3,850,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-20 People',
+      //     hotel: '',
+      //     rating: '4.8',
+      //     review_count: '128',
+      //     type: 'international',
+      //     level: 'standard',
+      //     city: 'Singapore',
+      //     country: 'Singapore',
+      //     image:
+      //       'https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&q=80&w=600',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Land in Singapore, check-in to a 4-star hotel, and enjoy a night safari tour at the Singapore Zoo.',
+      //       },
+      //       {
+      //         title: 'Universal Studios',
+      //         description:
+      //           'Spend a thrilling, action-packed full day at Universal Studios Singapore on Sentosa Island.',
+      //       },
+      //       {
+      //         title: 'Sentosa Island Fun',
+      //         description:
+      //           'Ride the Singapore Cable Car, visit S.E.A. Aquarium, and watch the spectacular Wings of Time show.',
+      //       },
+      //       {
+      //         title: 'Science & Sky',
+      //         description:
+      //           'Visit the ArtScience Museum and take a ride on the Singapore Flyer for panoramic city views.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Do some duty-free shopping at Changi Airport before boarding your flight back home.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 21,
+      //     title: 'Singapore Luxury Marina Prestige Escape',
+      //     overview:
+      //       'An ultimate elite experience staying at the world-famous Marina Bay Sands, featuring private yacht charters and Michelin-starred dining.',
+      //     price: '6,500,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-6 People',
+      //     hotel: '',
+      //     rating: '4.9',
+      //     review_count: '156',
+      //     type: 'international',
+      //     level: 'premium',
+      //     city: 'Singapore',
+      //     country: 'Singapore',
+      //     image:
+      //       'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=600',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'VIP Arrival',
+      //         description:
+      //           'Arrive via private luxury limousine and check-in to an executive suite at Marina Bay Sands.',
+      //       },
+      //       {
+      //         title: 'Infinity Pool & SkyPark',
+      //         description:
+      //           'Spend a luxurious morning swimming in the world’s largest rooftop Infinity Pool with panoramic skyline views.',
+      //       },
+      //       {
+      //         title: 'Private Yacht Charter',
+      //         description:
+      //           'Embark on a private luxury yacht cruise to the Southern Islands, complete with an on-board personal chef barbecue.',
+      //       },
+      //       {
+      //         title: 'Michelin Dining',
+      //         description:
+      //           'Enjoy a private VIP guided tour of Flower Dome and Cloud Forest, followed by dinner at a 3-Michelin-starred restaurant.',
+      //       },
+      //       {
+      //         title: 'Departure',
+      //         description:
+      //           'Indulge in a premium spa massage treatment at the Banyan Tree Spa before your private limousine transfer to the airport.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 22,
+      //     title: 'Shanghai City Explore',
+      //     overview:
+      //       'An affordable budget tour focused on discovering Shanghai’s famous historical waterfront, ancient gardens, and towering skyscrapers.',
+      //     price: '1,950,000 MMK',
+      //     duration: '4Days / 3Nights',
+      //     group_size: '2-12 People',
+      //     hotel: '',
+      //     rating: '4.7',
+      //     review_count: '165',
+      //     type: 'international',
+      //     level: 'budget',
+      //     city: 'Shanghai',
+      //     country: 'China',
+      //     image:
+      //       'https://images.unsplash.com/photo-1548919973-5cef591cdbc9?auto=format&fit=crop&w=800&q=80',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Fly into Shanghai, meet your tour guide, and check-in to your comfortable city center hotel.',
+      //       },
+      //       {
+      //         title: 'The Bund & Yu Garden',
+      //         description:
+      //           'Stroll along the historic waterfront at The Bund and explore the beautiful classical architecture of Yu Garden.',
+      //       },
+      //       {
+      //         title: 'Nanjing Road Shopping',
+      //         description:
+      //           'Experience the vibrant neon lights and extensive shopping opportunities along the Nanjing Road pedestrian street.',
+      //       },
+      //       {
+      //         title: 'Departure',
+      //         description:
+      //           'Visit the Jade Buddha Temple before transferring to the airport for your return flight.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 23,
+      //     title: 'Shanghai & Suzhou Cultural Discovery',
+      //     overview:
+      //       'A wonderful standard package exploring the modern marvels of Shanghai alongside the famous classical water towns and silk heritage of Suzhou.',
+      //     price: '2,950,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-10 People',
+      //     hotel: '',
+      //     rating: '4.9',
+      //     review_count: '240',
+      //     type: 'international',
+      //     level: 'standard',
+      //     city: 'Shanghai',
+      //     country: 'China',
+      //     image:
+      //       'https://plus.unsplash.com/premium_photo-1664299326174-f73b66496733?q=80&w=870&auto=format&fit=crop',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'Arrival',
+      //         description:
+      //           'Arrive in Shanghai, transfer to a 4-star hotel, and enjoy a relaxing evening Huangpu River cruise.',
+      //       },
+      //       {
+      //         title: 'Shanghai Heights',
+      //         description:
+      //           'Ascend to the observation deck of the Shanghai Tower and visit the high-tech Oriental Pearl TV Tower.',
+      //       },
+      //       {
+      //         title: 'Suzhou Water Town',
+      //         description:
+      //           'Travel to Suzhou to cruise through the historic canals of Zhouzhuang water town and visit the Humble Administrator’s Garden.',
+      //       },
+      //       {
+      //         title: 'Silk & Culture',
+      //         description:
+      //           'Tour a traditional Suzhou silk factory and explore the historic Shantang Street in the evening.',
+      //       },
+      //       {
+      //         title: 'Return',
+      //         description:
+      //           'Return to Shanghai for last-minute souvenir shopping before heading to the airport for your departure.',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 24,
+      //     title: 'Shanghai Luxury Skyline & Disney Prestige Vacation',
+      //     overview:
+      //       'An ultra-luxury vacation featuring stays at premium skyline-view hotels, private VIP tours of Shanghai Disneyland, and elite dining experiences.',
+      //     price: '4,850,000 MMK',
+      //     duration: '5Days / 4Nights',
+      //     group_size: '2-4 People',
+      //     hotel: '',
+      //     rating: '5.0',
+      //     review_count: '95',
+      //     type: 'international',
+      //     level: 'premium',
+      //     city: 'Shanghai',
+      //     country: 'China',
+      //     image:
+      //       'https://images.unsplash.com/photo-1474181487882-5abf3f0ba6c2?auto=format&fit=crop&q=80&w=600',
+      //     thumbnail_images: [
+      //       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
+      //       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
+      //     ],
+      //     itinerary: [
+      //       {
+      //         title: 'VIP Arrival',
+      //         description:
+      //           'Ride the high-speed Maglev train first class, followed by a private luxury car transfer to your Bund-view 5-star hotel.',
+      //       },
+      //       {
+      //         title: 'Private Skyline Tour',
+      //         description:
+      //           'Enjoy an exclusive private guided tour of the French Concession and a luxury VIP dinner overlooking the glowing Bund skyline.',
+      //       },
+      //       {
+      //         title: 'Disney VIP Experience',
+      //         description:
+      //           'Spend a magical day at Shanghai Disneyland with a private VIP tour guide, providing fast-pass access to all major rides.',
+      //       },
+      //       {
+      //         title: 'Luxury Relaxation',
+      //         description:
+      //           'Indulge in a premium spa wellness treatment and enjoy afternoon tea at a high-end rooftop lounge.',
+      //       },
+      //       {
+      //         title: 'Departure',
+      //         description:
+      //           'Complete your luxury check-out and take a private chauffeur transfer directly to the airport for your flight.',
+      //       },
+      //     ],
+      //   },
+      // ],
     }
   },
 
@@ -1510,22 +1510,22 @@ currentUser
 ? currentUser.fullName
 : "Anonymous Traveller";
 
-      // ၁။ လက်ရှိ list ထဲ ထည့်တယ်
+      // လက်ရှိ list ထဲ ထည့်တယ်
       this.commentsDataset.unshift({
         rating: this.newRating,
         comment: this.newComment,
         user_name: currentUserName,
       })
 
-      // ၂။ အားလုံးပေါင်းသိမ်းထားတဲ့ localStorage object ထဲမှာ သွားသိမ်းမယ်
+      //အားလုံးပေါင်းသိမ်းထားတဲ့ localStorage object ထဲမှာ သွားသိမ်းမယ်
       const allReviews = localStorage.getItem('all_packages_reviews')
       const reviewsObj = allReviews ? JSON.parse(allReviews) : {}
       reviewsObj[pkgId] = this.commentsDataset
       localStorage.setItem('all_packages_reviews', JSON.stringify(reviewsObj))
-      // 🌟 ထည့်ရမည့် ကုဒ်အသစ်: အခြား Component တွေက လှမ်းသိနိုင်အောင် Event ထုတ်လွှတ်လိုက်ခြင်း
+  
       window.dispatchEvent(new Event('reviews-updated'))
 
-      // ၃။ UI ပေါ်က Package rating တွေကိုပါ update ဖြစ်သွားအောင် localStorage ထဲမှာ ရလဒ် သိမ်းမယ်
+     
       const savedStats = localStorage.getItem('package_stats')
       const statsObj = savedStats ? JSON.parse(savedStats) : {}
       statsObj[pkgId] = {
@@ -1537,7 +1537,8 @@ currentUser
       this.newComment = ''
       this.newRating = 0
     },
-
+    
+    //APIချိတ်ရင်ဖျက်ရမယ့် logic
     loadPackageDetail() {
       this.loading = true
       const packageId = parseInt(this.$route.params.id)
@@ -1621,7 +1622,7 @@ currentUser
     },
   },
 
-  // ၃။ Watcher
+ 
   watch: {
     '$route.params.id': {
       handler: 'loadPackageDetail',
@@ -1650,7 +1651,7 @@ currentUser
     },
   },
 
-  // ၄။ Mounted Hook
+  //Mounted Hook
   mounted() {
     this.loadPackageDetail()
     const pkgId = this.$route.params.id

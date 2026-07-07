@@ -11,9 +11,7 @@ const router = createRouter({
 
   routes: [
 
-    // ======================
-    // PUBLIC ROUTES
-    // ======================
+  
     {
       path: '/',
       name: 'home',
@@ -74,9 +72,7 @@ const router = createRouter({
       component: () => import('../views/DestinationDetail.vue')
     },
 
-    // ======================
-    // PROTECTED ROUTES
-    // ======================
+   
     {
       path: '/booking/:id',
       name: 'booking',
@@ -113,9 +109,6 @@ const router = createRouter({
       }
     },
 
-    // ======================
-    // ADMIN ROUTES
-    // ======================
     {
       path: '/admin',
       component: AdminLayout,
@@ -186,9 +179,7 @@ router.beforeEach((to, from, next) => {
   const isLoggedIn = authStore.isLoggedIn
   const user = authStore.user
 
-  // ======================
-  // 1. LOGIN REQUIRED ROUTES
-  // ======================
+ 
   if (to.meta.requiresAuth && !isLoggedIn) {
     return next({
       path: '/login',
@@ -196,18 +187,13 @@ router.beforeEach((to, from, next) => {
     })
   }
 
-  // ======================
-  // 2. ADMIN ONLY ROUTES
-  // ======================
   if (to.meta.requiresAdmin) {
     if (!isLoggedIn || user?.role !== 'ADMIN') {
       return next('/')
     }
   }
 
-  // ======================
-  // OK PASS
-  // ======================
+ 
   next()
 });
 

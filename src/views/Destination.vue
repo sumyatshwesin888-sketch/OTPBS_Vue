@@ -152,93 +152,93 @@
 </template>
 <script setup>
 
-const domesticDestinations = [
+// const domesticDestinations = [
 
-  {
-    name: 'Bagan',
-    image: '/bagan.jpg',
+//   {
+//     name: 'Bagan',
+//     image: '/bagan.jpg',
     
-    price: '650,000 MMK',
+//     price: '650,000 MMK',
 
-    description:
-      'Ancient temples and breathtaking sunrise views.',
-  },
+//     description:
+//       'Ancient temples and breathtaking sunrise views.',
+//   },
 
-  {
-    name: 'Kalaw',
-    image: '/kalaw.jpg',
+//   {
+//     name: 'Kalaw',
+//     image: '/kalaw.jpg',
     
-    price: '420,000 MMK',
+//     price: '420,000 MMK',
 
-    description:
-      'Cool weather and beautiful trekking routes.',
-  },
+//     description:
+//       'Cool weather and beautiful trekking routes.',
+//   },
 
-  {
-    name: 'Hpa-An',
-    image: '/hpaan.jpg',
+//   {
+//     name: 'Hpa-An',
+//     image: '/hpaan.jpg',
     
-    price: '195,000 MMK',
+//     price: '195,000 MMK',
 
-    description:
-      'Mountains, caves and natural beauty.',
-  },
+//     description:
+//       'Mountains, caves and natural beauty.',
+//   },
 
-  {
-    name: 'Ngwe Saung',
-    image: '/ngwesaung.jpg',
+//   {
+//     name: 'Ngwe Saung',
+//     image: '/ngwesaung.jpg',
     
-    price: '750,000 MMK',
+//     price: '750,000 MMK',
 
-    description:
-      'Beautiful beach and seafood paradise.',
-  }
+//     description:
+//       'Beautiful beach and seafood paradise.',
+//   }
 
-]
+// ]
 
-const internationalDestinations = [
+// const internationalDestinations = [
 
-  {
-    name: 'Thailand',
-    image: '/thailand.jpg',
+//   {
+//     name: 'Thailand',
+//     image: '/thailand.jpg',
     
-    price: '1,650,000 MMK',
+//     price: '1,650,000 MMK',
 
-    description:
-      'Shopping, culture and vibrant city life.',
-  },
+//     description:
+//       'Shopping, culture and vibrant city life.',
+//   },
 
-  {
-    name: 'Japan',
-    image: '/japan.jpg',
+//   {
+//     name: 'Japan',
+//     image: '/japan.jpg',
     
-    price: '3,250,000 MMK',
+//     price: '3,250,000 MMK',
 
-    description:
-      'Technology and traditional culture.',
-  },
+//     description:
+//       'Technology and traditional culture.',
+//   },
 
-  {
-    name: 'China',
-    image: '/china.jpg',
+//   {
+//     name: 'China',
+//     image: '/china.jpg',
     
-    price: '1,950,000 MMK',
+//     price: '1,950,000 MMK',
 
-    description:
-      'Historic landmarks and modern skyline.',
-  },
+//     description:
+//       'Historic landmarks and modern skyline.',
+//   },
 
-  {
-    name: 'Singapore',
-    image: '/signapore.jpg',
+//   {
+//     name: 'Singapore',
+//     image: '/signapore.jpg',
     
-    price: '2,850,000 MMK',
+//     price: '2,850,000 MMK',
 
-    description:
-      'Luxury lifestyle and iconic attractions.',
-  }
+//     description:
+//       'Luxury lifestyle and iconic attractions.',
+//   }
 
-]
+// ]
 
 </script>
 <style setup>

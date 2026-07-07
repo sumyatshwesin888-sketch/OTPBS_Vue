@@ -27,12 +27,6 @@ class PackageService{
         return this.axios.delete(url).then(request => request.data);
     }
 
-    
-
-
-   
-
-    
 
 }
 
