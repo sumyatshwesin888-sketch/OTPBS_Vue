@@ -77,9 +77,6 @@ const router = createRouter({
       path: '/booking/:id',
       name: 'booking',
       component: BookingPage,
-      meta: {
-        requiresAuth: true
-      }
     },
 
     {

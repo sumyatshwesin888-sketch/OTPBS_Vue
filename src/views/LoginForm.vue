@@ -53,7 +53,8 @@
         <button
           type="submit"
           class="btn-submit"
-          :disabled="loading || !formValid"
+          :disabled="loading"
+          
         >
           <span v-if="loading">Loading...</span>
           <span v-else>Login →</span>
@@ -73,7 +74,7 @@
 
 <script>
 import { useAuthStore } from '@/store/auth'
-
+import userAccountService from '@/service/UserAccountService'
 export default {
   name: 'LoginForm',
 
@@ -84,7 +85,8 @@ export default {
       rememberMe: false,
       showPassword: false,
       loading: false,
-      authStore: useAuthStore()
+      authStore: useAuthStore(),
+      loginUser:{},
     }
   },
 
@@ -93,35 +95,57 @@ export default {
       return this.email && this.password.length >= 6
     }
   },
-
+  mounted() {
+    this.loginUser = localStorage.getItem('loginUser');
+    if(this.loginUser.userAccountId>0 || this.loginUser != undefined){
+       this.$router.push('/');
+    }
+  },
   methods: {
-
+    // loginMethod(){
+    //   console.log(this.email);
+    //   console.log(this.password);
+    // },
+    
     async handleSubmit() {
       this.loading = true
 
       try {
 
         // 🔥 ADMIN LOGIN (hardcoded)
-        if (this.email === 'admin@gmail.com' && this.password === '123456') {
-          const adminUser = {
-            name: 'Admin',
-            email: this.email,
-            role: 'ADMIN'
+        // if (this.email === 'admin@gmail.com' && this.password === '123456') {
+        //   const adminUser = {
+        //     name: 'Admin',
+        //     email: this.email,
+        //     role: 'ADMIN'
+        //   }
+
+        //   this.authStore.setUser(adminUser)
+
+        //   this.redirectAfterLogin(adminUser.role)
+        //   return
+        // }
+
+      //  await this.authStore.signIn(
+      //     this.email,
+      //     this.password
+      //   )
+
+      //   this.redirectAfterLogin('USER'  
+userAccountService
+        .getLogin(this.email,this.password)
+        .then((response) => {
+
+          if(response.userAccountId==0){
+            alert(" Email and Password is Wrong.");
+          }else{
+          localStorage.setItem('loginUser', JSON.stringify(response));
+          this.$router.push('/')
           }
-
-          this.authStore.setUser(adminUser)
-
-          this.redirectAfterLogin(adminUser.role)
-          return
-        }
-
-       await this.authStore.signIn(
-          this.email,
-          this.password
-        )
-
-        this.redirectAfterLogin('USER')
-
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
 
       } catch (err) {
         alert(err.message || 'Login failed')

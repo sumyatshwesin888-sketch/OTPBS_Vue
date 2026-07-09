@@ -61,7 +61,7 @@
               <input
                 type="text"
                 id="fullName"
-                v-model="formData.fullName"
+                v-model="formData.name"
                 placeholder="Enter your full name"
                 required
               />
@@ -95,15 +95,15 @@
             <label for="message">Message</label>
             <textarea
               id="message"
-              v-model="formData.message"
+              v-model="formData.messageText"
               placeholder="Type your message..."
               rows="5"
               required
             ></textarea>
           </div>
 
-          <button type="submit" class="submit-btn">
-            <i class="fas fa-paper-plane"></i> Send Message
+          <button type="submit" class="submit-btn" @click="saveMessage">
+            <i class="fas fa-paper-plane" ></i> Send Message
           </button>
         </form>
       </div>
@@ -112,19 +112,28 @@
 </template>
 
 <script>
+import MessageService from '@/service/MessageService'
 export default {
   name: 'ContactPage',
   data() {
     return {
-      formData: {
-        fullName: '',
-        email: '',
-        subject: '',
-        message: '',
-      },
+      formData: {},
     }
   },
   methods: {
+    saveMessage:function(){
+      let qt = {};
+      qt.questionTypeId = 1;
+      this.formData.questionType = qt;
+      MessageService
+        .addMessage(this.formData)
+        .then((response) => {
+         alert('Your message has been sent successfully!');
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+    },  
     handleSubmit() {
       console.log('Form Data Submitted:', this.formData)
       alert('Your message has been sent successfully!')

@@ -22,7 +22,7 @@
         </div>
 
         <div class="nav-actions">
-         <template v-if="!authStore.user">
+         <template v-if="loginUser == undefined ||  loginUser.userAccountId==0">
             <button
               class="btn-login"
               @click="$router.replace('/login')"
@@ -44,14 +44,14 @@
                 <v-btn variant="text" class="profile-trigger-btn" v-bind="props">
                   <v-avatar color="primary" size="32" class="mr-2 text-white font-weight-bold">
                     {{
-                      (authStore.user.fullName || authStore.user.name || 'U')
+                      (loginUser.profileName  || 'U')
                         .charAt(0)
                         .toUpperCase()
                     }}
                   </v-avatar>
-
+    
                   <span class="user-display-name">
-                   {{ authStore.user.fullName || authStore.user.name || 'User' }}
+                   {{ loginUser.profileName  || 'User' }}
                   </span>
                   <v-icon icon="mdi-chevron-down" size="small" class="ml-1 text-white" />
                 </v-btn>
@@ -107,27 +107,34 @@ export default {
   data() {
     return {
      
-      authStore: useAuthStore()
+      authStore: useAuthStore(),
+      loginUser:{},
     }
   },
   // created() {
   //  this.authStore.loadUser()
   // },
- 
+
   computed: {
     // 💡 လမ်းကြောင်းခွဲပေးမယ့် ဒီ computed property ရှိနေဖို့ လိုအပ်ပါတယ်ဗျာ
    
 
   profileRoute() {
-    const user = this.authStore.user
+    const user = this.authStore.loginUser
 
-    if (user && user.role === 'ADMIN') {
+    if (user && user.userType === 'ADMIN') {
       return '/admin/dashboard'
     }
 
     return '/profile'
   }
 
+  },
+    mounted() {
+    this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    console.log(" >>>>>>>>>>>>>>>>>>> ");
+    console.log(this.loginUser);
+    console.log(this.loginUser.userAccountId);
   },
   methods: {
     handleLogout() {

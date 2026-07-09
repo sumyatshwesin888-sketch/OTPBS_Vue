@@ -75,7 +75,7 @@
         </div>
 
         <!-- SUBMIT -->
-        <button type="submit" class="btn-submit">
+        <button type="submit" class="btn-submit" @click="saveUser">
           Create Account →
         </button>
 
@@ -116,7 +116,14 @@ export default {
   },
 
   methods: {
-
+      saveUser(){
+          let user = {};
+          user.profileName = this.fullName;
+          user.phone = this.phone;
+          user.email = this.email;
+          user.password = this.password;
+          user.userType = "CUSTOMER";
+    },
     handleSubmit() {
 
       // ❗ password check

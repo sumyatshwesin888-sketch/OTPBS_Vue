@@ -45,16 +45,29 @@
 
     <main class="packages-grid-section">
       <div class="container-max">
-        
         <!--  ALL Tab တွင် ပြသမည့်ပုံစံ -->
         <div
           v-if="activeTab === 'ALL' && filteredAllPackages.length > 0"
           class="all-packages-layout"
         >
           <div class="packages-grid-layout">
-            <div v-for="pkg in filteredAllPackages" :key="pkg.id" class="package-premium-card">
+            <div
+              v-for="pkg in filteredAllPackages"
+              :key="pkg.productId"
+              class="package-premium-card"
+            >
               <div class="card-image-box">
                 <img :src="pkg.photo" :alt="pkg.title" class="pkg-display-img" />
+
+                <span
+                  v-if="pkg.locationType"
+                  class="package-badge"
+                  :class="
+                    pkg.locationType === 'DOMESTIC' ? 'badge-domestic' : 'badge-international'
+                  "
+                >
+                  {{ pkg.locationType }}
+                </span>
               </div>
 
               <div class="card-body-content">
@@ -65,14 +78,14 @@
                 </div>
 
                 <div class="pkg-meta-row">
-                  <span class="pkg-duration">🕒 {{ pkg.day }}/{{ pkg.night }}</span>
+                  <span class="pkg-duration">🕒 {{ pkg.day }} day/{{ pkg.night }} night</span>
                   <span class="pkg-group">👥 {{ pkg.groupSize }}</span>
                 </div>
 
                 <div class="pkg-rating-row">
                   <span class="star-icon">⭐</span>
                   <span class="rating-val">{{ pkg.ratingCount }}</span>
-                  <span class="review-count">({{ pkg.commentCount}})</span>
+                  <span class="review-count">({{ pkg.commentCount }})</span>
                 </div>
 
                 <div class="pkg-card-footer">
@@ -89,7 +102,6 @@
           </div>
         </div>
 
-      
         <div v-else-if="activeTab !== 'ALL' && Object.keys(filteredGroupedPackages).length > 0">
           <div
             v-for="(packages, groupName) in filteredGroupedPackages"
@@ -111,6 +123,14 @@
               <div v-for="pkg in packages" :key="pkg.id" class="package-premium-card">
                 <div class="card-image-box">
                   <img :src="pkg.photo" :alt="pkg.title" class="pkg-display-img" />
+
+                  <span
+                    v-if="pkg.type || pkg.Type"
+                    class="package-badge"
+                    :class="`badge-${(pkg.type || pkg.Type).toLowerCase()}`"
+                  >
+                    {{ pkg.type || pkg.Type }}
+                  </span>
                 </div>
 
                 <div class="card-body-content">
@@ -123,8 +143,8 @@
 
                   <div class="pkg-rating-row">
                     <span class="star-icon">⭐</span>
-                    <span class="rating-val">{{ pkg.ratingCount}}</span>
-                    <span class="review-count">({{ pkg.commentCount}})</span>
+                    <span class="rating-val">{{ pkg.ratingCount }}</span>
+                    <span class="review-count">({{ pkg.commentCount }})</span>
                   </div>
 
                   <div class="pkg-card-footer">
@@ -142,7 +162,6 @@
           </div>
         </div>
 
-        
         <div v-else class="no-packages-found">
           <p>No travel packages found matching your criteria.</p>
         </div>
@@ -159,8 +178,8 @@ export default {
   data() {
     return {
       activeTab: 'ALL',
-      searchQuery: '', 
-      packagesData: [], 
+      searchQuery: '',
+      packagesData: [],
     }
   },
 
@@ -170,7 +189,7 @@ export default {
 
       const query = this.searchQuery.toLowerCase().trim()
       return this.packagesData.filter((pkg) => {
-        const loc = (pkg.location || pkg.destination || pkg.city || '').toLowerCase();
+        const loc = (pkg.location || pkg.destination || pkg.city || '').toLowerCase()
         return (
           (pkg.title || '').toLowerCase().includes(query) ||
           loc.includes(query) ||
@@ -183,46 +202,44 @@ export default {
 
     filteredGroupedPackages() {
       if (this.activeTab === 'ALL') return {}
+      console.log('Check Data - ', this.packagesData)
 
       let filtered = this.packagesData.filter((pkg) => {
-        
         if (pkg.locationType) {
-          return pkg.locationType.toUpperCase().trim() === this.activeTab;
+          return pkg.locationType.toUpperCase().trim() === this.activeTab
         }
         if (pkg.city && pkg.city.locationType) {
-          return pkg.city.locationType.toUpperCase().trim() === this.activeTab;
+          return pkg.city.locationType.toUpperCase().trim() === this.activeTab
         }
 
-        const locationText = (pkg.location || pkg.destination || pkg.city || '').toLowerCase();
+        const locationText = (pkg.location || pkg.destination || pkg.city || '').toLowerCase()
         if (this.activeTab === 'DOMESTIC') {
-         
-          return locationText.includes('myanmar') || !locationText.includes('china');
+          return locationText.includes('myanmar')
         } else if (this.activeTab === 'INTERNATIONAL') {
-         
-          return locationText.includes('china') || (!locationText.includes('myanmar') && locationText !== '');
+          return !locationText.includes('myanmar') && locationText !== ''
         }
-        return false;
+        return false
       })
 
       // Search Box Filter
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase().trim()
         filtered = filtered.filter((pkg) => {
-          const loc = (pkg.location || pkg.destination || pkg.city || '').toLowerCase();
+          const loc = (pkg.location || pkg.destination || pkg.city || '').toLowerCase()
           return (
             (pkg.title || '').toLowerCase().includes(query) ||
             loc.includes(query) ||
             (pkg.amount || '').toString().toLowerCase().includes(query) ||
             (pkg.duration || '').toLowerCase().includes(query) ||
             (pkg.group_size || '').toLowerCase().includes(query)
-          );
+          )
         })
       }
 
       // မြို့အလိုက် Group ပြန်ခွဲ
       const groups = {}
       filtered.forEach((pkg) => {
-        const key = pkg.location || pkg.destination || pkg.city || 'Other';
+        const key = pkg.location || pkg.destination || pkg.city || 'Other'
         if (!groups[key]) {
           groups[key] = []
         }
@@ -251,19 +268,22 @@ export default {
       }
     },
     getPackages() {
-      let apiParam = this.activeTab;
+      let apiParam = this.activeTab
       if (this.activeTab === 'DOMESTIC' || this.activeTab === 'INTERNATIONAL') {
-        apiParam = this.activeTab.toLowerCase();
+        apiParam = this.activeTab.toLowerCase()
       }
 
-      packageService.getPackages(apiParam).then((response) => {
-        console.log(response);
-        
-        this.packagesData.splice(0, this.packagesData.length)
-        this.packagesData.push(...response)
-      }).catch(err => {
-        console.error("API Fetch Error: ", err)
-      })
+      packageService
+        .getPackages(apiParam)
+        .then((response) => {
+          console.log(response)
+
+          this.packagesData.splice(0, this.packagesData.length)
+          this.packagesData.push(...response)
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
     },
   },
 
@@ -279,7 +299,6 @@ export default {
 </script>
 
 <style scoped>
-
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 .packages-page-container {
@@ -462,6 +481,44 @@ export default {
   position: relative;
   height: 190px;
   width: 100%;
+}
+
+.package-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 6px;
+  color: white;
+  z-index: 2;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* card ပိစိလေးတွေအတွက် */
+.badge-domestic {
+  background: #10b981;
+}
+.badge-international {
+  background: #3b82f6;
+}
+
+.badge-budget {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.badge-standard {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.badge-premium {
+  background: #f3e8ff;
+  color: #9333ea;
 }
 
 .pkg-display-img {
