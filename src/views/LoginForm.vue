@@ -2,12 +2,9 @@
   <div class="login-container">
     <main class="login-card">
       <h2 class="card-title">Welcome Back!</h2>
-      <p class="card-subtitle">
-        Unlock exclusive travel deals & book your dream trip!
-      </p>
+      <p class="card-subtitle">Unlock exclusive travel deals & book your dream trip!</p>
 
       <form @submit.prevent="handleSubmit" class="form-content">
-
         <!-- EMAIL -->
         <div class="input-group">
           <i class="fa-solid fa-envelope input-icon"></i>
@@ -32,9 +29,7 @@
             required
           />
 
-          <span class="toggle-password" @click="showPassword = !showPassword">
-            👁
-          </span>
+          <span class="toggle-password" @click="showPassword = !showPassword"> 👁 </span>
         </div>
 
         <!-- OPTIONS -->
@@ -44,22 +39,14 @@
             <span>Remember Me</span>
           </label>
 
-          <a href="#" @click.prevent="forgotPassword">
-            Forgot Password?
-          </a>
+          <a href="#" @click.prevent="forgotPassword"> Forgot Password? </a>
         </div>
 
         <!-- SUBMIT -->
-        <button
-          type="submit"
-          class="btn-submit"
-          :disabled="loading"
-          
-        >
+        <button type="submit" class="btn-submit" :disabled="loading">
           <span v-if="loading">Loading...</span>
           <span v-else>Login →</span>
         </button>
-
       </form>
 
       <footer class="card-footer">
@@ -86,32 +73,31 @@ export default {
       showPassword: false,
       loading: false,
       authStore: useAuthStore(),
-      loginUser:{},
+      loginUser: {},
     }
   },
 
   computed: {
     formValid() {
       return this.email && this.password.length >= 6
-    }
+    },
   },
   mounted() {
-    this.loginUser = localStorage.getItem('loginUser');
-    if(this.loginUser.userAccountId>0 || this.loginUser != undefined){
-       this.$router.push('/');
-    }
+    this.loginUser = JSON.parse(localStorage.getItem('loginUser'))
+    // if(this.loginUser.userAccountId>0 || this.loginUser != undefined){
+    //    this.$router.push('/');
+    // }
   },
   methods: {
     // loginMethod(){
     //   console.log(this.email);
     //   console.log(this.password);
     // },
-    
+
     async handleSubmit() {
       this.loading = true
 
       try {
-
         // 🔥 ADMIN LOGIN (hardcoded)
         // if (this.email === 'admin@gmail.com' && this.password === '123456') {
         //   const adminUser = {
@@ -126,27 +112,30 @@ export default {
         //   return
         // }
 
-      //  await this.authStore.signIn(
-      //     this.email,
-      //     this.password
-      //   )
+        //  await this.authStore.signIn(
+        //     this.email,
+        //     this.password
+        //   )
 
-      //   this.redirectAfterLogin('USER'  
-userAccountService
-        .getLogin(this.email,this.password)
-        .then((response) => {
-
-          if(response.userAccountId==0){
-            alert(" Email and Password is Wrong.");
-          }else{
-          localStorage.setItem('loginUser', JSON.stringify(response));
-          this.$router.push('/')
-          }
-        })
-        .catch((err) => {
-          console.error('API Fetch Error: ', err)
-        })
-
+        //   this.redirectAfterLogin('USER'
+        userAccountService
+          .getLogin(this.email, this.password)
+          .then((response) => {
+            if (response.userAccountId == 0) {
+              alert(' Email and Password is Wrong.')
+            } else {
+              localStorage.setItem('loginUser', JSON.stringify(response))
+              if(this.loginUser.userType=='ADMIN'){
+this.$router.push('/admin/dashboard')
+              }else{
+              this.$router.push('/')
+              }
+              location.reload();
+            }
+          })
+          .catch((err) => {
+            console.error('API Fetch Error: ', err)
+          })
       } catch (err) {
         alert(err.message || 'Login failed')
       } finally {
@@ -155,27 +144,27 @@ userAccountService
     },
 
     redirectAfterLogin(role) {
-     const goBooking = localStorage.getItem('goBooking')
+      const goBooking = localStorage.getItem('goBooking')
 
-  if (goBooking) {
-    localStorage.removeItem('goBooking')
-    this.$router.push(`/booking/${goBooking}`)
-    return
-  }
+      if (goBooking) {
+        localStorage.removeItem('goBooking')
+        this.$router.push(`/booking/${goBooking}`)
+        return
+      }
 
-  if (role === 'ADMIN') {
-    this.$router.push('/admin/dashboard')
-    return
-  }
+      if (role === 'ADMIN') {
+        this.$router.push('/admin/dashboard')
+        return
+      }
 
-  const redirect = this.$route.query.redirect || '/'
-  this.$router.push(redirect)
- },
+      // const redirect = this.$route.query.redirect || '/'
+      // this.$router.push(redirect)
+    },
 
     forgotPassword() {
       alert('Forgot password feature coming soon')
-    }
-  }
+    },
+  },
 }
 </script>
 <style scoped>
@@ -194,11 +183,7 @@ userAccountService
   align-items: center;
 
   /* 🔥 Background image + dark overlay */
-  background: linear-gradient(
-      rgba(0, 0, 0, 0.55),
-      rgba(0, 0, 0, 0.55)
-    ),
-    url('/login.avif');
+  background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url('/login.avif');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

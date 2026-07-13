@@ -27,16 +27,16 @@ const vuetify = createVuetify({
   },
 })
 
-// App ကို အရင်ဆောက်ရပါမယ်
+// App ကို အရင်ဆောက်
 const app = createApp(App)
 
-// Middleware တွေကို သုံးမယ် (use)
+// Middleware တွေကို သုံး (use)
 app.use(createPinia())
-app.use(axios)
-app.use(VueAxios)
+// app.use(axios)
+app.use(VueAxios,axios)
 app.use(router)
 app.use(vuetify)
 app.use(store)
 
-// အားလုံးပြီးမှ အောက်ဆုံးကနေ တစ်ကြိမ်ပဲ Mount လုပ်ရပါမယ်
+
 app.mount('#app')

@@ -1100,6 +1100,7 @@ export default {
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600',
       'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=600',
     ],
+    loginUser:{},
     itinerary: [
       {
         title: 'Myeik Arrival',
@@ -1122,6 +1123,7 @@ export default {
       },
       
     ],
+    
   },
 ],
     
@@ -1145,20 +1147,20 @@ currentStep: 1,
   return this.selectedPackage.price * (this.form.travelers || 1)
     }
   },
-
   created() {
-     const authStore = useAuthStore();
-    if (!authStore.isLoggedIn) {
-      localStorage.setItem("redirect_after_login", this.$route.fullPath)
-      this.$router.push('/login');
-      return;
-    } const user = authStore.user
+    
+//      const authStore = useAuthStore();
+//     if (!authStore.isLoggedIn) {
+//       localStorage.setItem("redirect_after_login", this.$route.fullPath)
+//       this.$router.push('/login');
+//       return;
+//     } const user = authStore.user
 
-if (user) {
-  this.form.name = user.fullName || ""
-  this.form.phone = user.phone || ""
-  this.form.email = user.email || ""
-}
+// if (user) {
+//   this.form.name = user.fullName || ""
+//   this.form.phone = user.phone || ""
+//   this.form.email = user.email || ""
+// }
    
     //   const authStore = useAuthStore();
     //  const route = this.$route
@@ -1173,6 +1175,11 @@ if (user) {
   
   },
   mounted() {
+     this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    if(this.loginUser.userAccountId==0 || this.loginUser.userAccountId == undefined){
+       this.$router.push('/login');
+    }
+    this.form.name  = this.loginUser.profileName;
     this.loadSelectedPackage();
     const today = new Date().toISOString().split('T')[0];
     this.form.date = today;

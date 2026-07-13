@@ -120,10 +120,8 @@ export default {
    
 
   profileRoute() {
-    const user = this.authStore.loginUser
-
-    if (user && user.userType === 'ADMIN') {
-      return '/admin/dashboard'
+    if (this.loginUser.userAccountId>0 && this.loginUser.userType === 'ADMIN') {
+      return '/admin/dashboard';
     }
 
     return '/profile'
@@ -132,9 +130,6 @@ export default {
   },
     mounted() {
     this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
-    console.log(" >>>>>>>>>>>>>>>>>>> ");
-    console.log(this.loginUser);
-    console.log(this.loginUser.userAccountId);
   },
   methods: {
     handleLogout() {
@@ -148,10 +143,13 @@ export default {
       sessionStorage.removeItem('travelAdminUser')
 
       this.authStore.logout()
-
-if (this.$route.path !== '/') {
+      let loginUser = {};
+      loginUser.userAccountId = 0;
+      localStorage.setItem('loginUser', JSON.stringify(loginUser));
+//if (this.$route.path !== '/') {
     this.$router.push('/')
-}
+    location.reload();
+//}
     },
   },
 }

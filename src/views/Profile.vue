@@ -174,12 +174,12 @@ export default {
   },
   computed: {
     initial() {
-      const name =
-    this.authStore.user?.fullName ||
-    this.authStore.user?.name ||
-    'Traveler'
+  //     const name =
+  //   this.authStore.user?.fullName ||
+  //   this.authStore.user?.name ||
+  //   'Traveler'
 
-  return name.charAt(0).toUpperCase()
+  // return name.charAt(0).toUpperCase()
     },
   },
   created() {
