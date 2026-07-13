@@ -78,8 +78,33 @@
                 </div>
 
                 <div class="pkg-meta-row">
-                  <span class="pkg-duration">🕒 {{ pkg.day }} day/{{ pkg.night }} night</span>
-                  <span class="pkg-group">👥 {{ pkg.groupSize }}</span>
+                  <span class="pkg-duration">🕒 {{ pkg.day }} Days/{{ pkg.night }} Nights</span>
+                  <span class="pkg-group">👥 {{ pkg.groupSize }} People</span>
+                </div>
+
+                <div
+                  class="pkg-ticket-row"
+                  style="
+                    font-size: 13px;
+                    margin-bottom: 8px;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                  "
+                >
+                  <span
+                    :style="{
+                      color: pkg.ticketLeft <= 5 ? '#ef4444' : '#10b981',
+                      fontWeight: '700',
+                    }"
+                  >
+                    🎫
+                    {{
+                      pkg.ticketLeft > 0
+                        ? pkg.ticketLeft + ' / ' + pkg.ticket + ' Tickets Left'
+                        : 'Out Of Stock'
+                    }}
+                  </span>
                 </div>
 
                 <div class="pkg-rating-row">
@@ -137,8 +162,33 @@
                   <h3 class="pkg-card-title">{{ pkg.title }}</h3>
 
                   <div class="pkg-meta-row">
-                    <span class="pkg-duration">🕒 {{ pkg.day }}/{{ pkg.night }}</span>
-                    <span class="pkg-group">👥 {{ pkg.groupSize }}</span>
+                    <span class="pkg-duration">🕒 {{ pkg.day }} Days/{{ pkg.night }} Nights</span>
+                    <span class="pkg-group">👥 {{ pkg.groupSize }} People</span>
+                  </div>
+
+                  <div
+                    class="pkg-ticket-row"
+                    style="
+                      font-size: 13px;
+                      margin-bottom: 8px;
+                      display: flex;
+                      align-items: center;
+                      gap: 4px;
+                    "
+                  >
+                    <span
+                      :style="{
+                        color: pkg.ticketLeft <= 5 ? '#ef4444' : '#10b981',
+                        fontWeight: '700',
+                      }"
+                    >
+                      🎫
+                      {{
+                        pkg.ticketLeft > 0
+                          ? pkg.ticketLeft + ' / ' + pkg.ticket + ' Tickets Left'
+                          : 'Out Of Stock'
+                      }}
+                    </span>
                   </div>
 
                   <div class="pkg-rating-row">

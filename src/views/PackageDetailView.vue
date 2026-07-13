@@ -40,7 +40,8 @@
           </div>
 
           <div class="hero-img-wrap">
-            <!-- ပုံအကြီးပြမည့်နေရာ -->
+
+            <!--show the selected photo from the package -->
             <img
               :src="selectedImg ? 'http://localhost:8088/api/v1/productphoto/' + selectedImg : ''"
               :alt="productDto.title"
@@ -50,13 +51,13 @@
             <div
               class="pkg-type-tag"
               :class="
-                productDto.type && productDto.type.toLowerCase() === 'domestic'
+                productDto.locationType && productDto.locationType.toLowerCase() === 'domestic'
                   ? 'tag-green'
                   : 'tag-blue'
               "
             >
               {{
-                productDto.type && productDto.type.toLowerCase() === 'domestic'
+                productDto.locationType && productDto.locationType.toLowerCase() === 'domestic'
                   ? 'Domestic'
                   : 'International'
               }}
@@ -122,9 +123,9 @@
             </div>
           </div>
 
-          <!--  Reviews & Comments Section -->
+          <!-- Ratings  & Reviews Section -->
           <div class="content-block rating-comment-section">
-            <h2 class="review-block-title">Reviews & Comments</h2>
+            <h2 class="review-block-title">Ratings & Reviews</h2>
 
             <!--  Review Form -->
             <div class="comment-form">
@@ -158,43 +159,53 @@
               </div>
             </div>
 
+            
             <div class="comments-list">
-  <!-- 🟢 ခေါင်းစဉ်အရေအတွက် ပြောင်းလဲခြင်း -->
-  <h3 class="list-title">User Reviews ({{ combinedReviews.length }})</h3>
+              <!-- to show rating list-->
+              <h3 class="list-title">
+                User Reviews ({{ ratingCommentList ? ratingCommentList.length : 0 }})
+              </h3>
 
-  <div v-if="combinedReviews.length === 0" class="no-reviews">
-    No reviews yet. Be the first to review!
-  </div>
+              <!-- to show if no rating -->
+              <div v-if="!ratingCommentList || ratingCommentList.length === 0" class="no-reviews">
+                No reviews yet. Be the first to review!
+              </div>
 
-  <!-- 🟢 combinedReviews ကို loop ပတ်ပေးလိုက်ပါ -->
-  <div v-for="(rev, index) in combinedReviews" :key="index" class="comment-card">
-    <div class="comment-card-header">
-      <div class="user-info">
-        <div class="user-avatar">{{ (rev.user_name || 'A')[0].toUpperCase() }}</div>
-        <span class="user-name">{{ rev.user_name }}</span>
-      </div>
+              <!-- show rating/comment history with loop -->
+              <div v-for="(rev, index) in ratingCommentList" :key="index" class="comment-card">
+                <div class="comment-card-header">
+                  <div class="user-info">
+                    <!-- Show first letter of Name -->
+                    <div class="user-avatar">
+                      {{ (rev.userAccountDto?.profileName || 'A')[0].toUpperCase() }}
+                    </div>
 
-      <!-- 🟢 အခုဆိုရင် ညာဘက်ကတ်မှာလို ကြယ်ပွင့်တွေ ကွက်တိထွက်လာပါပြီ -->
-      <div class="display-stars">
-        <span
-          v-for="s in 5"
-          :key="s"
-          :style="{ color: s <= rev.rating ? '#f59e0b' : '#cbd5e1' }"
-          class="static-star"
-        >
-          ★
-        </span>
-      </div>
+                    <!-- Show User Name -->
+                    <span class="user-name">{{
+                      rev.userAccountDto?.profileName || 'Anonymous Traveller'
+                    }}</span>
+                  </div>
 
-      <div class="review-date" style="color: #64748b; font-size: 0.875rem">
-        {{ rev.date }}
-      </div>
-    </div>
+                  <div class="display-stars">
+                    <span
+                      v-for="s in 5"
+                      :key="s"
+                      :style="{ color: s <= rev.rating ? '#f59e0b' : '#cbd5e1' }"
+                      class="static-star"
+                    >
+                      ★
+                    </span>
+                  </div>
 
-    <!-- 🟢 ကွန်မန့်စာသား ပြသခြင်း -->
-    <p class="comment-content-text">{{ rev.comment }}</p>
-  </div>
-</div>
+                  <div class="review-date" style="color: #64748b; font-size: 0.875rem">
+                    {{ rev.date }}
+                  </div>
+                </div>
+
+                <!--Show Comment -->
+                <p class="comment-content-text">{{ rev.comment }}</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -392,16 +403,16 @@ export default {
       commentsDataset: [],
       packagesDataset: [],
       productDto: {},
-      productId:0,
-      loginUser:{},
+      productId: 0,
+      loginUser: {},
     }
   },
 
   mounted() {
-     this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
-    this.loadPackageDetail()
-    const pkgId = this.$route.params.id;
-    this.productId = pkgId;
+    this.loginUser = JSON.parse(localStorage.getItem('loginUser'))
+    // this.loadPackageDetail()
+    const pkgId = this.$route.params.id
+    this.productId = pkgId
     this.getPackageDetail()
     const allReviews = localStorage.getItem('all_packages_reviews')
     const reviewsObj = allReviews ? JSON.parse(allReviews) : {}
@@ -414,25 +425,27 @@ export default {
   },
   methods: {
     async getPackageDetail() {
+      // 🟢 API မခေါ်ခင် Loading ကို True ပေးထားပါမည်
+      this.loading = true
       const packageId = this.$route.params.id
       try {
         const data = await packageDetailService.getPackageDetail(packageId)
-        
 
         this.itineraryList = data.itineraryList
         this.ratingCommentList = data.ratingCommentList
-
-        this.commentsDataset = data.ratingCommentList
-
         this.productDto = data.productDto
 
         if (this.productDto && this.productDto.photo) {
           this.selectedImg = this.productDto.photo
         }
-        this.commentsDataset = await packageDetailService.getComments();
-        this.ratingsDataset = await packageDetailService.getRatings();
+
+        this.commentsDataset = await packageDetailService.getComments()
+        this.ratingsDataset = await packageDetailService.getRatings()
       } catch (error) {
         console.error('API fetch error', error)
+      } finally {
+        // 🟢 API ဒေတာတွေ ကျလာပြီးမှ Loading ကို ပိတ်ပါမည်
+        this.loading = false
       }
     },
 
@@ -467,24 +480,22 @@ export default {
       //   ':' +
       //   String(now.getSeconds()).padStart(2, '0')
 
-     
       // const reviewPayload = {
       //   productId: parseInt(this.$route.params.id),
       //   message: this.newComment,
       //   date: formattedDate,
 
-       
       //   userAccountDto: {
-      //     userAccountId: parseInt(loggedInCustomerId), 
+      //     userAccountId: parseInt(loggedInCustomerId),
       //   },
       // }
 
-     // console.log('--- Sending Correct Payload to DB ---', reviewPayload)
-      let obj = {userAccountDto:{}};
-      obj.productId = this.productId;
-      obj.userAccountDto.userAccountId =  loggedInCustomerId;
-      obj.rating = this.newRating;
-      obj.comment = this.newComment;
+      // console.log('--- Sending Correct Payload to DB ---', reviewPayload)
+      let obj = { userAccountDto: {} }
+      obj.productId = this.productId
+      obj.userAccountDto.userAccountId = loggedInCustomerId
+      obj.rating = this.newRating
+      obj.comment = this.newComment
       try {
         await axios.post('http://localhost:8088/api/v1/package/ratingcomment', obj)
 
@@ -502,76 +513,22 @@ export default {
         }
       }
     },
-    loadPackageDetail() {
-      this.loading = true
-      const packageId = parseInt(this.$route.params.id)
-      const foundPkg = this.packagesDataset.find((p) => p.id === packageId)
-      if (foundPkg) {
-        this.pkg = foundPkg
-        this.selectedImg = foundPkg.image
-      } else {
-        this.pkg = null
-      }
-      this.loading = false
+    // loadPackageDetail() {
+    //   this.loading = true
+    //   const packageId = parseInt(this.$route.params.id)
+    //   const foundPkg = this.packagesDataset.find((p) => p.id === packageId)
+    //   if (foundPkg) {
+    //     this.pkg = foundPkg
+    //     this.selectedImg = foundPkg.image
+    //   } else {
+    //     this.pkg = null
+    //   }
+    //   this.loading = false
+    // },
+    clickBookNow() {
+      this.$router.push(`/booking/${this.productId}`)
     },
-    clickBookNow(){
-this.$router.push(`/booking/${this.productId}`)
-    },
-    handleBooking() {
-      //const authStore = useAuthStore()
-
-      //  not logged in
-      // if (this.loginUser.userAccountId>0) {
-      //   const goLogin = confirm('You need to login to book this package. Go to login page?')
-
-      //   if (goLogin) {
-      //     this.$router.push('/login')
-      //   }
-
-      //   return
-      // }
-
-      // logged in → go booking
-      //this.$router.push(`/booking/${this.productId}`)
-
-      //     if (!this.isLoggedIn) {
-
-      //     const confirmLogin = confirm(
-      //       "You need to login to book this package. Do you want to go to login page?"
-      //     )
-
-      //     if (confirmLogin) {
-      //       this.$router.push({
-      //   path: "/login",
-      //   query: {
-      //     redirect: this.$route.fullPath
-      //   }
-      // })
-      //     }
-
-      //     return
-      //   }
-
-      //   this.$router.push({
-      //     name: "Booking",
-      //     params: {
-      //       id: this.pkg.id
-      //     }
-      //   })
-      // if (!this.authStore.isLoggedIn) {
-      //     // Login မဝင်ရသေးလျှင်
-      //     const confirmLogin = confirm("You need to login to book this package. Do you want to go to login page?");
-      //     if (confirmLogin) {
-      //       this.$router.push({ name: 'login' });
-      //     }}else {
-      //     // 4. Login ဝင်ပြီးသားဆိုလျှင် Booking Page သို့ Navigate လုပ်ခြင်း
-      //     // Route Name 'Booking' ကို index.js ထဲကအတိုင်း သေချာစစ်ဆေးပါ
-      //     this.$router.push({
-      //       name: 'Booking',
-      //       params: { id: this.pkg.id }
-      //     });
-      //   }
-    },
+    handleBooking() {},
     setImage(img) {
       this.selectedImg = img
     },
@@ -600,16 +557,16 @@ this.$router.push(`/booking/${this.productId}`)
   },
   watch: {
     '$route.params.id': {
-      handler: 'loadPackageDetail',
+      handler: 'getPackageDetail',
       immediate: true,
     },
   },
-  
+
   computed: {
-    pkg() {
-      const id = this.$route.params.id
-      return this.packagesDataset.find((p) => p.id == id)
-    },
+    // pkg() {
+    //   const id = this.$route.params.id
+    //   return this.packagesDataset.find((p) => p.id == id)
+    // },
     auth() {
       return useAuthStore()
     },
@@ -617,39 +574,39 @@ this.$router.push(`/booking/${this.productId}`)
       return this.auth.isLoggedIn
     },
 
-  
     combinedReviews() {
       if (!this.commentsDataset || !this.ratingsDataset) {
         return []
       }
       const currentPackageId = this.$route.params.id
 
-     
-      const packageComments = this.commentsDataset.filter(c => 
-        c.productId == currentPackageId && 
-        (c.userAccountDto?.userAccountId !== 1)
-      )
+      const packageComments = this.commentsDataset.filter((c) => c.productId == currentPackageId)
 
-      
-      return packageComments.map(comment => {
-        const userId = comment.userAccountDto?.userAccountId
+      return packageComments.map((comment) => {
+        const commentUserId = comment.customerId || comment.userAccountDto?.userAccountId
+        const commentDate = comment.date
 
-        
-        const matchRating = this.ratingsDataset.find(r => 
-          r.customerId === userId && 
-          r.productId == currentPackageId
-        )
+        const matchRating = this.ratingsDataset.find((r) => {
+          const ratingUserId = r.customerId || r.userAccountDto?.userAccountId
+
+          if (r.productId != currentPackageId) return false
+          if (commentDate && r.date === commentDate) return true
+          if (commentUserId && ratingUserId && commentUserId == ratingUserId) return true
+
+          return false
+        })
 
         return {
-          user_name: comment.userAccountDto?.profileName || 'Anonymous Traveller',
-          rating: matchRating ? matchRating.rating : 0, 
-          comment: comment.message, 
-          date: comment.date
+          // 🟢 ပြင်ဆင်လိုက်သည့်လိုင်း - comment နေရာတွင် matchRating မှ နာမည်ကို လှမ်းယူခြင်း
+          user_name: matchRating?.userAccountDto?.profileName || 'Anonymous Traveller',
+
+          rating: matchRating ? Number(matchRating.rating) : 0,
+          comment: comment.message || comment.comment,
+          date: comment.date,
         }
       })
     },
 
-    
     averageRating() {
       if (this.combinedReviews.length === 0) return 0
       const sum = this.combinedReviews.reduce((acc, rev) => acc + rev.rating, 0)
