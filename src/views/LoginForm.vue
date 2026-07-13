@@ -45,7 +45,7 @@
         <!-- SUBMIT -->
         <button type="submit" class="btn-submit" :disabled="loading">
           <span v-if="loading">Loading...</span>
-          <span v-else>Login →</span>
+          <span v-else @click="clickLogin">Login →</span>
         </button>
       </form>
 
@@ -125,12 +125,16 @@ export default {
               alert(' Email and Password is Wrong.')
             } else {
               localStorage.setItem('loginUser', JSON.stringify(response))
-              if(this.loginUser.userType=='ADMIN'){
-this.$router.push('/admin/dashboard')
+
+              this.loginUser = JSON.parse(localStorage.getItem('loginUser'))
+              console.log(this.loginUser);
+              
+              if(this.loginUser.userType =='ADMIN'){
+                this.$router.push('/admin/dashboard')
               }else{
               this.$router.push('/')
               }
-              location.reload();
+              // location.reload();
             }
           })
           .catch((err) => {
@@ -143,23 +147,23 @@ this.$router.push('/admin/dashboard')
       }
     },
 
-    redirectAfterLogin(role) {
-      const goBooking = localStorage.getItem('goBooking')
+    // redirectAfterLogin(role) {
+    //   const goBooking = localStorage.getItem('goBooking')
 
-      if (goBooking) {
-        localStorage.removeItem('goBooking')
-        this.$router.push(`/booking/${goBooking}`)
-        return
-      }
+    //   if (goBooking) {
+    //     localStorage.removeItem('goBooking')
+    //     this.$router.push(`/booking/${goBooking}`)
+    //     return
+    //   }
 
-      if (role === 'ADMIN') {
-        this.$router.push('/admin/dashboard')
-        return
-      }
+    //   if (role === 'ADMIN') {
+    //     this.$router.push('/admin/dashboard')
+    //     return
+    //   }
 
-      // const redirect = this.$route.query.redirect || '/'
-      // this.$router.push(redirect)
-    },
+    //   const redirect = this.$route.query.redirect || '/'
+    //   this.$router.push(redirect)
+    // },
 
     forgotPassword() {
       alert('Forgot password feature coming soon')

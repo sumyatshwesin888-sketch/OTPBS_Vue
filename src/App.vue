@@ -107,7 +107,7 @@ export default {
   data() {
     return {
      
-      authStore: useAuthStore(),
+      //authStore: useAuthStore(),
       loginUser:{},
     }
   },
@@ -116,7 +116,7 @@ export default {
   // },
 
   computed: {
-    // 💡 လမ်းကြောင်းခွဲပေးမယ့် ဒီ computed property ရှိနေဖို့ လိုအပ်ပါတယ်ဗျာ
+    
    
 
   profileRoute() {
@@ -130,19 +130,21 @@ export default {
   },
     mounted() {
     this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
+      console.log(this.loginUser);
+      
   },
   methods: {
     handleLogout() {
-       localStorage.removeItem('user')
-  localStorage.removeItem('user_credentials')
-      localStorage.removeItem('is_logged_in')
-      localStorage.removeItem('user_role')
-      localStorage.removeItem('travelAdminAuth')
-      localStorage.removeItem('travelAdminUser')
-      sessionStorage.removeItem('travelAdminAuth')
-      sessionStorage.removeItem('travelAdminUser')
+  //      localStorage.removeItem('user')
+  // localStorage.removeItem('user_credentials')
+  //     localStorage.removeItem('is_logged_in')
+  //     localStorage.removeItem('user_role')
+  //     localStorage.removeItem('travelAdminAuth')
+  //     localStorage.removeItem('travelAdminUser')
+  //     sessionStorage.removeItem('travelAdminAuth')
+  //     sessionStorage.removeItem('travelAdminUser')
 
-      this.authStore.logout()
+  //     this.authStore.logout()
       let loginUser = {};
       loginUser.userAccountId = 0;
       localStorage.setItem('loginUser', JSON.stringify(loginUser));

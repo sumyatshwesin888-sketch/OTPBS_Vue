@@ -170,28 +170,28 @@ const router = createRouter({
     }
   ],
 })
-router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
+// router.beforeEach((to, from, next) => {
+//   const authStore = useAuthStore()
 
-  const isLoggedIn = authStore.isLoggedIn
-  const user = authStore.user
-
- 
-  if (to.meta.requiresAuth && !isLoggedIn) {
-    return next({
-      path: '/login',
-      query: { redirect: to.fullPath }
-    })
-  }
-
-  if (to.meta.requiresAdmin) {
-    if (!isLoggedIn || user?.role !== 'ADMIN') {
-      return next('/')
-    }
-  }
+//   const isLoggedIn = authStore.isLoggedIn
+//   const user = authStore.user
 
  
-  next()
-});
+//   if (to.meta.requiresAuth && !isLoggedIn) {
+//     return next({
+//       path: '/login',
+//       query: { redirect: to.fullPath }
+//     })
+//   }
+
+//   if (to.meta.requiresAdmin) {
+//     if (!isLoggedIn || user?.role !== 'ADMIN') {
+//       return next('/')
+//     }
+//   }
+
+ 
+//   next()
+// });
 
 export default router

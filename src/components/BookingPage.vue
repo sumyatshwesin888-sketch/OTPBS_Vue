@@ -1180,6 +1180,9 @@ currentStep: 1,
        this.$router.push('/login');
     }
     this.form.name  = this.loginUser.profileName;
+    this.form.phone = this.loginUser.phone;
+    this.form.email = this.loginUser.email;
+
     this.loadSelectedPackage();
     const today = new Date().toISOString().split('T')[0];
     this.form.date = today;

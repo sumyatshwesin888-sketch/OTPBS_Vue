@@ -7,13 +7,13 @@
             <div class="avatar-circle">{{ initial }}</div>
           </div>
           <div class="profile-details">
-            <h1 class="user-fullname">{{ authStore.user?.fullName || 'Traveler' }}</h1>
+            <h1 class="user-fullname">{{ loginUser.profileName || 'Traveler' }}</h1>
             <p class="user-meta-text">
-              <i class="fa-solid fa-envelope input-icon"></i> {{ authStore.user?.email }}
+              <i class="fa-solid fa-envelope input-icon"></i> {{ loginUser?.email }}
             </p>
             <p class="user-meta-text">
               <i class="fas fa-phone-alt input-icon"></i>
-             {{ authStore.user?.phone || 'No phone added' }}
+              {{ loginUser?.phone || 'No phone added' }}
             </p>
           </div>
           <v-btn
@@ -88,158 +88,164 @@
       </div>
 
       <v-dialog v-model="showEdit" max-width="460px" scrollable>
-  <v-card class="modern-profile-dialog pa-4">
-    
-    <!-- Header ပိုင်း -->
-    <v-card-item class="pb-2">
-      <h3 class="modern-dialog-title">Edit Profile Information</h3>
-      <p class="modern-dialog-subtitle">Update your personal details below.</p>
-    </v-card-item>
+        <v-card class="modern-profile-dialog pa-4">
+          <!-- Header ပိုင်း -->
+          <v-card-item class="pb-2">
+            <h3 class="modern-dialog-title">Edit Profile Information</h3>
+            <p class="modern-dialog-subtitle">Update your personal details below.</p>
+          </v-card-item>
 
-    <!-- Form & Input ပိုင်း -->
-    <v-card-text class="py-2">
-      <form @submit.prevent="handleUpdateProfile" id="editProfileForm" class="modern-dialog-form">
-        <div class="modern-input-group">
-          <label class="modern-input-label">Full Name</label>
-          <input
-            type="text"
-            v-model="editForm.fullName"
-            placeholder="Enter your full name"
-            class="modern-input-field"
-            required
-          />
-        </div>
+          <!-- Form & Input ပိုင်း -->
+          <v-card-text class="py-2">
+            <form
+              @submit.prevent="handleUpdateProfile"
+              id="editProfileForm"
+              class="modern-dialog-form"
+            >
+              <div class="modern-input-group">
+                <label class="modern-input-label">Full Name</label>
+                <input
+                  type="text"
+                  v-model="editForm.fullName"
+                  placeholder="Enter your full name"
+                  class="modern-input-field"
+                  required
+                />
+              </div>
 
-        <div class="modern-input-group mt-5">
-          <label class="modern-input-label">Phone Number</label>
-          <input
-            type="text"
-            v-model="editForm.phone"
-            placeholder="Enter your phone number"
-            class="modern-input-field"
-            required
-          />
-        </div>
-      </form>
-    </v-card-text>
+              <div class="modern-input-group mt-5">
+                <label class="modern-input-label">Phone Number</label>
+                <input
+                  type="text"
+                  v-model="editForm.phone"
+                  placeholder="Enter your phone number"
+                  class="modern-input-field"
+                  required
+                />
+              </div>
+            </form>
+          </v-card-text>
 
-    <v-card-actions class="pt-4 px-6 gap-3">
-      <v-spacer></v-spacer>
-      <v-btn
-        variant="text"
-        color="#64748B"
-        class="text-none font-weight-bold px-4"
-        rounded="xl"
-        @click="showEdit = false"
-      >
-        Cancel
-      </v-btn>
-      <v-btn
-        type="submit"
-        form="editProfileForm"
-        color="#1B3D8A"
-        variant="flat"
-        class="text-none font-weight-bold px-6 text-white"
-        rounded="xl"
-        style="background-color: #1B3D8A !important;"
-      >
-        Save Changes
-      </v-btn>
-    </v-card-actions>
-
-  </v-card>
-</v-dialog>
+          <v-card-actions class="pt-4 px-6 gap-3">
+            <v-spacer></v-spacer>
+            <v-btn
+              variant="text"
+              color="#64748B"
+              class="text-none font-weight-bold px-4"
+              rounded="xl"
+              @click="showEdit = false"
+            >
+              Cancel
+            </v-btn>
+            <v-btn
+              type="submit"
+              form="editProfileForm"
+              color="#1B3D8A"
+              variant="flat"
+              class="text-none font-weight-bold px-6 text-white"
+              rounded="xl"
+              style="background-color: #1b3d8a !important"
+            >
+              Save Changes
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
   </div>
 </template>
 
 <script>
-import { useAuthStore } from '@/store/auth'
+// import { useAuthStore } from '@/store/auth'
 
 export default {
   name: 'UserProfile',
   data() {
     return {
-      authStore:useAuthStore(),
+      authStore: {},
       showEdit: false,
       activeTab: 'bookings',
-      
+
       editForm: {
         fullName: '',
         phone: '',
       },
       bookings: [],
       wishes: [],
+      loginUser: {},
     }
+  },
+  mounted() {
+    this.loginUser = JSON.parse(localStorage.getItem('loginUser'))
+    console.log(this.loginUser)
   },
   computed: {
     initial() {
-  //     const name =
-  //   this.authStore.user?.fullName ||
-  //   this.authStore.user?.name ||
-  //   'Traveler'
-
-  // return name.charAt(0).toUpperCase()
+      //     const name =
+      //   this.authStore.user?.fullName ||
+      //   this.authStore.user?.name ||
+      //   'Traveler'
+      // return name.charAt(0).toUpperCase()
     },
   },
   created() {
-  this.authStore.loadUser()
-  this.loadUserData()
-
+    // this.authStore.loadUser()
+    // this.loadUserData()
   },
   methods: {
     handleLogout() {
-  this.authStore.logout()
-  this.$router.push('/login')
-},
+      this.authStore.logout()
+      this.$router.push('/login')
+    },
 
     loadUserData() {
-    const savedUser = localStorage.getItem('user')
+      // const savedUser = localStorage.getItem('user')
 
-  if (!savedUser) {
-    this.$router.push('/login')
-    return
-  }
-const user = JSON.parse(savedUser)
+      const savedUser = JSON.parse(localStorage.getItem('loginUser'))
 
-this.authStore.setUser(user)
+      if (!savedUser) {
+        this.$router.push('/login')
+        return
+      }
+      // const user = JSON.parse(savedUser)
 
-  // this.authStore.user?.email = user.email || ''
-  // this.authStore.user?.fullName  =
-  //   user.fullName || user.fullName || ''
+      // this.authStore.setUser(user)
 
-  // this.authStore.user?.phone  = user.phone || ''
+      // this.authStore.user?.email = user.email || ''
+      // this.authStore.user?.fullName  =
+      //   user.fullName || user.fullName || ''
 
-  this.editForm.fullName = user.fullName || ''
-this.editForm.phone = user.phone || ''
+      // this.authStore.user?.phone  = user.phone || ''
 
+      this.editForm.fullName = user.fullName || ''
+      this.editForm.phone = user.phone || ''
     },
     handleUpdateProfile() {
-  const savedUser = localStorage.getItem('user')
+      const savedUser = localStorage.getItem('user')
 
-  if (savedUser) {
-    const user = JSON.parse(savedUser)
+      if (savedUser) {
+        const user = JSON.parse(savedUser)
 
-    user.fullName = this.editForm.fullName
-    user.phone = this.editForm.phone
+        user.fullName = this.editForm.fullName
+        user.phone = this.editForm.phone
 
-    // Update localStorage
-    localStorage.setItem('user', JSON.stringify(user))
+        // Update localStorage
+        localStorage.setItem('user', JSON.stringify(user))
 
-    // ✅ Update Pinia Store
-    this.authStore.setUser(user)
+        // ✅ Update Pinia Store
+        this.authStore.setUser(user)
 
-    // Update current page
-    // this.auth.profile.fullName = user.fullName
-    // this.auth.profile.phone = user.phone
+        // Update current page
+        // this.auth.profile.fullName = user.fullName
+        // this.auth.profile.phone = user.phone
 
-    alert('Profile Updated Successfully!')
-    this.showEdit = false
-  }
-}  },
+        alert('Profile Updated Successfully!')
+        this.showEdit = false
+      }
+    },
+  },
 }
 </script>
-
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
@@ -316,7 +322,7 @@ this.editForm.phone = user.phone || ''
 }
 
 .user-meta-text i {
-  color: #0284c7; 
+  color: #0284c7;
   width: 16px;
 }
 
@@ -525,7 +531,7 @@ this.editForm.phone = user.phone || ''
 }
 
 .modern-input-field:focus {
-  border-color: #1B3D8A;
+  border-color: #1b3d8a;
   background: #ffffff;
   box-shadow: 0 0 0 4px rgba(27, 61, 138, 0.15);
 }
