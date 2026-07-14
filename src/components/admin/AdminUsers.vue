@@ -3,6 +3,7 @@ import { defineComponent } from 'vue'
 import { supabase } from '../../lib/supabase'
 import type { UserAccount } from '../../lib/supabase'
 
+import userAccountService from '@/service/UserAccountService'
 export default defineComponent({
   name: 'AdminUsers',
   data() {
@@ -20,7 +21,7 @@ export default defineComponent({
         userType: 'CUSTOMER' as 'ADMIN' | 'CUSTOMER',
         email: '',
         password: '',
-        status: 1
+        status: 1,
       },
       editing: false,
       itemToDelete: null as UserAccount | null,
@@ -30,26 +31,27 @@ export default defineComponent({
         { title: 'Phone', key: 'phone', align: 'start' as const },
         { title: 'Type', key: 'userType', align: 'center' as const },
         { title: 'Status', key: 'status', align: 'center' as const },
-        { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const }
-      ]
+        { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
+      ],
+      filteredUsers: [],
     }
   },
   computed: {
-    filteredUsers(): UserAccount[] {
-      let result = this.users
-      if (this.search) {
-        const term = this.search.toLowerCase()
-        result = result.filter(u =>
-          u.profileName.toLowerCase().includes(term) ||
-          u.email.toLowerCase().includes(term) ||
-          (u.phone && u.phone.toLowerCase().includes(term))
-        )
-      }
-      if (this.userTypeFilter) {
-        result = result.filter(u => u.userType === this.userTypeFilter)
-      }
-      return result
-    },
+    // filteredUsers(): UserAccount[] {
+    //   let result = this.users
+    //   if (this.search) {
+    //     const term = this.search.toLowerCase()
+    //     result = result.filter(u =>
+    //       u.profileName.toLowerCase().includes(term) ||
+    //       u.email.toLowerCase().includes(term) ||
+    //       (u.phone && u.phone.toLowerCase().includes(term))
+    //     )
+    //   }
+    //   if (this.userTypeFilter) {
+    //     result = result.filter(u => u.userType === this.userTypeFilter)
+    //   }
+    //   return result
+    // },
     formValid(): boolean {
       return !!(
         this.userForm.profileName &&
@@ -59,16 +61,89 @@ export default defineComponent({
       )
     },
     totalAdmins(): number {
-      return this.users.filter(u => u.userType === 'ADMIN').length
+      return this.users.filter((u) => u.userType === 'ADMIN').length
     },
     totalCustomers(): number {
-      return this.users.filter(u => u.userType === 'CUSTOMER').length
-    }
+      return this.users.filter((u) => u.userType === 'CUSTOMER').length
+    },
   },
   async mounted() {
     await this.fetchUsers()
+    this.getUserAccountMethod()
   },
   methods: {
+    deleteUserAccountMethod: function () {
+      this.deleteDialog = false
+      userAccountService
+        .deleteUserAccount(this.itemToDelete.userAccountId)
+        .then((response) => {
+          this.getUserAccountMethod()
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+    },
+    getUserAccountMethod: function () {
+      userAccountService
+        .getUserAccount('ALL', '')
+        .then((response) => {
+          this.filteredUsers.splice(0)
+          this.filteredUsers.push(...response)
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+      //this.filteredUsers = await userAccountService.getUserAccount();
+    },
+    clickSaveOrUpdate: function () {
+      console.log(this.userForm)
+      this.dialog = false
+      //this.userForm;
+      if (this.userForm.userAccountId == 0) {
+        userAccountService
+          .addUserAccount(this.userForm)
+          .then((response) => {
+            this.getUserAccountMethod()
+          })
+          .catch((err) => {
+            console.error('API Fetch Error: ', err)
+          })
+      } else {
+        userAccountService
+          .updateUserAccount(this.userForm)
+          .then((response) => {
+            this.getUserAccountMethod()
+          })
+          .catch((err) => {
+            console.error('API Fetch Error: ', err)
+          })
+      }
+    },
+    clickUserType: function () {
+      userAccountService
+        .getUserAccount(this.userTypeFilter, '')
+        .then((response) => {
+          this.filteredUsers.splice(0)
+          this.filteredUsers.push(...response)
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+    },
+    clickSearch: function () {
+      if (this.search == '') {
+        return
+      }
+      userAccountService
+        .getUserAccount('ALL', this.search)
+        .then((response) => {
+          this.filteredUsers.splice(0)
+          this.filteredUsers.push(...response)
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+    },
     async fetchUsers() {
       this.loading = true
       try {
@@ -89,13 +164,13 @@ export default defineComponent({
     openAddDialog() {
       this.editing = false
       this.userForm = {
-        userAccountId: '',
+        userAccountId: 0,
         profileName: '',
         phone: '',
         userType: 'CUSTOMER',
         email: '',
         password: '',
-        status: 1
+        status: 1,
       }
       this.dialog = true
     },
@@ -109,7 +184,7 @@ export default defineComponent({
         userType: user.userType,
         email: user.email,
         password: user.password,
-        status: user.status
+        status: user.status,
       }
       this.dialog = true
     },
@@ -125,22 +200,22 @@ export default defineComponent({
               userType: this.userForm.userType,
               email: this.userForm.email,
               password: this.userForm.password,
-              status: this.userForm.status
+              status: this.userForm.status,
             })
             .eq('userAccountId', this.userForm.userAccountId)
 
           if (error) throw error
         } else {
-          const { error } = await supabase
-            .from('user_account')
-            .insert([{
+          const { error } = await supabase.from('user_account').insert([
+            {
               profileName: this.userForm.profileName,
               phone: this.userForm.phone || null,
               userType: this.userForm.userType,
               email: this.userForm.email,
               password: this.userForm.password,
-              status: this.userForm.status
-            }])
+              status: this.userForm.status,
+            },
+          ])
 
           if (error) throw error
         }
@@ -193,8 +268,8 @@ export default defineComponent({
       } catch (error) {
         console.error('Error toggling status:', error)
       }
-    }
-  }
+    },
+  },
 })
 </script>
 
@@ -203,7 +278,7 @@ export default defineComponent({
     <!-- Stats Cards -->
     <v-row class="mb-6">
       <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
+        <v-card class="stat-card" style="position: relative">
           <div class="card-accent card-accent-blue"></div>
           <v-card-text class="pa-5">
             <div class="d-flex justify-space-between align-start">
@@ -219,7 +294,7 @@ export default defineComponent({
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
+        <v-card class="stat-card" style="position: relative">
           <div class="card-accent card-accent-amber"></div>
           <v-card-text class="pa-5">
             <div class="d-flex justify-space-between align-start">
@@ -235,7 +310,7 @@ export default defineComponent({
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
+        <v-card class="stat-card" style="position: relative">
           <div class="card-accent card-accent-purple"></div>
           <v-card-text class="pa-5">
             <div class="d-flex justify-space-between align-start">
@@ -251,13 +326,13 @@ export default defineComponent({
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
+        <v-card class="stat-card" style="position: relative">
           <div class="card-accent card-accent-green"></div>
           <v-card-text class="pa-5">
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Active</p>
-                <p class="stat-value">{{ users.filter(u => u.status === 1).length }}</p>
+                <p class="stat-value">{{ users.filter((u) => u.status === 1).length }}</p>
               </div>
               <div class="stat-icon-container stat-icon-container-green">
                 <v-icon size="22">mdi-check-circle-outline</v-icon>
@@ -280,30 +355,23 @@ export default defineComponent({
             variant="outlined"
             hide-details
             clearable
+            @update:model-value="clickSearch()"
           ></v-text-field>
         </v-col>
         <v-col cols="12" sm="6" md="3">
           <v-select
             v-model="userTypeFilter"
             label="User Type"
-            :items="[
-              { title: 'All Types', value: null },
-              { title: 'Admin', value: 'ADMIN' },
-              { title: 'Customer', value: 'CUSTOMER' }
-            ]"
+            :items="['ALL', 'ADMIN', 'CUSTOMER']"
             density="comfortable"
             variant="outlined"
             hide-details
             clearable
+            @update:model-value="clickUserType()"
           ></v-select>
         </v-col>
         <v-col cols="12" md="5" class="text-right">
-          <v-btn
-            color="primary"
-            class="btn-primary"
-            prepend-icon="mdi-plus"
-            @click="openAddDialog"
-          >
+          <v-btn color="primary" class="btn-primary" prepend-icon="mdi-plus" @click="openAddDialog">
             Add User
           </v-btn>
         </v-col>
@@ -326,7 +394,9 @@ export default defineComponent({
               size="40"
               class="mr-3"
             >
-              <span class="text-white font-weight-bold text-caption">{{ item.profileName.charAt(0).toUpperCase() }}</span>
+              <span class="text-white font-weight-bold text-caption">{{
+                item.profileName.charAt(0).toUpperCase()
+              }}</span>
             </v-avatar>
             <div>
               <p class="font-weight-medium text-grey-darken-3 mb-0">{{ item.profileName }}</p>
@@ -344,7 +414,9 @@ export default defineComponent({
             class="status-chip"
             :class="item.userType === 'ADMIN' ? 'chip-admin' : 'chip-customer'"
           >
-            <v-icon start size="14">{{ item.userType === 'ADMIN' ? 'mdi-shield-account' : 'mdi-account' }}</v-icon>
+            <v-icon start size="14">{{
+              item.userType === 'ADMIN' ? 'mdi-shield-account' : 'mdi-account'
+            }}</v-icon>
             {{ item.userType }}
           </span>
         </template>
@@ -355,7 +427,9 @@ export default defineComponent({
             :class="item.status === 1 ? 'status-confirm' : ''"
             @click="toggleStatus(item)"
           >
-            <v-icon start size="14">{{ item.status === 1 ? 'mdi-check-circle' : 'mdi-circle-outline' }}</v-icon>
+            <v-icon start size="14">{{
+              item.status === 1 ? 'mdi-check-circle' : 'mdi-circle-outline'
+            }}</v-icon>
             {{ item.status === 1 ? 'Active' : 'Inactive' }}
           </span>
         </template>
@@ -372,13 +446,7 @@ export default defineComponent({
             <v-icon>mdi-pencil-outline</v-icon>
             <v-tooltip activator="parent" location="top">Edit</v-tooltip>
           </v-btn>
-          <v-btn
-            icon
-            variant="text"
-            color="error"
-            size="small"
-            @click="openDeleteDialog(item)"
-          >
+          <v-btn icon variant="text" color="error" size="small" @click="openDeleteDialog(item)">
             <v-icon>mdi-delete-outline</v-icon>
             <v-tooltip activator="parent" location="top">Delete</v-tooltip>
           </v-btn>
@@ -389,9 +457,9 @@ export default defineComponent({
             <v-icon>mdi-account-group-outline</v-icon>
             <p class="empty-title">No users found</p>
             <p class="empty-text">Add users to get started</p>
-            <v-btn color="primary" class="btn-primary mt-4" prepend-icon="mdi-plus" @click="openAddDialog">
+            <!-- <v-btn color="primary" class="btn-primary mt-4" prepend-icon="mdi-plus" @click="openAddDialog">
               Add User
-            </v-btn>
+            </v-btn> -->
           </div>
         </template>
       </v-data-table>
@@ -402,8 +470,12 @@ export default defineComponent({
       <v-card class="premium-dialog">
         <v-card-title class="d-flex justify-space-between align-center pa-6 pb-0">
           <div>
-            <h3 class="text-h6 font-weight-bold text-grey-darken-3">{{ editing ? 'Edit User' : 'Add New User' }}</h3>
-            <p class="text-caption text-grey mt-1">{{ editing ? 'Update user information' : 'Create a new user account' }}</p>
+            <h3 class="text-h6 font-weight-bold text-grey-darken-3">
+              {{ editing ? 'Edit User' : 'Add New User' }}
+            </h3>
+            <p class="text-caption text-grey mt-1">
+              {{ editing ? 'Update user information' : 'Create a new user account' }}
+            </p>
           </div>
           <v-btn icon variant="text" size="small" @click="dialog = false">
             <v-icon>mdi-close</v-icon>
@@ -417,7 +489,7 @@ export default defineComponent({
                 v-model="userForm.profileName"
                 label="Profile Name"
                 prepend-inner-icon="mdi-account-outline"
-                :rules="[v => !!v || 'Profile name is required']"
+                :rules="[(v) => !!v || 'Profile name is required']"
                 required
                 variant="outlined"
                 density="comfortable"
@@ -431,8 +503,8 @@ export default defineComponent({
                 type="email"
                 prepend-inner-icon="mdi-email-outline"
                 :rules="[
-                  v => !!v || 'Email is required',
-                  v => /.+@.+\..+/.test(v) || 'Email must be valid'
+                  (v) => !!v || 'Email is required',
+                  (v) => /.+@.+\..+/.test(v) || 'Email must be valid',
                 ]"
                 required
                 variant="outlined"
@@ -456,7 +528,7 @@ export default defineComponent({
                 label="Password"
                 type="password"
                 prepend-inner-icon="mdi-lock-outline"
-                :rules="[v => !!v || 'Password is required']"
+                :rules="[(v) => !!v || 'Password is required']"
                 required
                 variant="outlined"
                 density="comfortable"
@@ -469,14 +541,14 @@ export default defineComponent({
                 label="User Type"
                 :items="['ADMIN', 'CUSTOMER']"
                 prepend-inner-icon="mdi-shield-account-outline"
-                :rules="[v => !!v || 'User type is required']"
+                :rules="[(v) => !!v || 'User type is required']"
                 required
                 variant="outlined"
                 density="comfortable"
                 hide-details="auto"
               ></v-select>
             </v-col>
-            <v-col cols="12" sm="6">
+            <!-- <v-col cols="12" sm="6">
               <v-select
                 v-model="userForm.status"
                 label="Status"
@@ -486,7 +558,7 @@ export default defineComponent({
                 density="comfortable"
                 hide-details="auto"
               ></v-select>
-            </v-col>
+            </v-col> -->
           </v-row>
 
           <v-card-actions class="pa-0 pt-6">
@@ -497,6 +569,7 @@ export default defineComponent({
               type="submit"
               class="btn-primary"
               :disabled="!formValid"
+              @click="clickSaveOrUpdate()"
             >
               {{ editing ? 'Update' : 'Create' }}
             </v-btn>
@@ -514,17 +587,17 @@ export default defineComponent({
           </v-avatar>
           <h3 class="text-h6 font-weight-bold text-grey-darken-3 mb-2">Confirm Delete</h3>
           <p class="text-body-2 text-grey">
-            Are you sure you want to delete <strong>{{ itemToDelete?.profileName }}</strong>? This action cannot be undone.
+            Are you sure you want to delete <strong>{{ itemToDelete?.profileName }}</strong
+            >? This action cannot be undone.
           </p>
         </v-card-text>
         <v-card-actions class="pa-4 pt-0 justify-center">
           <v-btn variant="outlined" class="mr-2" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" class="btn-error" @click="deleteUser">Delete</v-btn>
+          <v-btn color="error" class="btn-error" @click="deleteUserAccountMethod()">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

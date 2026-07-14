@@ -1,288 +1,17 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
-import { supabase } from '../../lib/supabase'
-import type { Product, UserAccount, Hotel } from '../../lib/supabase'
-
-export default defineComponent({
-  name: 'AdminProducts',
-  data() {
-    return {
-      products: [] as Product[],
-      users: [] as UserAccount[],
-      hotels: [] as Hotel[],
-      loading: true,
-      dialog: false,
-      deleteDialog: false,
-      search: '',
-      typeFilter: null as string | null,
-      locationTypeFilter: null as string | null,
-      currentStep: 1,
-      productForm: {
-        productId: '',
-        userAccountId: '',
-        hotelId: '' as string | null,
-        locationType: 'DOMESTIC' as 'DOMESTIC' | 'INTERNATIONAL',
-        photo: '',
-        title: '',
-        location: '',
-        day: 0,
-        night: 0,
-        groupSize: 0,
-        amount: 0,
-        type: 'Standard' as 'Budget' | 'Standard' | 'Premium',
-        meals: '',
-        photoOne: '',
-        photoTwo: '',
-        photoThree: '',
-        photoFour: '',
-        detail: '',
-        travelDate: '',
-        ticket: ''
-      },
-      editing: false,
-      itemToDelete: null as Product | null,
-      headers: [
-        { title: 'Product', key: 'title', align: 'start' as const },
-        { title: 'Type', key: 'type', align: 'start' as const },
-        { title: 'Location', key: 'locationType', align: 'start' as const },
-        { title: 'Duration', key: 'duration', sortable: false },
-        { title: 'Price', key: 'amount', align: 'end' as const },
-        { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const }
-      ],
-      steps: ['Basic Info', 'Details', 'Photos & Extra']
-    }
-  },
-  computed: {
-    filteredProducts(): Product[] {
-      let result = this.products
-      if (this.search) {
-        const term = this.search.toLowerCase()
-        result = result.filter(p =>
-          p.title.toLowerCase().includes(term) ||
-          (p.location && p.location.toLowerCase().includes(term))
-        )
-      }
-      if (this.typeFilter) {
-        result = result.filter(p => p.type === this.typeFilter)
-      }
-      if (this.locationTypeFilter) {
-        result = result.filter(p => p.locationType === this.locationTypeFilter)
-      }
-      return result
-    },
-    formValid(): boolean {
-      return !!(this.productForm.title && this.productForm.userAccountId && this.productForm.amount > 0)
-    },
-    currencyFormatter() {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
-    }
-  },
-  async mounted() {
-    await Promise.all([this.fetchProducts(), this.fetchUsers(), this.fetchHotels()])
-  },
-  methods: {
-    async fetchProducts() {
-      this.loading = true
-      try {
-        const { data, error } = await supabase
-          .from('product')
-          .select('*, userAccount(*), hotel(*, city(*))')
-          .order('created_at', { ascending: false })
-
-        if (error) throw error
-        this.products = data || []
-      } catch (error) {
-        console.error('Error fetching products:', error)
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async fetchUsers() {
-      try {
-        const { data } = await supabase.from('user_account').select('*')
-        this.users = data || []
-        if (this.users.length > 0) {
-          this.productForm.userAccountId = this.users[0].userAccountId
-        }
-      } catch (error) {
-        console.error('Error fetching users:', error)
-      }
-    },
-
-    async fetchHotels() {
-      try {
-        const { data } = await supabase.from('hotel').select('*, city(*)')
-        this.hotels = data || []
-      } catch (error) {
-        console.error('Error fetching hotels:', error)
-      }
-    },
-
-    openAddDialog() {
-      this.editing = false
-      this.currentStep = 1
-      this.productForm = {
-        productId: '',
-        userAccountId: this.users[0]?.userAccountId || '',
-        hotelId: null,
-        locationType: 'DOMESTIC',
-        photo: '',
-        title: '',
-        location: '',
-        day: 0,
-        night: 0,
-        groupSize: 0,
-        amount: 0,
-        type: 'Standard',
-        meals: '',
-        photoOne: '',
-        photoTwo: '',
-        photoThree: '',
-        photoFour: '',
-        detail: '',
-        travelDate: '',
-        ticket: ''
-      }
-      this.dialog = true
-    },
-
-    openEditDialog(product: Product) {
-      this.editing = true
-      this.currentStep = 1
-      this.productForm = {
-        productId: product.productId,
-        userAccountId: product.userAccountId,
-        hotelId: product.hotelId || null,
-        locationType: product.locationType,
-        photo: product.photo || '',
-        title: product.title,
-        location: product.location || '',
-        day: product.day || 0,
-        night: product.night || 0,
-        groupSize: product.groupSize || 0,
-        amount: product.amount,
-        type: product.type,
-        meals: product.meals || '',
-        photoOne: product.photoOne || '',
-        photoTwo: product.photoTwo || '',
-        photoThree: product.photoThree || '',
-        photoFour: product.photoFour || '',
-        detail: product.detail || '',
-        travelDate: product.travelDate || '',
-        ticket: product.ticket || ''
-      }
-      this.dialog = true
-    },
-
-    async saveProduct() {
-      try {
-        const payload = {
-          userAccountId: this.productForm.userAccountId,
-          hotelId: this.productForm.hotelId || null,
-          locationType: this.productForm.locationType,
-          photo: this.productForm.photo || null,
-          title: this.productForm.title,
-          location: this.productForm.location || null,
-          day: this.productForm.day || null,
-          night: this.productForm.night || null,
-          groupSize: this.productForm.groupSize || null,
-          amount: this.productForm.amount,
-          type: this.productForm.type,
-          meals: this.productForm.meals || null,
-          photoOne: this.productForm.photoOne || null,
-          photoTwo: this.productForm.photoTwo || null,
-          photoThree: this.productForm.photoThree || null,
-          photoFour: this.productForm.photoFour || null,
-          detail: this.productForm.detail || null,
-          travelDate: this.productForm.travelDate || null,
-          ticket: this.productForm.ticket || null
-        }
-
-        if (this.editing) {
-          const { error } = await supabase
-            .from('product')
-            .update(payload)
-            .eq('productId', this.productForm.productId)
-
-          if (error) throw error
-        } else {
-          const { error } = await supabase
-            .from('product')
-            .insert([payload])
-
-          if (error) throw error
-        }
-
-        this.dialog = false
-        await this.fetchProducts()
-      } catch (error) {
-        console.error('Error saving product:', error)
-      }
-    },
-
-    openDeleteDialog(product: Product) {
-      this.itemToDelete = product
-      this.deleteDialog = true
-    },
-
-    async deleteProduct() {
-      if (!this.itemToDelete) return
-
-      try {
-        const { error } = await supabase
-          .from('product')
-          .delete()
-          .eq('productId', this.itemToDelete.productId)
-
-        if (error) throw error
-
-        this.deleteDialog = false
-        this.itemToDelete = null
-        await this.fetchProducts()
-      } catch (error) {
-        console.error('Error deleting product:', error)
-      }
-    },
-
-    getTypeColor(type: string): string {
-      return type === 'Budget' ? 'success' : type === 'Standard' ? 'info' : 'warning'
-    },
-
-    getTypeClass(type: string): string {
-      return `chip-${type.toLowerCase()}`
-    },
-
-    getDuration(product: Product): string {
-      const day = product.day || 0
-      const night = product.night || 0
-      return `${day} Days ${night} Nights`
-    },
-
-    formatDate(date: string | null): string {
-      if (!date) return '-'
-      return new Date(date).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      })
-    }
-  }
-})
-</script>
-
 <template>
-  <div>
+  <div class="admin-products-container pa-6">
     <!-- Filter Bar -->
-    <v-card class="filter-bar mb-6">
-      <v-row align="center">
-        <v-col cols="12" sm="6" md="3">
+    <v-card class="filter-bar border mb-6 pa-4" variant="flat" rounded="lg">
+      <v-row align="center" dense>
+        <v-col cols="12" sm="6" md="4">
           <v-text-field
             v-model="search"
             label="Search products..."
             prepend-inner-icon="mdi-magnify"
-            density="comfortable"
+            density="compact"
             variant="outlined"
+            color="primary"
+            flat
             hide-details
             clearable
           ></v-text-field>
@@ -297,8 +26,9 @@ export default defineComponent({
               { title: 'Standard', value: 'Standard' },
               { title: 'Premium', value: 'Premium' }
             ]"
-            density="comfortable"
+            density="compact"
             variant="outlined"
+            color="primary"
             hide-details
             clearable
           ></v-select>
@@ -312,17 +42,20 @@ export default defineComponent({
               { title: 'Domestic', value: 'DOMESTIC' },
               { title: 'International', value: 'INTERNATIONAL' }
             ]"
-            density="comfortable"
+            density="compact"
             variant="outlined"
+            color="primary"
             hide-details
             clearable
           ></v-select>
         </v-col>
-        <v-col cols="12" md="5" class="text-right">
+        <v-col cols="12" sm="6" md="4" class="text-right">
           <v-btn
             color="primary"
-            class="btn-primary"
+            class="btn-primary text-none font-weight-medium px-4"
             prepend-icon="mdi-plus"
+            rounded="md"
+            elevation="0"
             @click="openAddDialog"
           >
             Add Product
@@ -331,405 +64,205 @@ export default defineComponent({
       </v-row>
     </v-card>
 
-    <!-- Data Table -->
-    <v-card class="enterprise-card">
+    <!-- Data Table (Fixed Header & Height ထည့်သွင်းထားပါသည်) -->
+    <v-card class="enterprise-card border" variant="flat" rounded="lg">
       <v-data-table
+        v-model:items-per-page="itemsPerPage"
         :headers="headers"
         :items="filteredProducts"
         :loading="loading"
         item-value="productId"
-        class="premium-table elevation-0"
+        class="premium-table"
+        fixed-header
+        height="550"
       >
+        <!-- Product Info -->
         <template #item.title="{ item }">
           <div class="d-flex align-center py-3">
-            <v-avatar size="48" rounded="lg" class="mr-3" color="grey-lighten-3">
+            <v-avatar size="44" rounded="md" class="mr-3 border" color="grey-lighten-4">
               <v-img v-if="item.photo" :src="item.photo" cover></v-img>
-              <v-icon v-else color="grey">mdi-package-variant</v-icon>
+              <v-icon v-else color="grey-darken-1">mdi-package-variant</v-icon>
             </v-avatar>
             <div>
-              <p class="font-weight-medium text-grey-darken-3 mb-0">{{ item.title }}</p>
-              <p class="text-caption text-grey mb-0">
-                <v-icon size="14">mdi-map-marker</v-icon>
-                {{ item.location || 'Unknown' }}
-              </p>
+              <p class="font-weight-semibold text-slate-800 mb-0">{{ item.title }}</p>
             </div>
           </div>
         </template>
 
         <template #item.type="{ item }">
-          <span :class="getTypeClass(item.type)" class="status-chip">
+          <span :class="['status-chip', getTypeClass(item.type)]">
             {{ item.type }}
           </span>
         </template>
 
         <template #item.locationType="{ item }">
-          <span
-            :class="item.locationType === 'DOMESTIC' ? 'chip-domestic' : 'chip-international'"
-            class="status-chip"
-          >
-            <v-icon start size="14">{{ item.locationType === 'DOMESTIC' ? 'mdi-home' : 'mdi-airplane' }}</v-icon>
+          <span :class="['status-chip', item.locationType === 'DOMESTIC' ? 'chip-domestic' : 'chip-international']">
+            <v-icon start size="12" class="mr-1">
+              {{ item.locationType === 'DOMESTIC' ? 'mdi-home-outline' : 'mdi-airplane' }}
+            </v-icon>
             {{ item.locationType }}
           </span>
         </template>
 
+        <!-- Location Column -->
+        <template #item.location="{ item }">
+          <span class="text-body-2 text-slate-700 d-inline-flex align-center">
+            <v-icon size="16" color="grey-darken-1" class="mr-1">mdi-map-marker-outline</v-icon>
+            {{ item.location || 'Unknown' }}
+          </span>
+        </template>
+
         <template #item.duration="{ item }">
-          <span class="text-body-2">
-            <v-icon size="14" color="grey" class="mr-1">mdi-calendar</v-icon>
+          <span class="text-body-2 text-slate-700">
+            <v-icon size="14" color="grey-darken-1" class="mr-1">mdi-clock-outline</v-icon>
             {{ getDuration(item) }}
           </span>
         </template>
 
+        <template #item.groupSize="{ item }">
+          <span class="text-body-2">{{ item.groupSize || '-' }}</span>
+        </template>
+
+        <template #item.meals="{ item }">
+          <span class="text-body-2 text-truncate d-inline-block" style="max-width: 120px;">
+            {{ item.meals || '-' }}
+          </span>
+        </template>
+
+        <template #item.travelDate="{ item }">
+          <span class="text-body-2">{{ formatDate(item.travelDate) }}</span>
+        </template>
+
+        <template #item.ticket="{ item }">
+          <v-chip size="small" :color="item.ticket > 5 ? 'success' : 'warning'" variant="tonal" class="font-weight-bold">
+            {{ item.ticket ?? 0 }} Left
+          </v-chip>
+        </template>
+
+        <template #item.transport="{ item }">
+          <span v-if="item.transport" class="status-chip chip-domestic">
+            <v-icon start size="14" class="mr-1">
+              {{ item.transport === 'FLIGHT' ? 'mdi-airplane' : 'mdi-car' }}
+            </v-icon>
+            {{ item.transport }}
+          </span>
+          <span v-else>-</span>
+        </template>
+
         <template #item.amount="{ item }">
-          <span class="font-weight-bold text-body-2" style="color: #2563eb;">{{ currencyFormatter.format(item.amount) }}</span>
+          <span class="font-weight-bold text-body-2 text-primary">
+            {{ currencyFormatter.format(item.amount) }}
+          </span>
         </template>
 
+        <!-- Actions -->
         <template #item.actions="{ item }">
-          <v-btn
-            icon
-            variant="text"
-            color="primary"
-            size="small"
-            class="mr-1"
-            @click="openEditDialog(item)"
-          >
-            <v-icon>mdi-pencil-outline</v-icon>
-            <v-tooltip activator="parent" location="top">Edit</v-tooltip>
+          <v-btn icon variant="text" color="primary" size="small" class="mr-1" @click="openImageDialog(item)">
+            <v-icon size="20">mdi-image-multiple-outline</v-icon>
           </v-btn>
-          <v-btn
-            icon
-            variant="text"
-            color="error"
-            size="small"
-            @click="openDeleteDialog(item)"
-          >
-            <v-icon>mdi-delete-outline</v-icon>
-            <v-tooltip activator="parent" location="top">Delete</v-tooltip>
+          <v-btn icon variant="text" color="slate-600" size="small" class="mr-1" @click="openEditDialog(item)">
+            <v-icon size="20">mdi-pencil-outline</v-icon>
           </v-btn>
-        </template>
-
-        <template #no-data>
-          <div class="premium-empty-state">
-            <v-icon>mdi-package-variant</v-icon>
-            <p class="empty-title">No products found</p>
-            <p class="empty-text">Add tour packages to get started</p>
-            <v-btn color="primary" class="btn-primary mt-4" prepend-icon="mdi-plus" @click="openAddDialog">
-              Add Product
-            </v-btn>
-          </div>
+          <v-btn icon variant="text" color="error" size="small" @click="openDeleteDialog(item)">
+            <v-icon size="20">mdi-delete-outline</v-icon>
+          </v-btn>
         </template>
       </v-data-table>
     </v-card>
-
-    <!-- Add/Edit Dialog -->
-    <v-dialog v-model="dialog" max-width="900" persistent>
-      <v-card class="premium-dialog">
-        <v-card-title class="d-flex justify-space-between align-center pa-6 pb-0">
-          <div>
-            <h3 class="text-h6 font-weight-bold text-grey-darken-3">{{ editing ? 'Edit Product' : 'Add New Product' }}</h3>
-            <p class="text-caption text-grey mt-1">{{ editing ? 'Update product information' : 'Create a new tour package' }}</p>
-          </div>
-          <v-btn icon variant="text" size="small" @click="dialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-
-        <v-stepper v-model="currentStep" class="rounded-0 elevation-0" alt-labels>
-          <v-stepper-header>
-            <v-stepper-item :value="1" title="Basic Info" subtitle="Title & Type" :complete="currentStep > 1"></v-stepper-item>
-            <v-divider></v-divider>
-            <v-stepper-item :value="2" title="Details" subtitle="Duration & Price" :complete="currentStep > 2"></v-stepper-item>
-            <v-divider></v-divider>
-            <v-stepper-item :value="3" title="Photos" subtitle="Images & Extras"></v-stepper-item>
-          </v-stepper-header>
-
-          <v-stepper-window>
-            <v-stepper-window-item :value="1">
-              <v-form class="pa-4 premium-form">
-                <v-row>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="productForm.title"
-                      label="Product Title"
-                      :rules="[v => !!v || 'Title is required']"
-                      required
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-select
-                      v-model="productForm.userAccountId"
-                      label="Tour Operator"
-                      :items="users"
-                      item-title="profileName"
-                      item-value="userAccountId"
-                      :rules="[v => !!v || 'Operator is required']"
-                      required
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="productForm.location"
-                      label="Location"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-select
-                      v-model="productForm.hotelId"
-                      label="Hotel"
-                      :items="hotels"
-                      item-title="hotelName"
-                      item-value="hotelId"
-                      clearable
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-select
-                      v-model="productForm.locationType"
-                      label="Location Type"
-                      :items="['DOMESTIC', 'INTERNATIONAL']"
-                      :rules="[v => !!v || 'Location type is required']"
-                      required
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-select
-                      v-model="productForm.type"
-                      label="Package Type"
-                      :items="['Budget', 'Standard', 'Premium']"
-                      :rules="[v => !!v || 'Package type is required']"
-                      required
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-select>
-                  </v-col>
-                </v-row>
-              </v-form>
-            </v-stepper-window-item>
-
-            <v-stepper-window-item :value="2">
-              <v-form class="pa-4 premium-form">
-                <v-row>
-                  <v-col cols="12" sm="4">
-                    <v-text-field
-                      v-model.number="productForm.day"
-                      label="Number of Days"
-                      type="number"
-                      min="0"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="4">
-                    <v-text-field
-                      v-model.number="productForm.night"
-                      label="Number of Nights"
-                      type="number"
-                      min="0"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="4">
-                    <v-text-field
-                      v-model.number="productForm.groupSize"
-                      label="Group Size"
-                      type="number"
-                      min="0"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model.number="productForm.amount"
-                      label="Price"
-                      type="number"
-                      min="0"
-                      prefix="$"
-                      :rules="[v => v > 0 || 'Price must be greater than 0']"
-                      required
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="productForm.meals"
-                      label="Meals Included"
-                      placeholder="e.g., Breakfast, Lunch"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="productForm.travelDate"
-                      label="Travel Date"
-                      type="date"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="productForm.ticket"
-                      label="Ticket Type"
-                      placeholder="e.g., Economy Class"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-textarea
-                      v-model="productForm.detail"
-                      label="Detailed Description"
-                      rows="4"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-textarea>
-                  </v-col>
-                </v-row>
-              </v-form>
-            </v-stepper-window-item>
-
-            <v-stepper-window-item :value="3">
-              <v-form class="pa-4 premium-form">
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="productForm.photo"
-                      label="Main Photo URL"
-                      hint="Enter a valid image URL"
-                      persistent-hint
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    >
-                      <template #append>
-                        <v-btn v-if="productForm.photo" color="primary" variant="text" size="small">
-                          Preview
-                        </v-btn>
-                      </template>
-                    </v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="productForm.photoOne"
-                      label="Photo 1 URL"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="productForm.photoTwo"
-                      label="Photo 2 URL"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="productForm.photoThree"
-                      label="Photo 3 URL"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="productForm.photoFour"
-                      label="Photo 4 URL"
-                      variant="outlined"
-                      density="comfortable"
-                      hide-details="auto"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-form>
-            </v-stepper-window-item>
-          </v-stepper-window>
-
-          <v-stepper-actions>
-            <template #prev>
-              <v-btn
-                v-if="currentStep > 1"
-                variant="outlined"
-                @click="currentStep--"
-              >
-                Previous
-              </v-btn>
-            </template>
-            <template #next>
-              <v-btn
-                v-if="currentStep < 3"
-                color="primary"
-                class="btn-primary"
-                @click="currentStep++"
-              >
-                Next
-              </v-btn>
-              <v-btn
-                v-else
-                color="primary"
-                class="btn-primary"
-                :disabled="!formValid"
-                @click="saveProduct"
-              >
-                {{ editing ? 'Update' : 'Create' }}
-              </v-btn>
-            </template>
-          </v-stepper-actions>
-        </v-stepper>
-      </v-card>
-    </v-dialog>
-
-    <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="420" persistent>
-      <v-card class="premium-dialog">
-        <v-card-text class="pa-6 text-center">
-          <v-avatar size="56" class="avatar-error mb-4">
-            <v-icon size="28" color="white">mdi-alert-outline</v-icon>
-          </v-avatar>
-          <h3 class="text-h6 font-weight-bold text-grey-darken-3 mb-2">Confirm Delete</h3>
-          <p class="text-body-2 text-grey">
-            Are you sure you want to delete <strong>{{ itemToDelete?.title }}</strong>? This will also delete associated itineraries and bookings.
-          </p>
-        </v-card-text>
-        <v-card-actions class="pa-4 pt-0 justify-center">
-          <v-btn variant="outlined" class="mr-2" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" class="btn-error" @click="deleteProduct">Delete</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'AdminProducts',
+  
+  data() {
+    return {
+      itemsPerPage: 10,
+      loading: false,
+      dialog: false,
+      deleteDialog: false,
+      imageDialog: false,
+      search: '',
+      typeFilter: null as string | null,
+      locationTypeFilter: null as string | null,
+      currentStep: 1,
+      editing: false,
+      itemToDelete: null as any | null,
+      
+      products: [
+        { productId: 'p1', title: 'Beautiful Bali Gateway', location: 'Bali, Indonesia', type: 'Premium', locationType: 'INTERNATIONAL', day: 5, night: 4, groupSize: '10-12 Pax', amount: 1250, meals: 'Breakfast & Dinner', travelDate: '2026-08-20', ticket: 15, transport: 'FLIGHT', photo: 'https://picsum.photos/id/10/200/200' },
+        { productId: 'p2', title: 'Bagan Heritage Cultural Tour', location: 'Bagan, Myanmar', type: 'Budget', locationType: 'DOMESTIC', day: 3, night: 2, groupSize: '20 Pax', amount: 150, meals: 'Breakfast Only', travelDate: '2026-10-05', ticket: 25, transport: 'CAR', photo: 'https://picsum.photos/id/11/200/200' },
+        { productId: 'p3', title: 'Tokyo Cherry Blossom Special', location: 'Tokyo, Japan', type: 'Premium', locationType: 'INTERNATIONAL', day: 7, night: 6, groupSize: '8-10 Pax', amount: 2100, meals: 'All Meals Included', travelDate: '2026-04-12', ticket: 5, transport: 'FLIGHT', photo: 'https://picsum.photos/id/12/200/200' },
+        { productId: 'p4', title: 'Phuket Beach Relax Package', location: 'Phuket, Thailand', type: 'Standard', locationType: 'INTERNATIONAL', day: 4, night: 3, groupSize: '15 Pax', amount: 450, meals: 'Breakfast & Seafood Dinner', travelDate: '2026-09-15', ticket: 12, transport: 'FLIGHT', photo: 'https://picsum.photos/id/13/200/200' },
+        { productId: 'p5', title: 'Inle Lake Magic & Culture', location: 'Shan State, Myanmar', type: 'Standard', locationType: 'DOMESTIC', day: 3, night: 2, groupSize: '12 Pax', amount: 180, meals: 'Breakfast & Lunch', travelDate: '2026-11-20', ticket: 8, transport: 'CAR', photo: 'https://picsum.photos/id/14/200/200' },
+        { productId: 'p6', title: 'Seoul City Explorer', location: 'Seoul, South Korea', type: 'Standard', locationType: 'INTERNATIONAL', day: 6, night: 5, groupSize: '14 Pax', amount: 980, meals: 'Breakfast', travelDate: '2026-10-10', ticket: 20, transport: 'FLIGHT', photo: 'https://picsum.photos/id/15/200/200' },
+        { productId: 'p7', title: 'Ngapali Luxury Beach Escape', location: 'Rakhine, Myanmar', type: 'Premium', locationType: 'DOMESTIC', day: 4, night: 3, groupSize: '6-8 Pax', amount: 350, meals: 'Breakfast Buffet', travelDate: '2026-12-24', ticket: 4, transport: 'FLIGHT', photo: 'https://picsum.photos/id/16/200/200' },
+        { productId: 'p8', title: 'Bangkok Shopping Spree Tour', location: 'Bangkok, Thailand', type: 'Budget', locationType: 'INTERNATIONAL', day: 3, night: 2, groupSize: '25 Pax', amount: 299, meals: 'None', travelDate: '2026-08-05', ticket: 40, transport: 'FLIGHT', photo: 'https://picsum.photos/id/17/200/200' },
+        { productId: 'p9', title: 'Pyin Oo Lwin Cool Breeze Getaway', location: 'Mandalay, Myanmar', type: 'Budget', locationType: 'DOMESTIC', day: 2, night: 1, groupSize: '30 Pax', amount: 80, meals: 'Traditional Dinner', travelDate: '2026-07-28', ticket: 18, transport: 'CAR', photo: 'https://picsum.photos/id/18/200/200' },
+        { productId: 'p10', title: 'Singapore Modern City Wonders', location: 'Marina Bay, Singapore', type: 'Premium', locationType: 'INTERNATIONAL', day: 5, night: 4, groupSize: '10 Pax', amount: 1400, meals: 'Full Board', travelDate: '2026-09-02', ticket: 9, transport: 'FLIGHT', photo: 'https://picsum.photos/id/19/200/200' }
+      ] as any[],
+
+      headers: [
+        { title: 'Product Info', key: 'title', align: 'start' as const },
+        { title: 'Type', key: 'type', align: 'start' as const },
+        { title: 'Region', key: 'locationType', align: 'start' as const },
+        { title: 'Location', key: 'location', align: 'start' as const },
+        { title: 'Duration', key: 'duration' },
+        { title: 'Group Size', key: 'groupSize' },
+        { title: 'Meals', key: 'meals' },
+        { title: 'Travel Date', key: 'travelDate' },
+        { title: 'Tickets', key: 'ticket' },
+        { title: 'Transport', key: 'transport' },
+        { title: 'Price', key: 'amount', align: 'end' as const },
+        { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const }
+      ]
+    }
+  },
+
+  computed: {
+    filteredProducts(): any[] {
+      return this.products.filter(p => {
+        const matchesSearch = !this.search || p.title.toLowerCase().includes(this.search.toLowerCase()) || (p.location && p.location.toLowerCase().includes(this.search.toLowerCase()))
+        const matchesType = !this.typeFilter || p.type === this.typeFilter
+        const matchesLocationType = !this.locationTypeFilter || p.locationType === this.locationTypeFilter
+        return matchesSearch && matchesType && matchesLocationType
+      })
+    },
+    currencyFormatter() { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }) }
+  },
+
+  methods: {
+    getTypeClass(type: string): string { return `chip-${(type || 'standard').toLowerCase()}` },
+    getDuration(p: any): string { return `${p.day || 0}D / ${p.night || 0}N` },
+    formatDate(dateStr: string): string {
+      if (!dateStr) return '-'
+      return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    }
+  }
+})
+</script>
+
 <style scoped>
+.admin-products-container { background-color: #f8fafc; min-height: 100vh; }
+.text-slate-800 { color: #1e293b; }
+.text-slate-700 { color: #334155; }
+.border { border: 1px solid #e2e8f0 !important; }
+.status-chip { display: inline-flex; align-items: center; padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 50px; text-transform: uppercase; }
+.chip-budget { background-color: #f0fdf4; color: #16a34a; }
+.chip-standard { background-color: #eff6ff; color: #2563eb; }
+.chip-premium { background-color: #faf5ff; color: #7c3aed; }
+.chip-domestic { background-color: #f1f5f9; color: #475569; }
+.chip-international { background-color: #fff7ed; color: #ea580c; }
+
+/* Sticky Header အလုပ်လုပ်စေရန် နောက်ခံအရောင်နှင့် z-index သတ်မှတ်ချက် */
+.premium-table :deep(th) { 
+  font-weight: 600 !important; 
+  color: #475569 !important; 
+  background-color: #f8fafc !important; 
+  font-size: 13px !important;
+  z-index: 2 !important;
+}
 </style>
