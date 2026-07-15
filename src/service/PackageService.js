@@ -27,6 +27,19 @@ class PackageService{
         return this.axios.delete(url).then(request => request.data);
     }
 
+    getProduct(locationType) {
+        let url = `/package`
+        return axios.get(url,{
+            params: {
+                locationType
+            }
+        }).then(request => request.data);
+    }
+    addProduct(pkg) {
+        let url = `/package`;
+        return this.axios.post(url, pkg).then(request => request.data);
+    }
+
 
 }
 

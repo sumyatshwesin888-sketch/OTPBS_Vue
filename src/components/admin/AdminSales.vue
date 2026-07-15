@@ -1,3 +1,462 @@
+<template>
+  <div>
+    <!-- Stats Cards (Premium Glassmorphic Architecture) -->
+    <v-row class="mb-4">
+      <v-col cols="12" sm="6" lg="3">
+        <v-card class="stat-card" style="position: relative">
+          <div class="card-accent card-accent-green"></div>
+          <v-card-text class="pa-4 pr-6">
+            <div class="d-flex justify-space-between align-start">
+              <div>
+                <p class="stat-label">Total Revenue</p>
+                <p class="stat-value">{{ currencyFormatter.format(totalRevenue) }}</p>
+                <p class="stat-trend">
+                  <v-icon size="11" color="success">mdi-trending-up</v-icon>
+                  <span class="ml-1">Gross earnings</span>
+                </p>
+              </div>
+              <div class="stat-icon-container stat-icon-container-green">
+                <v-icon size="18">mdi-currency-usd</v-icon>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" sm="6" lg="3">
+        <v-card class="stat-card" style="position: relative">
+          <div class="card-accent card-accent-blue"></div>
+          <v-card-text class="pa-4 pr-6">
+            <div class="d-flex justify-space-between align-start">
+              <div>
+                <p class="stat-label">Confirmed</p>
+                <p class="stat-value">{{ confirmedBookings }}</p>
+                <p class="stat-trend">
+                  <v-icon size="11" color="primary">mdi-clock-check-outline</v-icon>
+                  <span class="ml-1">Awaiting approval</span>
+                </p>
+              </div>
+              <div class="stat-icon-container stat-icon-container-blue">
+                <v-icon size="18">mdi-check-circle-outline</v-icon>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" sm="6" lg="3">
+        <v-card class="stat-card" style="position: relative">
+          <div class="card-accent card-accent-amber"></div>
+          <v-card-text class="pa-4 pr-6">
+            <div class="d-flex justify-space-between align-start">
+              <div>
+                <p class="stat-label">Approved</p>
+                <p class="stat-value">{{ approvedBookings }}</p>
+                <p class="stat-trend">
+                  <v-icon size="11" color="warning">mdi-shield-check-outline</v-icon>
+                  <span class="ml-1">Finalized bookings</span>
+                </p>
+              </div>
+              <div class="stat-icon-container stat-icon-container-amber">
+                <v-icon size="18">mdi-thumb-up-outline</v-icon>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" sm="6" lg="3">
+        <v-card class="stat-card" style="position: relative">
+          <div class="card-accent card-accent-red"></div>
+          <v-card-text class="pa-4 pr-6">
+            <div class="d-flex justify-space-between align-start">
+              <div>
+                <p class="stat-label">Cancelled</p>
+                <p class="stat-value">{{ cancelledBookings }}</p>
+                <p class="stat-trend">
+                  <v-icon size="11" color="error">mdi-alert-circle-outline</v-icon>
+                  <span class="ml-1">Revoked bookings</span>
+                </p>
+              </div>
+              <div class="stat-icon-container stat-icon-container-red">
+                <v-icon size="18">mdi-cancel</v-icon>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <!-- Filter Bar -->
+    <v-card class="filter-bar-card mb-4 pa-3">
+      <v-row align="center" no-gutters class="ga-2">
+        <v-col cols="12" sm="5" md="4">
+          <v-text-field
+            v-model="search"
+            label="Search bookings..."
+            prepend-inner-icon="mdi-magnify"
+            density="compact"
+            variant="outlined"
+            hide-details
+            clearable
+            class="sleek-input"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" sm="4" md="3">
+          <v-select
+            v-model="statusFilter"
+            label="Status"
+            :items="[
+              { title: 'All', value: null },
+              { title: 'Confirmed', value: 'CONFIRM' },
+              { title: 'Approved', value: 'APPROVED' },
+              { title: 'Cancelled', value: 'DELETE' }
+            ]"
+            density="compact"
+            variant="outlined"
+            hide-details
+            clearable
+            class="sleek-input"
+          ></v-select>
+        </v-col>
+        <v-spacer class="hidden-xs-only"></v-spacer>
+        <v-col cols="auto" class="text-right">
+          <v-btn
+            color="primary"
+            class="btn-primary text-none text-caption font-weight-bold"
+            prepend-icon="mdi-plus"
+            elevation="0"
+            height="36"
+            @click="openAddDialog"
+          >
+            New Booking
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-card>
+
+    <!-- Data Table Card -->
+    <v-card class="enterprise-card">
+      <v-card-title class="pa-4 pb-2">
+        <div>
+          <h3 class="card-title-text mb-0">Booking & Sales Registry</h3>
+          <p class="card-subtitle-text mb-0">Manage tour client statements, operator validation and confirmations</p>
+        </div>
+      </v-card-title>
+      
+      <v-card-text class="pt-0 px-4 pb-4">
+        <v-data-table
+          :headers="headers"
+          :items="filteredSales"
+          :loading="loading"
+          item-value="saleId"
+          hide-default-footer
+          class="premium-table elevation-0"
+          fixed-header
+          height="480"
+        >
+          <!-- Booking ID -->
+          <template #item.saleId="{ item }">
+            <span class="text-caption font-weight-bold text-primary" style="font-size: 0.75rem !important;">
+              #{{ item.saleId.slice(0, 8).toUpperCase() }}
+            </span>
+          </template>
+
+          <!-- Customer Name -->
+          <template #item.customer.profileName="{ item }">
+            <div class="d-flex align-center py-1">
+              <v-avatar size="28" class="avatar-gradient mr-2 glass-avatar">
+                <span class="text-white font-weight-bold" style="font-size: 0.7rem;">
+                  {{ item.customer?.profileName?.charAt(0) || 'U' }}
+                </span>
+              </v-avatar>
+              <span class="font-weight-semibold text-grey-darken-3" style="font-size: 0.8rem !important;">
+                {{ item.customer?.profileName || 'N/A' }}
+              </span>
+            </div>
+          </template>
+
+          <!-- Product Title -->
+          <template #item.product.title="{ item }">
+            <span class="text-grey-darken-2 d-inline-block text-truncate" style="max-width: 180px; font-size: 0.8rem !important;">
+              {{ item.product?.title || 'N/A' }}
+            </span>
+          </template>
+
+          <!-- Qty -->
+          <template #item.qty="{ item }">
+            <span class="text-grey-darken-1 font-weight-medium" style="font-size: 0.8rem !important;">
+              {{ item.qty }}
+            </span>
+          </template>
+
+          <!-- Amount -->
+          <template #item.amount="{ item }">
+            <span class="font-weight-bold text-primary" style="font-size: 0.8rem !important;">
+              {{ currencyFormatter.format(item.amount) }}
+            </span>
+          </template>
+
+          <!-- Status Dropdown Trigger -->
+          <template #item.status="{ item }">
+            <v-menu location="bottom end" offset="4">
+              <template #activator="{ props }">
+                <span
+                  v-bind="props"
+                  :class="['status-chip', item.status === 'CONFIRM' ? 'status-confirm' : item.status === 'APPROVED' ? 'chip-standard' : 'status-delete']"
+                  class="cursor-pointer d-inline-flex align-center"
+                  style="gap: 2px;"
+                >
+                  {{ item.status === 'DELETE' ? 'Cancelled' : item.status }}
+                  <v-icon end size="11">mdi-chevron-down</v-icon>
+                </span>
+              </template>
+              <v-list density="compact" class="pa-1 glass-menu">
+                <v-list-item class="menu-item rounded-lg" @click="updateStatus(item, 'CONFIRM')">
+                  <v-list-item-title class="text-caption font-weight-medium text-success">Confirm</v-list-item-title>
+                </v-list-item>
+                <v-list-item class="menu-item rounded-lg" @click="updateStatus(item, 'APPROVED')">
+                  <v-list-item-title class="text-caption font-weight-medium text-primary">Approve</v-list-item-title>
+                </v-list-item>
+                <v-list-item class="menu-item rounded-lg" @click="updateStatus(item, 'DELETE')">
+                  <v-list-item-title class="text-caption font-weight-medium text-error">Cancel</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </template>
+
+          <!-- Date -->
+          <template #item.date="{ item }">
+            <span class="text-grey-darken-1" style="font-size: 0.8rem !important;">
+              {{ formatDate(item.date) }}
+            </span>
+          </template>
+
+          <!-- Actions -->
+          <template #item.actions="{ item }">
+            <v-btn icon variant="text" color="slate-600" size="small" class="mr-1" @click="openEditDialog(item)">
+              <v-icon size="18">mdi-pencil-outline</v-icon>
+              <v-tooltip activator="parent" location="top">Edit</v-tooltip>
+            </v-btn>
+            <v-btn icon variant="text" color="error" size="small" @click="openDeleteDialog(item)">
+              <v-icon size="18">mdi-delete-outline</v-icon>
+              <v-tooltip activator="parent" location="top">Delete</v-tooltip>
+            </v-btn>
+          </template>
+
+          <!-- Empty State -->
+          <template #no-data>
+            <div class="premium-empty-state pa-6 text-center">
+              <v-avatar size="48" color="grey-lighten-4" class="mb-2">
+                <v-icon color="grey-darken-1" size="22">mdi-cart-off-outline</v-icon>
+              </v-avatar>
+              <p class="card-title-text mb-0">No bookings discovered</p>
+              <p class="card-subtitle-text">Try modifying your text parameters or register a statement</p>
+              <v-btn color="primary" class="btn-primary text-none text-caption font-weight-bold mt-3" prepend-icon="mdi-plus" size="small" @click="openAddDialog">
+                New Booking
+              </v-btn>
+            </div>
+          </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
+
+    <!-- Add/Edit Dialog -->
+    <v-dialog v-model="dialog" max-width="620px" persistent>
+      <v-card class="premium-dialog">
+        <v-card-title class="d-flex justify-space-between align-center pa-5 pb-2">
+          <div>
+            <h3 class="card-title-text" style="font-size: 1.1rem !important;">
+              {{ editing ? 'Edit Booking Entry' : 'Create Booking Statement' }}
+            </h3>
+            <p class="card-subtitle-text">
+              {{ editing ? 'Modify standard sales pipeline parameters' : 'Provision a new customer seat itinerary allocation' }}
+            </p>
+          </div>
+          <v-btn icon variant="text" size="small" @click="dialog = false">
+            <v-icon size="18">mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-card-text class="px-5 pb-5 pt-2 premium-form">
+          <v-form @submit.prevent="saveSale">
+            <v-row class="form-row-spacing">
+              <v-col cols="12" sm="6">
+                <v-select
+                  v-model="saleForm.userAccountId"
+                  label="Tour Operator *"
+                  :items="users"
+                  item-title="profileName"
+                  item-value="userAccountId"
+                  prepend-inner-icon="mdi-account-tie-outline"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-select
+                  v-model="saleForm.customerId"
+                  label="Customer Account *"
+                  :items="users.filter(u => u.userType === 'CUSTOMER')"
+                  item-title="profileName"
+                  item-value="userAccountId"
+                  prepend-inner-icon="mdi-account-outline"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-select>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-model="saleForm.productId"
+                  label="Destination Product Package *"
+                  :items="products"
+                  item-title="title"
+                  item-value="productId"
+                  prepend-inner-icon="mdi-package-variant-closed"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                  @update:model-value="onProductChange"
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model.number="saleForm.qty"
+                  label="Seat Quantity *"
+                  type="number"
+                  min="1"
+                  prepend-inner-icon="mdi-format-list-numbered"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model.number="saleForm.unitPrice"
+                  label="Unit Rate *"
+                  type="number"
+                  min="0"
+                  prefix="$"
+                  prepend-inner-icon="mdi-tag-outline"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  :model-value="currencyFormatter.format(saleForm.amount)"
+                  label="Aggregated Total (ReadOnly)"
+                  readonly
+                  prepend-inner-icon="mdi-calculator"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input font-weight-bold field-readonly"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="saleForm.voucherCode"
+                  label="Promotional Voucher"
+                  prepend-inner-icon="mdi-ticket-percent-outline"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="saleForm.paymentType"
+                  label="Payment Channel"
+                  placeholder="e.g., Bank, Card, Cash"
+                  prepend-inner-icon="mdi-credit-card-outline"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-select
+                  v-model="saleForm.status"
+                  label="Workflow Pipeline Status *"
+                  :items="['CONFIRM', 'APPROVED', 'DELETE']"
+                  prepend-inner-icon="mdi-list-status"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="saleForm.date"
+                  label="Booking Ledger Date"
+                  type="date"
+                  prepend-inner-icon="mdi-calendar-range"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-card-actions class="pa-0 pt-4">
+              <v-spacer></v-spacer>
+              <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="34" @click="dialog = false">Cancel</v-btn>
+              <v-btn
+                color="primary"
+                type="submit"
+                class="btn-primary text-none text-caption font-weight-bold"
+                height="34"
+                :disabled="!formValid"
+              >
+                {{ editing ? 'Update Ledger' : 'Create Ledger' }}
+              </v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="deleteDialog" max-width="380" persistent>
+      <v-card class="premium-dialog">
+        <v-card-text class="pa-5 text-center">
+          <v-avatar size="48" class="avatar-error mb-3">
+            <v-icon size="24" color="white">mdi-alert-outline</v-icon>
+          </v-avatar>
+          <h3 class="card-title-text text-center mb-1" style="font-size: 1.05rem !important;">Confirm Absolute Removal</h3>
+          <p class="card-subtitle-text text-center">
+            Are you sure you want to drop booking statement? This operations ledger layer cannot be restored.
+          </p>
+        </v-card-text>
+        <v-card-actions class="pa-4 pt-0 justify-center">
+          <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="32" @click="deleteDialog = false">Cancel</v-btn>
+          <v-btn color="error" class="btn-error text-none text-caption font-weight-bold" height="32" @click="deleteSale">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { supabase } from '../../lib/supabase'
@@ -38,7 +497,7 @@ export default defineComponent({
         { title: 'Amount', key: 'amount', align: 'end' as const },
         { title: 'Status', key: 'status', align: 'center' as const },
         { title: 'Date', key: 'date', align: 'start' as const },
-        { title: 'Actions', key: 'actions', sortable: false }
+        { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const }
       ]
     }
   },
@@ -268,403 +727,203 @@ export default defineComponent({
 })
 </script>
 
-<template>
-  <div>
-    <!-- Summary Cards -->
-    <v-row class="mb-6">
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-green"></div>
-          <v-card-text class="pa-5">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Total Revenue</p>
-                <p class="stat-value">{{ currencyFormatter.format(totalRevenue) }}</p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-green">
-                <v-icon size="22">mdi-currency-usd</v-icon>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-blue"></div>
-          <v-card-text class="pa-5">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Confirmed</p>
-                <p class="stat-value">{{ confirmedBookings }}</p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-blue">
-                <v-icon size="22">mdi-check-circle-outline</v-icon>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-amber"></div>
-          <v-card-text class="pa-5">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Approved</p>
-                <p class="stat-value">{{ approvedBookings }}</p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-amber">
-                <v-icon size="22">mdi-thumb-up-outline</v-icon>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-red"></div>
-          <v-card-text class="pa-5">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Cancelled</p>
-                <p class="stat-value">{{ cancelledBookings }}</p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-red">
-                <v-icon size="22">mdi-cancel</v-icon>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <!-- Filter Bar -->
-    <v-card class="filter-bar mb-6">
-      <v-row align="center">
-        <v-col cols="12" sm="6" md="4">
-          <v-text-field
-            v-model="search"
-            label="Search bookings..."
-            prepend-inner-icon="mdi-magnify"
-            density="comfortable"
-            variant="outlined"
-            hide-details
-            clearable
-          ></v-text-field>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-select
-            v-model="statusFilter"
-            label="Status"
-            :items="[
-              { title: 'All', value: null },
-              { title: 'Confirmed', value: 'CONFIRM' },
-              { title: 'Approved', value: 'APPROVED' },
-              { title: 'Cancelled', value: 'DELETE' }
-            ]"
-            density="comfortable"
-            variant="outlined"
-            hide-details
-            clearable
-          ></v-select>
-        </v-col>
-        <v-col cols="12" md="5" class="text-right">
-          <v-btn
-            color="primary"
-            class="btn-primary"
-            prepend-icon="mdi-plus"
-            @click="openAddDialog"
-          >
-            New Booking
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card>
-
-    <!-- Data Table -->
-    <v-card class="enterprise-card">
-      <v-data-table
-        :headers="headers"
-        :items="filteredSales"
-        :loading="loading"
-        item-value="saleId"
-        class="premium-table elevation-0"
-      >
-        <template #item.saleId="{ item }">
-          <span class="text-caption font-weight-medium text-primary">#{{ item.saleId.slice(0, 8).toUpperCase() }}</span>
-        </template>
-
-        <template #item.customer.profileName="{ item }">
-          <div class="d-flex align-center py-2">
-            <v-avatar size="36" class="avatar-gradient mr-2">
-              <span class="text-white text-caption font-weight-bold">{{ item.customer?.profileName?.charAt(0) || 'U' }}</span>
-            </v-avatar>
-            <span class="font-weight-medium text-body-2">{{ item.customer?.profileName || 'N/A' }}</span>
-          </div>
-        </template>
-
-        <template #item.product.title="{ item }">
-          <span class="text-body-2">{{ item.product?.title || 'N/A' }}</span>
-        </template>
-
-        <template #item.amount="{ item }">
-          <span class="font-weight-semibold text-body-2" style="color: #2563eb;">{{ currencyFormatter.format(item.amount) }}</span>
-        </template>
-
-        <template #item.status="{ item }">
-          <v-menu location="bottom end" offset="4">
-            <template #activator="{ props }">
-              <span
-                v-bind="props"
-                :class="'status-' + item.status.toLowerCase()"
-                class="status-chip cursor-pointer"
-              >
-                {{ item.status === 'DELETE' ? 'Cancelled' : item.status }}
-                <v-icon end size="14">mdi-chevron-down</v-icon>
-              </span>
-            </template>
-            <v-list density="compact" class="pa-1">
-              <v-list-item class="menu-item" @click="updateStatus(item, 'CONFIRM')">
-                <v-list-item-title class="text-body-2">Confirm</v-list-item-title>
-              </v-list-item>
-              <v-list-item class="menu-item" @click="updateStatus(item, 'APPROVED')">
-                <v-list-item-title class="text-body-2">Approve</v-list-item-title>
-              </v-list-item>
-              <v-list-item class="menu-item" @click="updateStatus(item, 'DELETE')">
-                <v-list-item-title class="text-body-2 text-error">Cancel</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </template>
-
-        <template #item.date="{ item }">
-          <span class="text-body-2 text-grey">{{ formatDate(item.date) }}</span>
-        </template>
-
-        <template #item.actions="{ item }">
-          <v-btn
-            icon
-            variant="text"
-            color="primary"
-            size="small"
-            class="mr-1"
-            @click="openEditDialog(item)"
-          >
-            <v-icon>mdi-pencil-outline</v-icon>
-            <v-tooltip activator="parent" location="top">Edit</v-tooltip>
-          </v-btn>
-          <v-btn
-            icon
-            variant="text"
-            color="error"
-            size="small"
-            @click="openDeleteDialog(item)"
-          >
-            <v-icon>mdi-delete-outline</v-icon>
-            <v-tooltip activator="parent" location="top">Delete</v-tooltip>
-          </v-btn>
-        </template>
-
-        <template #no-data>
-          <div class="premium-empty-state">
-            <v-icon>mdi-cart-outline</v-icon>
-            <p class="empty-title">No bookings found</p>
-            <p class="empty-text">Add bookings to get started</p>
-            <v-btn color="primary" class="btn-primary mt-4" prepend-icon="mdi-plus" @click="openAddDialog">
-              New Booking
-            </v-btn>
-          </div>
-        </template>
-      </v-data-table>
-    </v-card>
-
-    <!-- Add/Edit Dialog -->
-    <v-dialog v-model="dialog" max-width="700" persistent>
-      <v-card class="premium-dialog">
-        <v-card-title class="d-flex justify-space-between align-center pa-6 pb-0">
-          <div>
-            <h3 class="text-h6 font-weight-bold text-grey-darken-3">{{ editing ? 'Edit Booking' : 'New Booking' }}</h3>
-            <p class="text-caption text-grey mt-1">{{ editing ? 'Update booking information' : 'Create a new booking' }}</p>
-          </div>
-          <v-btn icon variant="text" size="small" @click="dialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-
-        <v-form @submit.prevent="saveSale" class="pa-6 pt-4 premium-form">
-          <v-row>
-            <v-col cols="12" sm="6">
-              <v-select
-                v-model="saleForm.userAccountId"
-                label="Tour Operator"
-                :items="users"
-                item-title="profileName"
-                item-value="userAccountId"
-                prepend-inner-icon="mdi-account-outline"
-                :rules="[v => !!v || 'Operator is required']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-select>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-select
-                v-model="saleForm.customerId"
-                label="Customer"
-                :items="users.filter(u => u.userType === 'CUSTOMER')"
-                item-title="profileName"
-                item-value="userAccountId"
-                prepend-inner-icon="mdi-account-outline"
-                :rules="[v => !!v || 'Customer is required']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-select>
-            </v-col>
-            <v-col cols="12">
-              <v-select
-                v-model="saleForm.productId"
-                label="Product"
-                :items="products"
-                item-title="title"
-                item-value="productId"
-                prepend-inner-icon="mdi-package-variant"
-                :rules="[v => !!v || 'Product is required']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-                @update:model-value="onProductChange"
-              ></v-select>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model.number="saleForm.qty"
-                label="Quantity"
-                type="number"
-                min="1"
-                prepend-inner-icon="mdi-counter"
-                :rules="[v => v > 0 || 'Quantity must be at least 1']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model.number="saleForm.unitPrice"
-                label="Unit Price"
-                type="number"
-                min="0"
-                prefix="$"
-                prepend-inner-icon="mdi-currency-usd"
-                :rules="[v => v >= 0 || 'Price must be valid']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field
-                :model-value="currencyFormatter.format(saleForm.amount)"
-                label="Total Amount"
-                readonly
-                prepend-inner-icon="mdi-calculator"
-                hint="Calculated as Qty x Unit Price"
-                persistent-hint
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-                class="font-weight-bold"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="saleForm.voucherCode"
-                label="Voucher Code"
-                prepend-inner-icon="mdi-ticket-percent"
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="saleForm.paymentType"
-                label="Payment Type"
-                prepend-inner-icon="mdi-credit-card-outline"
-                placeholder="e.g., Credit Card, Cash"
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-select
-                v-model="saleForm.status"
-                label="Status"
-                :items="['CONFIRM', 'APPROVED', 'DELETE']"
-                prepend-inner-icon="mdi-list-status"
-                :rules="[v => !!v || 'Status is required']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-select>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="saleForm.date"
-                label="Booking Date"
-                type="date"
-                prepend-inner-icon="mdi-calendar"
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-
-          <v-card-actions class="pa-0 pt-6">
-            <v-spacer></v-spacer>
-            <v-btn variant="outlined" class="mr-2" @click="dialog = false">Cancel</v-btn>
-            <v-btn
-              color="primary"
-              type="submit"
-              class="btn-primary"
-              :disabled="!formValid"
-            >
-              {{ editing ? 'Update' : 'Create' }}
-            </v-btn>
-          </v-card-actions>
-        </v-form>
-      </v-card>
-    </v-dialog>
-
-    <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="420" persistent>
-      <v-card class="premium-dialog">
-        <v-card-text class="pa-6 text-center">
-          <v-avatar size="56" class="avatar-error mb-4">
-            <v-icon size="28" color="white">mdi-alert-outline</v-icon>
-          </v-avatar>
-          <h3 class="text-h6 font-weight-bold text-grey-darken-3 mb-2">Confirm Delete</h3>
-          <p class="text-body-2 text-grey">
-            Are you sure you want to delete this booking? This action cannot be undone.
-          </p>
-        </v-card-text>
-        <v-card-actions class="pa-4 pt-0 justify-center">
-          <v-btn variant="outlined" class="mr-2" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" class="btn-error" @click="deleteSale">Delete</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
-</template>
-
 <style scoped>
+/* Glassmorphism & Modern Micro Elements */
+.stat-card {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(14px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 4px 20px 0 rgba(31, 38, 135, 0.02) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  overflow: hidden;
+}
+
+.enterprise-card, .filter-bar-card {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(16px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 6px 24px 0 rgba(31, 38, 135, 0.03) !important;
+  border-radius: 14px !important;
+  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+/* Compact Core Typography Hierarchy */
+.card-title-text {
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  letter-spacing: -0.01em !important;
+}
+
+.card-subtitle-text {
+  font-size: 0.725rem !important;
+  color: #64748b !important;
+  font-weight: 400 !important;
+  margin-top: 1px !important;
+}
+
+/* Interactivity & Neon Edge Glow Effect */
+.stat-card:hover, .enterprise-card:hover, .filter-bar-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.65) !important;
+}
+
+.card-accent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.stat-card:has(.card-accent-green):hover { box-shadow: 0 6px 24px 0 rgba(76, 175, 80, 0.15) !important; border-color: rgba(76, 175, 80, 0.3) !important; }
+.stat-card:has(.card-accent-blue):hover { box-shadow: 0 6px 24px 0 rgba(33, 150, 243, 0.15) !important; border-color: rgba(33, 150, 243, 0.3) !important; }
+.stat-card:has(.card-accent-amber):hover { box-shadow: 0 6px 24px 0 rgba(255, 193, 7, 0.15) !important; border-color: rgba(255, 193, 7, 0.3) !important; }
+.stat-card:has(.card-accent-red):hover { box-shadow: 0 6px 24px 0 rgba(244, 67, 54, 0.15) !important; border-color: rgba(244, 67, 54, 0.3) !important; }
+
+.card-accent-green { background: linear-gradient(180deg, #4caf50, #81c784); }
+.card-accent-blue { background: linear-gradient(180deg, #2196f3, #64b5f6); }
+.card-accent-amber { background: linear-gradient(180deg, #ffc107, #ffe082); }
+.card-accent-red { background: linear-gradient(180deg, #f44336, #ef5350); }
+
+/* Minimal Layout Elements */
+.stat-icon-container {
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stat-icon-container-green { background: rgba(76, 175, 80, 0.08); color: #2e7d32 !important; }
+.stat-icon-container-blue { background: rgba(33, 150, 243, 0.08); color: #1565c0 !important; }
+.stat-icon-container-amber { background: rgba(255, 193, 7, 0.08); color: #b78103 !important; }
+.stat-icon-container-red { background: rgba(244, 67, 54, 0.08); color: #c62828 !important; }
+
+.stat-label {
+  font-size: 0.725rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 1px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin-bottom: 1px;
+}
+.stat-trend {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Glass Input Control Framework */
+.sleek-input :deep(.v-field) {
+  border-radius: 8px !important;
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  transition: all 0.25s ease-in-out;
+}
+.sleek-input :deep(.v-field--focused) {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+}
+.sleek-input :deep(.v-field__outline) {
+  display: none !important;
+}
+.sleek-input :deep(.v-label) {
+  font-size: 0.8rem !important;
+  color: #64748b !important;
+}
+.field-readonly :deep(.v-field) {
+  background-color: rgba(241, 245, 249, 0.5) !important;
+}
+
+/* High-Density Dense Directory Table */
+.premium-table {
+  background: transparent !important;
+}
+.premium-table :deep(th) {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+  background: rgba(241, 245, 249, 0.4) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
+  padding: 8px 12px !important;
+}
+.premium-table :deep(td) {
+  border-bottom: 1px solid rgba(241, 245, 249, 0.3) !important;
+  padding: 6px 12px !important;
+}
+
+.avatar-gradient {
+  background: linear-gradient(135deg, #6366f1, #3b82f6);
+}
+.glass-avatar {
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Micro Action Badges */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.status-confirm { background: rgba(76, 175, 80, 0.1); color: #2e7d32; }
+.chip-standard { background: rgba(33, 150, 243, 0.1); color: #1565c0; }
+.status-delete { background: rgba(244, 67, 54, 0.1); color: #c62828; }
+
+.glass-menu {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Elegant Dialog Setup */
+.premium-dialog {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08) !important;
+}
+
+.form-row-spacing > div {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+/* Action Control Highlights */
+.avatar-error {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px 0 rgba(59, 130, 246, 0.15) !important;
+}
+
+.btn-error {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: white !important;
+  border-radius: 8px !important;
+}
 </style>
