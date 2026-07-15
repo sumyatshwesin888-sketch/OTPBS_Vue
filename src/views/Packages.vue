@@ -94,14 +94,14 @@
                 >
                   <span
                     :style="{
-                      color: pkg.ticketLeft <= 5 ? '#ef4444' : '#10b981',
+                      color: pkg.leftTicket <= 5 ? '#ef4444' : '#10b981',
                       fontWeight: '700',
                     }"
                   >
                     🎫
                     {{
-                      pkg.ticketLeft > 0
-                        ? pkg.ticketLeft + ' / ' + pkg.ticket + ' Tickets Left'
+                      pkg.leftTicket > 0
+                        ? pkg.leftTicket + ' Tickets Left'
                         : 'Out Of Stock'
                     }}
                   </span>
@@ -178,14 +178,14 @@
                   >
                     <span
                       :style="{
-                        color: pkg.ticketLeft <= 5 ? '#ef4444' : '#10b981',
+                        color: pkg.leftTicket <= 5 ? '#ef4444' : '#10b981',
                         fontWeight: '700',
                       }"
                     >
                       🎫
                       {{
-                        pkg.ticketLeft > 0
-                          ? pkg.ticketLeft + ' / ' + pkg.ticket + ' Tickets Left'
+                        pkg.leftTicket > 0
+                          ? pkg.leftTicket + ' Tickets Left'
                           : 'Out Of Stock'
                       }}
                     </span>
@@ -202,7 +202,7 @@
                       <span class="price-amount">{{ pkg.amount }}</span>
                       <span class="price-label">/ person</span>
                     </div>
-                    <router-link :to="`/packagedetail/${pkg.id}`" class="btn-view-details">
+                    <router-link :to="`/packagedetail/${pkg.productId}`" class="btn-view-details">
                       View Details
                     </router-link>
                   </div>
@@ -235,6 +235,8 @@ export default {
 
   computed: {
     filteredAllPackages() {
+      console.log(this.packagesData);
+      
       if (!this.searchQuery) return this.packagesData
 
       const query = this.searchQuery.toLowerCase().trim()
@@ -323,6 +325,8 @@ export default {
         apiParam = this.activeTab.toLowerCase()
       }
 
+      console.log(apiParam);
+      
       packageService
         .getPackages(apiParam)
         .then((response) => {

@@ -22,7 +22,7 @@
         </div>
 
         <div class="nav-actions">
-         <template v-if="loginUser == undefined ||  loginUser.userAccountId==0">
+          <template v-if="loginUser == undefined || loginUser.userAccountId == 0">
             <button
               class="btn-login"
               @click="$router.replace('/login')"
@@ -43,15 +43,11 @@
               <template v-slot:activator="{ props }">
                 <v-btn variant="text" class="profile-trigger-btn" v-bind="props">
                   <v-avatar color="primary" size="32" class="mr-2 text-white font-weight-bold">
-                    {{
-                      (loginUser.profileName  || 'U')
-                        .charAt(0)
-                        .toUpperCase()
-                    }}
+                    {{ (loginUser.profileName || 'U').charAt(0).toUpperCase() }}
                   </v-avatar>
-    
+
                   <span class="user-display-name">
-                   {{ loginUser.profileName  || 'User' }}
+                    {{ loginUser.profileName || 'User' }}
                   </span>
                   <v-icon icon="mdi-chevron-down" size="small" class="ml-1 text-white" />
                 </v-btn>
@@ -106,9 +102,8 @@ export default {
   name: 'App',
   data() {
     return {
-     
       //authStore: useAuthStore(),
-      loginUser:{},
+      loginUser: {},
     }
   },
   // created() {
@@ -116,42 +111,39 @@ export default {
   // },
 
   computed: {
-    
-   
+    profileRoute() {
+      if (this.loginUser.userAccountId > 0 && this.loginUser.userType === 'ADMIN') {
+        return '/admin/dashboard'
+      }
 
-  profileRoute() {
-    if (this.loginUser.userAccountId>0 && this.loginUser.userType === 'ADMIN') {
-      return '/admin/dashboard';
-    }
-
-    return '/profile'
-  }
-
+      return '/profile'
+    },
   },
-    mounted() {
-    this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
-      console.log(this.loginUser);
-      
+  mounted() {
+    this.checkUser();
+  },
+  //  Route ပြောင်းလဲမှုကို စောင့်ကြည့်ပြီး User Data ကို အော်တို Update လုပ်ခိုင်းခြင်း
+  watch: {
+    $route() {
+      this.checkUser();
+    }
   },
   methods: {
+    
+    checkUser() {
+      const user = localStorage.getItem('loginUser');
+      this.loginUser = user ? JSON.parse(user) : { userAccountId: 0 };
+    },
     handleLogout() {
-  //      localStorage.removeItem('user')
-  // localStorage.removeItem('user_credentials')
-  //     localStorage.removeItem('is_logged_in')
-  //     localStorage.removeItem('user_role')
-  //     localStorage.removeItem('travelAdminAuth')
-  //     localStorage.removeItem('travelAdminUser')
-  //     sessionStorage.removeItem('travelAdminAuth')
-  //     sessionStorage.removeItem('travelAdminUser')
-
-  //     this.authStore.logout()
-      let loginUser = {};
-      loginUser.userAccountId = 0;
+      let loginUser = { userAccountId: 0 };
       localStorage.setItem('loginUser', JSON.stringify(loginUser));
-//if (this.$route.path !== '/') {
-    this.$router.push('/')
-    location.reload();
-//}
+      
+      
+      this.loginUser = loginUser;
+
+      if (this.$route.path !== '/') {
+        this.$router.push('/');
+      }
     },
   },
 }
@@ -223,7 +215,7 @@ html {
   display: flex;
   align-items: center;
   gap: 10px;
-position: relative !important;
+  position: relative !important;
   left: -100px !important;
 }
 

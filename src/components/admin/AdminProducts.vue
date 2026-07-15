@@ -76,9 +76,16 @@
         fixed-header
         height="550"
       >
+        <!-- Serial Number (No.) Column -->
+        <template #item.index="{ index }">
+          <span class="text-body-2 font-weight-medium text-slate-500">
+            {{ index + 1 }}
+          </span>
+        </template>
+
         <!-- Product Info -->
         <template #item.title="{ item }">
-          <div class="d-flex align-center py-3">
+          <div class="d-flex align-center py-3 text-no-wrap">
             <v-avatar size="44" rounded="md" class="mr-3 border" color="grey-lighten-4">
               <v-img v-if="item.photo" :src="item.photo" cover></v-img>
               <v-icon v-else color="grey-darken-1">mdi-package-variant</v-icon>
@@ -106,21 +113,21 @@
 
         <!-- Location Column -->
         <template #item.location="{ item }">
-          <span class="text-body-2 text-slate-700 d-inline-flex align-center">
+          <span class="text-body-2 text-slate-700 d-inline-flex align-center text-no-wrap">
             <v-icon size="16" color="grey-darken-1" class="mr-1">mdi-map-marker-outline</v-icon>
             {{ item.location || 'Unknown' }}
           </span>
         </template>
 
         <template #item.duration="{ item }">
-          <span class="text-body-2 text-slate-700">
+          <span class="text-body-2 text-slate-700 text-no-wrap">
             <v-icon size="14" color="grey-darken-1" class="mr-1">mdi-clock-outline</v-icon>
             {{ getDuration(item) }}
           </span>
         </template>
 
         <template #item.groupSize="{ item }">
-          <span class="text-body-2">{{ item.groupSize || '-' }}</span>
+          <span class="text-body-2 text-no-wrap">{{ item.groupSize || '-' }}</span>
         </template>
 
         <template #item.meals="{ item }">
@@ -130,17 +137,17 @@
         </template>
 
         <template #item.travelDate="{ item }">
-          <span class="text-body-2">{{ formatDate(item.travelDate) }}</span>
+          <span class="text-body-2 text-no-wrap">{{ formatDate(item.travelDate) }}</span>
         </template>
 
         <template #item.ticket="{ item }">
-          <v-chip size="small" :color="item.ticket > 5 ? 'success' : 'warning'" variant="tonal" class="font-weight-bold">
+          <v-chip size="small" :color="item.ticket > 5 ? 'success' : 'warning'" variant="tonal" class="font-weight-bold text-no-wrap">
             {{ item.ticket ?? 0 }} Left
           </v-chip>
         </template>
 
         <template #item.transport="{ item }">
-          <span v-if="item.transport" class="status-chip chip-domestic">
+          <span v-if="item.transport" class="status-chip chip-domestic text-no-wrap">
             <v-icon start size="14" class="mr-1">
               {{ item.transport === 'FLIGHT' ? 'mdi-airplane' : 'mdi-car' }}
             </v-icon>
@@ -150,31 +157,48 @@
         </template>
 
         <template #item.amount="{ item }">
-          <span class="font-weight-bold text-body-2 text-primary">
+          <span class="font-weight-bold text-body-2 text-primary text-no-wrap">
             {{ currencyFormatter.format(item.amount) }}
           </span>
         </template>
 
         <!-- Actions -->
         <template #item.actions="{ item }">
-          <v-btn icon variant="text" color="primary" size="small" class="mr-1" @click="openImageDialog(item)">
-            <v-icon size="20">mdi-image-multiple-outline</v-icon>
-          </v-btn>
-          <v-btn icon variant="text" color="slate-600" size="small" class="mr-1" @click="openEditDialog(item)">
-            <v-icon size="20">mdi-pencil-outline</v-icon>
-          </v-btn>
-          <v-btn icon variant="text" color="error" size="small" @click="openDeleteDialog(item)">
-            <v-icon size="20">mdi-delete-outline</v-icon>
-          </v-btn>
+          <div class="d-flex align-center justify-end text-no-wrap">
+            <v-btn icon variant="text" size="small" class="mr-1" @click="openImageDialog(item)">
+              <v-badge
+                :content="getImageCount(item)"
+                :color="getImageBadgeColor(item)"
+                location="top end"
+                offset-x="2"
+                offset-y="2"
+              >
+                <v-icon :color="getImageBadgeColor(item)" size="22">
+                  {{ getImageIcon(item) }}
+                </v-icon>
+              </v-badge>
+              <v-tooltip activator="parent" location="top">
+                {{ getImageCount(item) }} / 5 Photos Uploaded
+              </v-tooltip>
+            </v-btn>
+
+            <v-btn icon variant="text" color="slate-600" size="small" class="mr-1" @click="openEditDialog(item)">
+              <v-icon size="20">mdi-pencil-outline</v-icon>
+            </v-btn>
+
+            <v-btn icon variant="text" color="error" size="small" @click="openDeleteDialog(item)">
+              <v-icon size="20">mdi-delete-outline</v-icon>
+            </v-btn>
+          </div>
         </template>
       </v-data-table>
     </v-card>
 
-    <!-- Add Product Dialog Form -->
+    <!-- Add/Edit Product Dialog Form -->
     <v-dialog v-model="dialog" max-width="600px" persistent>
       <v-card rounded="lg" class="pa-4">
         <v-card-title class="text-h6 font-weight-bold text-slate-800 px-2 pb-4">
-          Add New Travel Product
+          {{ editing ? 'Edit Travel Product' : 'Add New Travel Product' }}
         </v-card-title>
         
         <v-card-text class="pa-2">
@@ -227,13 +251,111 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Dedicated 5 Images Upload Dialog -->
+    <v-dialog v-model="imageDialog" max-width="700" persistent>
+      <v-card class="premium-dialog" rounded="lg">
+        <v-card-title class="d-flex justify-space-between align-center pa-6 border-bottom">
+          <div>
+            <h3 class="text-h6 font-weight-bold text-slate-800">Upload Product Photos</h3>
+            <p class="text-caption text-muted mb-0 mt-0.5">Select real image files for <strong>{{ imageForm.title }}</strong></p>
+          </div>
+          <v-btn icon variant="text" size="small" color="grey-darken-1" @click="imageDialog = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        
+        <v-card-text class="pa-6 bg-slate-50">
+          <v-row dense>
+            <!-- Main Cover Photo -->
+            <v-col cols="12" class="mb-4">
+              <v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
+                <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
+                  <v-img v-if="imagePreviews.photo" :src="imagePreviews.photo" cover></v-img>
+                  <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
+                </v-avatar>
+                <div class="flex-grow-1">
+                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
+                  <v-file-input
+                    label="Select Cover Photo"
+                    density="compact"
+                    variant="outlined"
+                    accept="image/*"
+                    hide-details
+                    prepend-icon=""
+                    prepend-inner-icon="mdi-camera"
+                    @change="handleFileChange($event, 'photo')"
+                  ></v-file-input>
+                </div>
+              </v-card>
+            </v-col>
+
+            <!-- Sub Photos (4 Slots) -->
+            <v-col cols="12" sm="6" v-for="num in ['One', 'Two', 'Three', 'Four']" :key="num">
+              <v-card variant="outlined" class="pa-3 bg-white border d-flex align-center mb-3" rounded="lg">
+                <v-avatar size="64" rounded="lg" class="mr-3 border bg-grey-lighten-4">
+                  <v-img v-if="imagePreviews['photo' + num]" :src="imagePreviews['photo' + num]" cover></v-img>
+                  <v-icon v-else size="24" color="grey-darken-1">mdi-image-outline</v-icon>
+                </v-avatar>
+                <div class="flex-grow-1">
+                  <div class="text-caption font-weight-semibold text-slate-700 mb-1">Sub Photo {{ num }}</div>
+                  <v-file-input
+                    label="Choose File"
+                    density="compact"
+                    variant="outlined"
+                    accept="image/*"
+                    hide-details
+                    prepend-icon=""
+                    prepend-inner-icon="mdi-camera"
+                    @change="handleFileChange($event, 'photo' + num)"
+                  ></v-file-input>
+                </div>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-divider></v-divider>
+        <v-card-actions class="pa-4 bg-white justify-end">
+          <v-btn variant="outlined" color="slate-600" class="text-none mr-2" @click="imageDialog = false">Cancel</v-btn>
+          <v-btn 
+            color="primary" 
+            class="btn-primary text-none px-5" 
+            elevation="0" 
+            :loading="uploadingImages"
+            @click="saveProductImages"
+          >
+            Save Uploads
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="deleteDialog" max-width="400" persistent>
+      <v-card class="premium-dialog pa-2" rounded="lg">
+        <v-card-text class="pa-6 text-center">
+          <v-avatar size="48" color="red-lighten-5" class="mb-4">
+            <v-icon size="24" color="error">mdi-alert-circle-outline</v-icon>
+          </v-avatar>
+          <h3 class="text-h6 font-weight-bold text-slate-800 mb-2">Delete Product</h3>
+          <p class="text-body-2 text-muted">
+            Are you sure you want to delete <strong>{{ itemToDelete?.title }}</strong>? This action cannot be undone.
+          </p>
+        </v-card-text>
+        <v-card-actions class="pa-4 pt-0 justify-center">
+          <v-btn variant="outlined" color="slate-600" class="text-none mr-2" @click="deleteDialog = false">Cancel</v-btn>
+          <v-btn color="error" class="text-none px-4" variant="flat" rounded="md" elevation="0" @click="deleteProduct">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-
-import PackageService from '@/service/PackageService' //[cite: 8]
+import PackageService from '@/service/PackageService'
+import { supabase } from '@/lib/supabase'
 
 export default defineComponent({
   name: 'AdminProducts',
@@ -252,10 +374,10 @@ export default defineComponent({
       editing: false, 
       itemToDelete: null as any | null, 
       
-      // ✅ ပြင်ဆင်ချက် ၂: TypeScript Type Casting (products: [] as any[]) ထည့်ပေးထားပါသည်
       products: [] as any[], 
 
       headers: [
+        { title: 'No.', key: 'index', align: 'start' as const, sortable: false },
         { title: 'Product Info', key: 'title', align: 'start' as const },
         { title: 'Type', key: 'type', align: 'start' as const },
         { title: 'locationType', key: 'locationType', align: 'start' as const },
@@ -283,13 +405,37 @@ export default defineComponent({
         travelDate: '',
         ticket: 0,
         transport: 'CAR'
-      }
+      },
+
+      imageForm: {
+        productId: '',
+        title: '',
+        photo: '',
+        photoOne: '',
+        photoTwo: '',
+        photoThree: '',
+        photoFour: ''
+      },
+      imageFiles: {
+        photo: null as File | null,
+        photoOne: null as File | null,
+        photoTwo: null as File | null,
+        photoThree: null as File | null,
+        photoFour: null as File | null
+      } as Record<string, File | null>,
+      imagePreviews: {
+        photo: '',
+        photoOne: '',
+        photoTwo: '',
+        photoThree: '',
+        photoFour: ''
+      } as Record<string, string>,
+      uploadingImages: false
     }
   },
 
   computed: {
     filteredProducts(): any[] {
-      // ✅ ပြင်ဆင်ချက် ၃: TypeScript Type error မတက်စေရန် filter function ထဲမှ parameter ကို (p: any) ဟု သတ်မှတ်ပေးပါသည်
       return this.products.filter((p: any) => {
         const matchesSearch = !this.search || p.title.toLowerCase().includes(this.search.toLowerCase()) || (p.location && p.location.toLowerCase().includes(this.search.toLowerCase()))
         const matchesType = !this.typeFilter || p.type === this.typeFilter
@@ -298,10 +444,10 @@ export default defineComponent({
       })
     }, 
     currencyFormatter() { 
-  return {
-    format: (value: number) => new Intl.NumberFormat('en-US').format(value) + ' MMK'
-  }
-}
+      return {
+        format: (value: number) => new Intl.NumberFormat('en-US').format(value) + ' MMK'
+      }
+    }
   },
 
   mounted() {
@@ -319,7 +465,7 @@ export default defineComponent({
     async fetchProducts() {
       try {
         this.loading = true;
-        const data = await PackageService.getPackages(this.locationTypeFilter || undefined); //[cite: 8]
+        const data = await PackageService.getProduct(this.locationTypeFilter || undefined);
         this.products = data; 
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -329,6 +475,7 @@ export default defineComponent({
     },
 
     openAddDialog() {
+      this.editing = false;
       this.dialog = true; 
     },
     
@@ -340,10 +487,10 @@ export default defineComponent({
     async saveProduct() {
       try {
         this.loading = true; 
-        const data = await PackageService.addPackage(this.newProduct); //[cite: 8]
+        const data = await PackageService.addPackage(this.newProduct);
         
         if (data > 0) { 
-          alert('Product added successfully!');
+          alert('Product saved successfully!');
           this.closeDialog();
           this.fetchProducts(); 
         } else {
@@ -357,22 +504,159 @@ export default defineComponent({
       }
     },
 
-    // ✅ ပြင်ဆင်ချက် ၄: Template ထဲတွင် ခေါ်ယူထားသော်လည်း မရှိသေးသော Method များကို ဖြည့်စွက်ပေးလိုက်ပါသည်
-    openImageDialog(item: any) {
-      this.imageDialog = true;
-      // လိုအပ်သော Image Dialog Control Logic ကို ဤနေရာတွင် ထပ်ထည့်နိုင်ပါသည်
-    },
-
     openEditDialog(item: any) {
       this.editing = true;
-      this.newProduct = { ...item }; // ရွေးချယ်လိုက်သော item data များကို form ထဲထည့်ပေးခြင်း
+      this.newProduct = { ...item };
       this.dialog = true;
     },
 
     openDeleteDialog(item: any) {
       this.itemToDelete = item;
       this.deleteDialog = true;
-      // လိုအပ်သော Delete Control Logic ကို ဤနေရာတွင် ထပ်ထည့်နိုင်ပါသည်
+    },
+
+    async deleteProduct() {
+      if (!this.itemToDelete) return;
+      try {
+        this.loading = true;
+        this.products = this.products.filter((p: any) => p.productId !== this.itemToDelete.productId);
+        this.deleteDialog = false;
+        this.itemToDelete = null;
+        alert('Product deleted successfully.');
+      } catch (error) {
+        console.error("Error deleting product:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // Image Handlers
+    getImageCount(item: any): number {
+      let count = 0;
+      if (item.photo) count++;
+      if (item.photoOne) count++;
+      if (item.photoTwo) count++;
+      if (item.photoThree) count++;
+      if (item.photoFour) count++;
+      return count;
+    },
+
+    getImageIcon(item: any): string {
+      const count = this.getImageCount(item);
+      if (count === 0) return 'mdi-image-off-outline';
+      if (count === 5) return 'mdi-image-multiple';
+      return 'mdi-image-multiple-outline';
+    },
+
+    getImageBadgeColor(item: any): string {
+      const count = this.getImageCount(item);
+      if (count === 0) return 'grey-darken-1';
+      if (count === 5) return 'success';
+      return 'primary';
+    },
+
+    openImageDialog(product: any) {
+      this.imageForm = {
+        productId: product.productId,
+        title: product.title,
+        photo: product.photo || '',
+        photoOne: product.photoOne || '',
+        photoTwo: product.photoTwo || '',
+        photoThree: product.photoThree || '',
+        photoFour: product.photoFour || ''
+      };
+
+      this.imageFiles = {
+        photo: null,
+        photoOne: null,
+        photoTwo: null,
+        photoThree: null,
+        photoFour: null
+      };
+
+      this.imagePreviews = {
+        photo: product.photo || '',
+        photoOne: product.photoOne || '',
+        photoTwo: product.photoTwo || '',
+        photoThree: product.photoThree || '',
+        photoFour: product.photoFour || ''
+      };
+
+      this.imageDialog = true;
+    },
+
+    handleFileChange(event: any, key: string) {
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+        this.imageFiles[key] = file;
+        this.imagePreviews[key] = URL.createObjectURL(file);
+      }
+    },
+
+    async uploadImageFile(file: File): Promise<string | null> {
+      try {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`
+        const filePath = `products/${fileName}`
+
+        const { data, error } = await supabase.storage
+          .from('products')
+          .upload(filePath, file)
+
+        if (error) throw error
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('products')
+          .getPublicUrl(filePath)
+
+        return publicUrl
+      } catch (err) {
+        console.warn('Supabase fallback to Base64 format...', err)
+        return new Promise((resolve) => {
+          const reader = new FileReader()
+          reader.onloadend = () => resolve(reader.result as string)
+          reader.readAsDataURL(file)
+        })
+      }
+    },
+
+    async saveProductImages() {
+      this.uploadingImages = true;
+      try {
+        const payload: Record<string, string | null> = {};
+        const keys = ['photo', 'photoOne', 'photoTwo', 'photoThree', 'photoFour'];
+
+        for (const key of keys) {
+          const file = this.imageFiles[key];
+          if (file) {
+            const uploadedUrl = await this.uploadImageFile(file);
+            payload[key] = uploadedUrl;
+          } else {
+            payload[key] = this.imageForm[key as keyof typeof this.imageForm] || null;
+          }
+        }
+
+        const idx = this.products.findIndex(p => p.productId === this.imageForm.productId);
+        if (idx !== -1) {
+          this.products[idx] = { ...this.products[idx], ...payload };
+        }
+
+        if (supabase) {
+          await supabase
+            .from('product')
+            .update(payload)
+            .eq('productId', this.imageForm.productId);
+        }
+
+        this.imageDialog = false;
+        alert('Photos uploaded successfully!');
+      } catch (error) {
+        console.error('Error saving images:', error);
+        alert('Failed to save images.');
+      } finally {
+        this.uploadingImages = false;
+      }
     }
   }
 })
@@ -390,11 +674,16 @@ export default defineComponent({
 .chip-domestic { background-color: #f1f5f9; color: #475569; }
 .chip-international { background-color: #fff7ed; color: #ea580c; }
 
+/* Table cells တွေအားလုံးကို တစ်ကြောင်းတည်း ဖြစ်အောင် ထိန်းသည့် အပိုင်း */
+.premium-table :deep(td) { 
+  white-space: nowrap !important;
+}
 .premium-table :deep(th) { 
   font-weight: 600 !important; 
   color: #475569 !important; 
   background-color: #f8fafc !important; 
   font-size: 13px !important;
   z-index: 2 !important;
+  white-space: nowrap !important;
 }
 </style>
