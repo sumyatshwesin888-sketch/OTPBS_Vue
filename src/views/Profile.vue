@@ -9,11 +9,11 @@
           <div class="profile-details">
             <h1 class="user-fullname">{{ loginUser.profileName || 'Traveler' }}</h1>
             <p class="user-meta-text">
-              <i class="fa-solid fa-envelope input-icon"></i> {{ loginUser?.email }}
+              <i class="fa-solid fa-envelope input-icon"></i> {{ loginUser.email }}
             </p>
             <p class="user-meta-text">
               <i class="fas fa-phone-alt input-icon"></i>
-              {{ loginUser?.phone || 'No phone added' }}
+              {{ loginUser.phone || 'No phone added' }}
             </p>
           </div>
           <v-btn
@@ -21,7 +21,7 @@
             variant="tonal"
             rounded="xl"
             class="edit-profile-btn text-none"
-            @click="showEdit = true"
+            @click="openEditModal"
           >
             <v-icon size="16" class="mr-1">mdi-pencil-outline</v-icon> Edit Profile
           </v-btn>
@@ -78,85 +78,209 @@
             <h4>Your Wishlist is Empty</h4>
             <p>Save tour packages you're interested in to keep track of them easily.</p>
           </div>
+          <div v-else class="wishlist-grid mt-4">
+            <div v-for="item in wishes" :key="item.productId" class="wishlist-item-card">
+              <img
+                :src="'http://localhost:8088/api/v1/productphoto/' + item.photo"
+                class="wish-card-img"
+                alt="package photo"
+              />
+              <div class="wish-card-body">
+                <h5 class="wish-title">{{ item.title }}</h5>
+                <p class="wish-meta">
+                  📍 {{ item.location }} | 📅 {{ item.day }} Day / {{ item.night }} Night
+                </p>
+                <div class="wish-footer">
+                  <span class="wish-price">{{ item.amount }} / person</span>
+                  <div class="wish-actions">
+                    <v-btn
+                      color="#1B3D8A"
+                      size="small"
+                      rounded="xl"
+                      class="text-white"
+                      :to="'/packagedetail/:id' + item.productId"
+                      >View Detail</v-btn
+                    >
+                    <button class="wish-delete-btn" @click="removeFromWishlist(item.productId)">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <div class="danger-zone-logout-section">
+          <button class="logout-action-btn" @click="handleLogout">
+            <i class="fa-solid fa-right-from-bracket"></i> Log Out
+          </button>
+        </div>
+
+        <!-- Edit Account Dialog -->
+        <v-dialog v-model="showEdit" max-width="480px" scrollable>
+          <v-card class="modern-profile-dialog pa-4">
+            <!-- Header -->
+            <v-card-item class="pb-2">
+              <h3 class="modern-dialog-title">Edit Account</h3>
+              <p class="modern-dialog-subtitle">Update your account information below.</p>
+            </v-card-item>
+
+            <!-- Toggle Tabs -->
+            <div class="dialog-tab-nav mx-4 mt-2">
+              <button
+                :class="['dialog-tab-btn', { active: dialogTab === 'profile' }]"
+                @click="dialogTab = 'profile'"
+              >
+                <i class="fa-solid fa-user mr-1"></i> Profile Information
+              </button>
+              <button
+                :class="['dialog-tab-btn', { active: dialogTab === 'password' }]"
+                @click="dialogTab = 'password'"
+              >
+                <i class="fa-solid fa-lock mr-1"></i> Change Password
+              </button>
+            </div>
+
+            <!-- Form Content -->
+            <v-card-text class="py-4">
+              <!-- Profile Info Tab Form -->
+              <form
+                v-if="dialogTab === 'profile'"
+                @submit.prevent="handleUpdateProfile"
+                id="editProfileForm"
+                class="modern-dialog-form"
+              >
+                <div class="modern-input-group">
+                  <label class="modern-input-label">Full Name</label>
+                  <input
+                    type="text"
+                    v-model="editForm.fullName"
+                    placeholder="Enter your full name"
+                    class="modern-input-field"
+                    required
+                  />
+                </div>
+
+                <div class="modern-input-group mt-4">
+                  <label class="modern-input-label">Phone Number</label>
+                  <input
+                    type="text"
+                    v-model="editForm.phone"
+                    placeholder="Enter your phone number"
+                    class="modern-input-field"
+                    required
+                  />
+                </div>
+              </form>
+
+              <!-- Change Password Tab Form -->
+              <form
+                v-if="dialogTab === 'password'"
+                @submit.prevent="handleChangePassword"
+                id="changePasswordForm"
+                class="modern-dialog-form"
+              >
+                <div class="modern-input-group">
+                  <label class="modern-input-label">Current Password</label>
+                  <div class="password-input-wrapper">
+                    <input
+                      :type="showCurrentPassword ? 'text' : 'password'"
+                      v-model="passwordForm.currentPassword"
+                      placeholder="Enter your current password"
+                      class="modern-input-field"
+                      required
+                    />
+                    <span
+                      class="toggle-password"
+                      @click="showCurrentPassword = !showCurrentPassword"
+                    >
+                      👁
+                    </span>
+                  </div>
+                </div>
+
+                <div class="modern-input-group mt-4">
+                  <label class="modern-input-label">New Password</label>
+                  <div class="password-input-wrapper">
+                    <input
+                      :type="showNewPassword ? 'text' : 'password'"
+                      v-model="passwordForm.newPassword"
+                      placeholder="Enter your new password"
+                      class="modern-input-field"
+                      required
+                    />
+                    <span class="toggle-password" @click="showNewPassword = !showNewPassword">
+                      👁
+                    </span>
+                  </div>
+                </div>
+
+                <div class="modern-input-group mt-4">
+                  <label class="modern-input-label">Confirm New Password</label>
+                  <div class="password-input-wrapper">
+                    <input
+                      :type="showConfirmPassword ? 'text' : 'password'"
+                      v-model="passwordForm.confirmPassword"
+                      placeholder="Confirm your new password"
+                      class="modern-input-field"
+                      required
+                    />
+                    <span
+                      class="toggle-password"
+                      @click="showConfirmPassword = !showConfirmPassword"
+                    >
+                      👁
+                    </span>
+                  </div>
+                </div>
+              </form>
+            </v-card-text>
+
+            <!-- Actions Footer -->
+            <v-card-actions class="pt-2 px-6 pb-2">
+              <v-spacer></v-spacer>
+              <button
+                type="button"
+                class="dialog-cancel-btn text-none font-weight-bold mr-3"
+                @click="showEdit = false"
+              >
+                Cancel
+              </button>
+
+              <v-btn
+                v-if="dialogTab === 'profile'"
+                type="submit"
+                form="editProfileForm"
+                color="#1B3D8A"
+                variant="flat"
+                class="text-none font-weight-bold px-6 text-white dialog-submit-btn"
+                rounded="xl"
+              >
+                Save Changes
+              </v-btn>
+
+              <v-btn
+                v-if="dialogTab === 'password'"
+                type="submit"
+                form="changePasswordForm"
+                color="#1B3D8A"
+                variant="flat"
+                class="text-none font-weight-bold px-6 text-white dialog-submit-btn"
+                rounded="xl"
+              >
+                Update Password
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </div>
-
-      <div class="danger-zone-logout-section">
-        <button class="logout-action-btn" @click="handleLogout">
-          <i class="fa-solid fa-right-from-bracket"></i> Log Out
-        </button>
-      </div>
-
-      <v-dialog v-model="showEdit" max-width="460px" scrollable>
-        <v-card class="modern-profile-dialog pa-4">
-          <!-- Header ပိုင်း -->
-          <v-card-item class="pb-2">
-            <h3 class="modern-dialog-title">Edit Profile Information</h3>
-            <p class="modern-dialog-subtitle">Update your personal details below.</p>
-          </v-card-item>
-
-          <!-- Form & Input ပိုင်း -->
-          <v-card-text class="py-2">
-            <form
-              @submit.prevent="handleUpdateProfile"
-              id="editProfileForm"
-              class="modern-dialog-form"
-            >
-              <div class="modern-input-group">
-                <label class="modern-input-label">Full Name</label>
-                <input
-                  type="text"
-                  v-model="editForm.fullName"
-                  placeholder="Enter your full name"
-                  class="modern-input-field"
-                  required
-                />
-              </div>
-
-              <div class="modern-input-group mt-5">
-                <label class="modern-input-label">Phone Number</label>
-                <input
-                  type="text"
-                  v-model="editForm.phone"
-                  placeholder="Enter your phone number"
-                  class="modern-input-field"
-                  required
-                />
-              </div>
-            </form>
-          </v-card-text>
-
-          <v-card-actions class="pt-4 px-6 gap-3">
-            <v-spacer></v-spacer>
-            <v-btn
-              variant="text"
-              color="#64748B"
-              class="text-none font-weight-bold px-4"
-              rounded="xl"
-              @click="showEdit = false"
-            >
-              Cancel
-            </v-btn>
-            <v-btn
-              type="submit"
-              form="editProfileForm"
-              color="#1B3D8A"
-              variant="flat"
-              class="text-none font-weight-bold px-6 text-white"
-              rounded="xl"
-              style="background-color: #1b3d8a !important"
-            >
-              Save Changes
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
     </div>
   </div>
 </template>
 
 <script>
-// import { useAuthStore } from '@/store/auth'
+import UserAccountService from '@/service/UserAccountService'
 
 export default {
   name: 'UserProfile',
@@ -165,10 +289,20 @@ export default {
       authStore: {},
       showEdit: false,
       activeTab: 'bookings',
+      dialogTab: 'profile',
+
+      showCurrentPassword: false,
+      showNewPassword: false,
+      showConfirmPassword: false,
 
       editForm: {
         fullName: '',
         phone: '',
+      },
+      passwordForm: {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
       },
       bookings: [],
       wishes: [],
@@ -176,71 +310,124 @@ export default {
     }
   },
   mounted() {
-    this.loginUser = JSON.parse(localStorage.getItem('loginUser'))
-    console.log(this.loginUser)
+    this.loginUser = JSON.parse(localStorage.getItem('loginUser')) || {}
+    this.loadUserData()
+    this.loadWishlist()
   },
   computed: {
     initial() {
-      //     const name =
-      //   this.authStore.user?.fullName ||
-      //   this.authStore.user?.name ||
-      //   'Traveler'
-      // return name.charAt(0).toUpperCase()
+      const name = this.loginUser?.fullName || this.loginUser?.profileName || 'T'
+      return name.charAt(0).toUpperCase()
     },
-  },
-  created() {
-    // this.authStore.loadUser()
-    // this.loadUserData()
   },
   methods: {
     handleLogout() {
-      this.authStore.logout()
+      localStorage.removeItem('loginUser')
+      localStorage.removeItem('user')
       this.$router.push('/login')
     },
-
+    openEditModal() {
+      this.dialogTab = 'profile'
+      this.showEdit = true
+      this.loadUserData()
+    },
     loadUserData() {
-      // const savedUser = localStorage.getItem('user')
+      const savedUser = JSON.parse(localStorage.getItem('loginUser'))
+      if (savedUser) {
+        this.editForm.fullName = savedUser.fullName || savedUser.profileName || ''
+        this.editForm.phone = savedUser.phone || ''
+      }
+    },
+    loadWishlist() {
+      if (this.loginUser && this.loginUser.userAccountId) {
+        const userId = this.loginUser.userAccountId
+        const wishlistKey = `wishlist_${userId}`
+        this.wishes = JSON.parse(localStorage.getItem(wishlistKey)) || []
+      }
+    },
+    removeFromWishlist(prodId) {
+      const userId = this.loginUser.userAccountId
+      const wishlistKey = `wishlist_${userId}`
+      this.wishes = this.wishes.filter((item) => Number(item.productId) !== Number(prodId))
+      localStorage.setItem(wishlistKey, JSON.stringify(this.wishes))
+      alert('Removed from Wishlist!')
+    },
 
+    async handleUpdateProfile() {
       const savedUser = JSON.parse(localStorage.getItem('loginUser'))
 
       if (!savedUser) {
-        this.$router.push('/login')
+        alert('User session not found. Please log in again.')
         return
       }
-      // const user = JSON.parse(savedUser)
 
-      // this.authStore.setUser(user)
+      // Backend Error မတက် ဖို့လက်ရှိ User ရဲ့ Data အဟောင်းတွေကိုပါ Payload မှာ တွဲထည့်ထား
+      const updateData = {
+        ...savedUser, // email, userType, password စတာတွေအကုန်လုံး ပါသွားအောင် ဖြန့်ထည့်ခြင်း
+        userAccountId: savedUser.userAccountId,
+        profileName: this.editForm.fullName,
+        fullName: this.editForm.fullName,
+        phone: this.editForm.phone,
+      }
 
-      // this.authStore.user?.email = user.email || ''
-      // this.authStore.user?.fullName  =
-      //   user.fullName || user.fullName || ''
+      try {
+        await UserAccountService.updateUserAccount(updateData)
 
-      // this.authStore.user?.phone  = user.phone || ''
+        // Local Storage နှင့် UI state ကို အောင်မြင်စွာ update လုပ်
+        savedUser.fullName = this.editForm.fullName
+        savedUser.profileName = this.editForm.fullName
+        savedUser.phone = this.editForm.phone
 
-      this.editForm.fullName = user.fullName || ''
-      this.editForm.phone = user.phone || ''
-    },
-    handleUpdateProfile() {
-      const savedUser = localStorage.getItem('user')
-
-      if (savedUser) {
-        const user = JSON.parse(savedUser)
-
-        user.fullName = this.editForm.fullName
-        user.phone = this.editForm.phone
-
-        // Update localStorage
-        localStorage.setItem('user', JSON.stringify(user))
-
-        // ✅ Update Pinia Store
-        this.authStore.setUser(user)
-
-        // Update current page
-        // this.auth.profile.fullName = user.fullName
-        // this.auth.profile.phone = user.phone
+        localStorage.setItem('loginUser', JSON.stringify(savedUser))
+        this.loginUser = savedUser
 
         alert('Profile Updated Successfully!')
         this.showEdit = false
+      } catch (error) {
+        console.error('Update Error:', error)
+        alert('Failed to update profile. Please try again!')
+      }
+    },
+    async handleChangePassword() {
+      if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+        alert('New passwords do not match!')
+        return
+      }
+
+      const savedUser = JSON.parse(localStorage.getItem('loginUser'))
+      if (!savedUser) return
+
+      // Current password မှန်/မမှန် အရင်စစ်
+      if (savedUser.password && savedUser.password !== this.passwordForm.currentPassword) {
+        alert('Current password is incorrect!')
+        return
+      }
+
+      //  ပြင်ဆင်ချက်: Backend Controller / DTO က မျှော်လင့်ထားတဲ့အတိုင်း userAccountId ပါ ထည့်ပေးရပါမယ်
+      const passwordPayload = {
+        userAccountId: savedUser.userAccountId, // Backend DTO ထဲက id နဲ့ ကိုက်ညီစေရန်
+        password: this.passwordForm.newPassword, // Password အသစ်
+      }
+
+      try {
+        // API သို့ ၎င်း Payload ကို လှမ်းပို့
+        await UserAccountService.updatePassword(passwordPayload)
+
+        // Local Storage ထဲက password ကိုပါ အသစ်လဲပေး
+        savedUser.password = this.passwordForm.newPassword
+        localStorage.setItem('loginUser', JSON.stringify(savedUser))
+        this.loginUser = savedUser // UI State ကိုပါ ချက်ချင်း update ဖြစ်စေရန်
+
+        alert('Password Updated Successfully in Database!')
+
+        // Form field များကို Reset ပြန်ချ
+        this.passwordForm.currentPassword = ''
+        this.passwordForm.newPassword = ''
+        this.passwordForm.confirmPassword = ''
+        this.showEdit = false
+      } catch (error) {
+        console.error('Password Update Error:', error)
+        alert('Failed to update password. Please try again!')
       }
     },
   },
@@ -486,6 +673,7 @@ export default {
   border-color: #ef4444;
 }
 
+/* Dialog Styles */
 .modern-profile-dialog {
   border-radius: 24px !important;
   background: #ffffff !important;
@@ -503,13 +691,40 @@ export default {
   font-size: 13px;
   color: #64748b;
   margin-top: 4px;
-  margin-bottom: 0px;
+}
+
+/* Navigation Tabs inside Dialog */
+.dialog-tab-nav {
+  display: flex;
+  background: #e2e8f0;
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.dialog-tab-btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog-tab-btn.active {
+  background: #1b3d8a;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(27, 61, 138, 0.2);
 }
 
 .modern-input-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 .modern-input-label {
   font-size: 13px;
@@ -517,12 +732,99 @@ export default {
   color: #334155;
   padding-left: 4px;
 }
+/* 💡 Wishlist UI Card Style များ */
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.wishlist-item-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+.wish-card-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+.wish-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.wish-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+.wish-meta {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+.wish-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+.wish-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #16a34a;
+}
+.wish-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wish-delete-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+  transition: transform 0.2s;
+}
+.wish-delete-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Signup-style Input Wrapper & Eye Style */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  padding-right: 40px; /* Make space for eye icon on the right */
+}
+
+/* Signup file ထဲက ပုံစံအတိုင်း Class name နှင့် CSS transition style */
+.toggle-password {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+  user-select: none;
+}
 
 .modern-input-field {
-  border: 1.5px solid #cbd5e1;
+  border: 1.5px solid #e2e8f0;
   border-radius: 14px;
   padding: 12px 16px;
-  font-size: 15px;
+  font-size: 14px;
   color: #0f172a;
   background: #f8fafc;
   outline: none;
@@ -536,10 +838,18 @@ export default {
   box-shadow: 0 0 0 4px rgba(27, 61, 138, 0.15);
 }
 
-.dialog-actions-row {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
+.dialog-cancel-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.dialog-submit-btn {
+  background-color: #1b3d8a !important;
+  text-transform: none !important;
+  font-size: 14px !important;
 }
 
 @media (max-width: 600px) {

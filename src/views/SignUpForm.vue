@@ -1,52 +1,22 @@
 <template>
   <div class="signup-container">
     <main class="signup-card">
-
-
       <h2 class="card-title">Create Your Account</h2>
-      <p class="card-subtitle">
-        
-        Unlock exclusive travel deals & book your dream trip!
-      
-      </p>
+      <p class="card-subtitle">Unlock exclusive travel deals & book your dream trip!</p>
 
-      <form @submit.prevent="handleSubmit" class="form-content">
-
-        <!-- FULL NAME -->
-
-        <!-- FULL NAME -->
+      <form @submit.prevent="saveUser" class="form-content">
         <div class="input-group">
           <i class="fa-solid fa-user input-icon"></i>
-          <input
-            type="text"
-            v-model="fullName"
-            placeholder="Full Name"
-            required
-          />
+          <input type="text" v-model="fullName" placeholder="Full Name" required />
         </div>
-
-        <!-- PHONE -->
         <div class="input-group">
           <i class="fa-solid fa-phone input-icon"></i>
-          <input
-            type="text"
-            v-model="phone"
-            placeholder="Phone Number"
-            required
-          />
+          <input type="text" v-model="phone" placeholder="Phone Number" required />
         </div>
-        <!-- EMAIL -->
         <div class="input-group">
           <i class="fa-solid fa-envelope input-icon"></i>
-          <input
-            type="email"
-            v-model="email"
-            placeholder="Email Address"
-            required
-          />
+          <input type="email" v-model="email" placeholder="Email Address" required />
         </div>
-
-        <!-- PASSWORD -->
         <div class="input-group">
           <i class="fa-solid fa-lock input-icon"></i>
           <input
@@ -55,12 +25,8 @@
             placeholder="Password"
             required
           />
-          <span class="toggle-password" @click="showPassword = !showPassword">
-            👁
-          </span>
+          <span class="toggle-password" @click="showPassword = !showPassword"> 👁 </span>
         </div>
-
-        <!-- CONFIRM PASSWORD -->
         <div class="input-group">
           <i class="fa-solid fa-lock input-icon"></i>
           <input
@@ -69,38 +35,27 @@
             placeholder="Confirm Password"
             required
           />
-          <span class="toggle-password" @click="showConfirm = !showConfirm">
-            👁
-          </span>
+          <span class="toggle-password" @click="showConfirm = !showConfirm"> 👁 </span>
         </div>
 
-        <!-- SUBMIT -->
-        <button type="submit" class="btn-submit" @click="saveUser">
-          Create Account →
-        </button>
-
-
+        <button type="submit" class="btn-submit">Create Account →</button>
       </form>
 
       <footer class="card-footer">
-              <p>
-          
+        <p>
           Already have an account?
-         
           <router-link to="/login">Login</router-link>
-        
         </p>
-            </footer>
+      </footer>
     </main>
   </div>
 </template>
 
 <script>
-import { useAuthStore } from '@/store/auth'
+import UserAccountService from '@/service/UserAccountService'
 
 export default {
   name: 'SignUpForm',
-
 
   data() {
     return {
@@ -111,82 +66,77 @@ export default {
       confirmPassword: '',
       showPassword: false,
       showConfirm: false,
-      authStore: useAuthStore()
+      loginUser: {},
     }
   },
-
+  mounted() {
+    const appHeight = () => {
+      const doc = document.documentElement
+      doc.style.setProperty('--app-height', `${window.innerHeight}px`)
+    }
+    window.addEventListener('resize', appHeight)
+    appHeight()
+  },
   methods: {
-      saveUser(){
-          let user = {};
-          user.profileName = this.fullName;
-          user.phone = this.phone;
-          user.email = this.email;
-          user.password = this.password;
-          user.userType = "CUSTOMER";
+    togglePasswordVisibility() {
+      this.isPasswordVisible = !this.isPasswordVisible
     },
-    handleSubmit() {
+    toggleConfirmPasswordVisibility() {
+      this.isConfirmPasswordVisible = !this.isConfirmPasswordVisible
+    },
 
-      // ❗ password check
+    saveUser() {
+      //  Password ရှိမရှိစစ်
       if (this.password !== this.confirmPassword) {
         alert('Passwords do not match!')
         return
       }
 
-      const existingUser = localStorage.getItem('user_account')
-      if (existingUser) {
-        const savedUser = JSON.parse(existingUser)
-        if (this.formData.email === savedUser.email) {
-          alert('Account already exists! Please log in instead.')
-          this.$router.push('/login')
-          return
-        }
-      }
-
       const userData = {
-        full_name: this.formData.fullName,
-        phone: this.formData.phone,
-        email: this.formData.email,
-        password: this.formData.password
+        profileName: this.fullName,
+        phone: this.phone,
+        email: this.email,
+        password: this.password,
+        userType: 'Customer',
+        status: 1,
       }
-      localStorage.setItem('user_account', JSON.stringify(userData))
-      
-      localStorage.setItem('is_logged_in', 'true')
-      
-      this.$store.commit('SET_USER', userData)
-      
-      alert('Account Created Successfully!')
 
-      // 🚀 redirect logic
-      const goBooking = localStorage.getItem('goBooking')
-
-      if (goBooking) {
-        localStorage.removeItem('goBooking')
-        this.$router.push(`/booking/${goBooking}`)
-      } else {
-        this.$router.push('/')
-      }
-    }
-  }
+      UserAccountService.addUserAccount(userData)
+        .then((response) => {
+          console.log('Backend Response:', response)
+          alert('Account Created Successfully!')
+          this.$router.push('/login')
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+          if (err.response && err.response.data && err.response.data.message) {
+            alert(err.response.data.message)
+          } else {
+            alert('Failed to create account. Please try again.')
+          }
+        })
+    },
+  },
 }
 </script>
+
 <style scoped>
 .signup-container {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),
-  url('/signupimg.png');
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/signupimg.png');
   background-size: cover;
   background-position: center;
 }
 
 .signup-card {
   width: 420px;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.95);
   padding: 30px;
   border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
 }
 
 .card-title {

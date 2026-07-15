@@ -6,18 +6,19 @@ class MessageService {
     this.axios = axios;
   }
 
-  // getPackage(locationType) {
-  //   let url = `/package`;
-  //   return axios.get(url,{
-  //     params:{
-  //       locationType
-  //     }
-  //   }).then((request) => request.data);
-  // }
+  getQuestionTypes() {
+    let url = `/questionType`;
+    return axios.get(url).then((request) => request.data);
+  }
 
   addMessage(message) {
     let url = `/message`;
     return this.axios.post(url, message).then((request) => request.data);
+  }
+
+  getAboutStats() {
+    let url = `/product`;
+    return axios.get(url).then((request) => request.data);
   }
 
   // updateBrand(brand) {

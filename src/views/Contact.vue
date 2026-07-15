@@ -54,7 +54,7 @@
       </div>
 
       <div class="contact-form-card">
-        <form @submit.prevent="handleSubmit">
+        <form>
           <div class="form-row">
             <div class="form-group">
               <label for="fullName">Full Name</label>
@@ -81,12 +81,10 @@
           <div class="form-group full-width">
             <label for="subject">Subject</label>
             <div class="select-wrapper">
-              <select id="subject" v-model="formData.subject" required>
-                <option value="" disabled selected>Select a subject</option>
-                <option value="booking">Booking & Reservation</option>
-                <option value="package">Travel Packages Inquiry</option>
-                <option value="support">Technical Support</option>
-                <option value="feedback">Feedback & Suggestions</option>
+              <select id="subject" v-model="formData.questionType" required>
+                <option v-for="type in questionType" :key="type.questionTypeId" :value="type">
+                  {{ type.question }}
+                </option>
               </select>
             </div>
           </div>
@@ -102,8 +100,8 @@
             ></textarea>
           </div>
 
-          <button type="submit" class="submit-btn" @click="saveMessage">
-            <i class="fas fa-paper-plane" ></i> Send Message
+          <button type="button" class="submit-btn" @click="saveMessage">
+            <i class="fas fa-paper-plane"></i> Send Message
           </button>
         </form>
       </div>
@@ -113,37 +111,46 @@
 
 <script>
 import MessageService from '@/service/MessageService'
+
 export default {
   name: 'ContactPage',
   data() {
     return {
-      formData: {},
+      formData: {
+        name: '',
+        email: '',
+        questionType: '',
+        messageText: '',
+      },
+      questionType: [],
     }
   },
+  created() {
+    this.loadQuestionTypes()
+  },
   methods: {
-    saveMessage:function(){
-      let qt = {};
-      qt.questionTypeId = 1;
-      this.formData.questionType = qt;
-      MessageService
-        .addMessage(this.formData)
+    loadQuestionTypes() {
+      MessageService.getQuestionTypes()
         .then((response) => {
-         alert('Your message has been sent successfully!');
+          console.log('Backend Data:', response)
+          this.questionType = response
+        })
+        .catch((err) => {
+          console.error('Error fetching question types: ', err)
+        })
+    },
+    saveMessage() {
+      let qt = {}
+      qt.questionTypeId = 1
+      this.formData.questionType = qt
+      MessageService.addMessage(this.formData)
+        .then((response) => {
+          alert('Your message has been sent successfully!')
         })
         .catch((err) => {
           console.error('API Fetch Error: ', err)
+          alert('Failed to send message. Please try again.')
         })
-    },  
-    handleSubmit() {
-      console.log('Form Data Submitted:', this.formData)
-      alert('Your message has been sent successfully!')
-
-      this.formData = {
-        fullName: '',
-        email: '',
-        subject: '',
-        message: '',
-      }
     },
   },
 }
@@ -176,20 +183,20 @@ export default {
 .main-title {
   font-size: 3rem;
   font-weight: 700;
-  color: #ffffff; 
+  color: #ffffff;
   margin: 0 0 10px 0;
   letter-spacing: -0.5px;
 }
 
 .subtitle {
   font-size: 1.35rem;
-  color: #3b82f6; 
+  color: #3b82f6;
   font-weight: 600;
   margin: 0 0 20px 0;
 }
 
 .description {
-  color: #94a3b8; 
+  color: #94a3b8;
   font-size: 1.05rem;
   line-height: 1.7;
   margin: 0 0 40px 0;
@@ -210,8 +217,8 @@ export default {
 .icon-box {
   width: 52px;
   height: 52px;
-  border-radius: 14px; 
-  background-color: rgba(255, 255, 255, 0.05); 
+  border-radius: 14px;
+  background-color: rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -248,7 +255,7 @@ export default {
 
 .info-text .value {
   font-size: 1.1rem;
-  color: #f1f5f9; 
+  color: #f1f5f9;
   font-weight: 500;
   line-height: 1.4;
 }
@@ -258,7 +265,7 @@ export default {
   background-color: #ffffff;
   border-radius: 24px;
   padding: 50px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); 
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
 .form-row {

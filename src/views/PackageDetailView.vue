@@ -391,7 +391,6 @@ export default {
 
   data() {
     return {
-      // pkg: {},
       loading: true,
       selectedImg: '',
       inWishlist: false,
@@ -399,6 +398,7 @@ export default {
       newRating: 0,
       newComment: '',
       itineraryList: [],
+      ratingCommentList: [],
       ratingsDataset: [],
       commentsDataset: [],
       packagesDataset: [],
@@ -409,11 +409,12 @@ export default {
   },
 
   mounted() {
-    this.loginUser = JSON.parse(localStorage.getItem('loginUser'))
-    // this.loadPackageDetail()
-    const pkgId = this.$route.params.id
+    this.loginUser = JSON.parse(localStorage.getItem('loginUser')) || {}
+    const pkgId = Number(this.$route.params.id) // 💡 Number ပြောင်းသိမ်းပါမည်
     this.productId = pkgId
     this.getPackageDetail()
+    this.checkWishlistStatus()
+    
     const allReviews = localStorage.getItem('all_packages_reviews')
     const reviewsObj = allReviews ? JSON.parse(allReviews) : {}
 
@@ -425,9 +426,13 @@ export default {
   },
   methods: {
     async getPackageDetail() {
-      // 🟢 API မခေါ်ခင် Loading ကို True ပေးထားပါမည်
-      this.loading = true
       const packageId = this.$route.params.id
+      if (!packageId || packageId === 'null' || packageId === 'undefined') {
+        console.warn("Package ID is null or undefined, skipping API call.");
+        this.loading = false;
+        return;
+      }
+      this.loading = true
       try {
         const data = await packageDetailService.getPackageDetail(packageId)
 
@@ -444,11 +449,52 @@ export default {
       } catch (error) {
         console.error('API fetch error', error)
       } finally {
-        // 🟢 API ဒေတာတွေ ကျလာပြီးမှ Loading ကို ပိတ်ပါမည်
         this.loading = false
       }
     },
+    checkWishlistStatus() {
+      const userId = this.loginUser?.userAccountId || 'guest';
+      const wishlistKey = `wishlist_${userId}`;
+      const currentWishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
+      // loose equality (==) သုံးပြီး id တိုက်စစ်ပါမည်
+      this.inWishlist = currentWishlist.some(item => item.productId == this.productId);
+    },
 
+    toggleWishlist() {
+      if (!this.loginUser || !this.loginUser.userAccountId) {
+        alert('Please login to add to wishlist!');
+        this.$router.push('/login');
+        return;
+      }
+
+      const userId = this.loginUser.userAccountId;
+      const wishlistKey = `wishlist_${userId}`;
+      let currentWishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
+
+      // ရှိမရှိကို id သေချာတိုက်စစ်ခြင်း
+      const exists = currentWishlist.some(item => item.productId == this.productId);
+
+      if (exists) {
+        currentWishlist = currentWishlist.filter(item => item.productId != this.productId);
+        this.inWishlist = false;
+        alert('Removed from Wishlist!');
+      } else {
+        const wishlistProduct = {
+          productId: Number(this.productId),
+          title: this.productDto.title,
+          amount: this.productDto.amount,
+          photo: this.productDto.photo || this.selectedImg,
+          location: this.productDto.location,
+          day: this.productDto.day,
+          night: this.productDto.night
+        };
+        currentWishlist.push(wishlistProduct);
+        this.inWishlist = true;
+        alert('Added to Wishlist!');
+      }
+
+      localStorage.setItem(wishlistKey, JSON.stringify(currentWishlist));
+    },
     async submitReview() {
       if (this.newRating === 0) {
         alert('Please select a star rating.')
@@ -463,34 +509,9 @@ export default {
       let loggedInCustomerId = loginUserData ? loginUserData.userAccountId : null
 
       if (!loggedInCustomerId) {
-        loggedInCustomerId = 6 // Backup ID
+        loggedInCustomerId = 6 
       }
 
-      // const now = new Date()
-      // const formattedDate =
-      //   now.getFullYear() +
-      //   '-' +
-      //   String(now.getMonth() + 1).padStart(2, '0') +
-      //   '-' +
-      //   String(now.getDate()).padStart(2, '0') +
-      //   ' ' +
-      //   String(now.getHours()).padStart(2, '0') +
-      //   ':' +
-      //   String(now.getMinutes()).padStart(2, '0') +
-      //   ':' +
-      //   String(now.getSeconds()).padStart(2, '0')
-
-      // const reviewPayload = {
-      //   productId: parseInt(this.$route.params.id),
-      //   message: this.newComment,
-      //   date: formattedDate,
-
-      //   userAccountDto: {
-      //     userAccountId: parseInt(loggedInCustomerId),
-      //   },
-      // }
-
-      // console.log('--- Sending Correct Payload to DB ---', reviewPayload)
       let obj = { userAccountDto: {} }
       obj.productId = this.productId
       obj.userAccountDto.userAccountId = loggedInCustomerId
@@ -498,9 +519,7 @@ export default {
       obj.comment = this.newComment
       try {
         await axios.post('http://localhost:8088/api/v1/package/ratingcomment', obj)
-
         alert('Review Success')
-
         this.newComment = ''
         this.newRating = 0
         this.getPackageDetail()
@@ -509,22 +528,10 @@ export default {
         if (error.response) {
           alert('DB Save error Reason: ' + (error.response.data.message || 'Internal Error'))
         } else {
-          alert('API fectch Error: ' + error.message)
+          alert('API fetch Error: ' + error.message)
         }
       }
     },
-    // loadPackageDetail() {
-    //   this.loading = true
-    //   const packageId = parseInt(this.$route.params.id)
-    //   const foundPkg = this.packagesDataset.find((p) => p.id === packageId)
-    //   if (foundPkg) {
-    //     this.pkg = foundPkg
-    //     this.selectedImg = foundPkg.image
-    //   } else {
-    //     this.pkg = null
-    //   }
-    //   this.loading = false
-    // },
     clickBookNow() {
       this.$router.push(`/booking/${this.productId}`)
     },
@@ -532,26 +539,15 @@ export default {
     setImage(img) {
       this.selectedImg = img
     },
-    toggleWishlist() {
-      this.inWishlist = !this.inWishlist
-    },
     formatMMK(price) {
       return price
     },
-
     formatDate(timestamp) {
       if (!timestamp) return 'N/A'
-
-      // Timestamp ဂဏန်းကို Date Object
       const date = new Date(Number(timestamp))
-
       const day = String(date.getDate()).padStart(2, '0')
       const month = String(date.getMonth() + 1).padStart(2, '0')
-
-      // .slice(-2) သုံးပြီး နှစ်ရဲ့ နောက်ဆုံးဂဏန်း ၂ လုံးပဲ ယူ (ဥပမာ - 2026 ဆိုရင် 26)
       const year = String(date.getFullYear()).slice(-4)
-
-      // dd-mm-yy format
       return `${day}-${month}-${year}`
     },
   },
@@ -561,25 +557,18 @@ export default {
       immediate: true,
     },
   },
-
   computed: {
-    // pkg() {
-    //   const id = this.$route.params.id
-    //   return this.packagesDataset.find((p) => p.id == id)
-    // },
     auth() {
       return useAuthStore()
     },
     isLoggedIn() {
       return this.auth.isLoggedIn
     },
-
     combinedReviews() {
       if (!this.commentsDataset || !this.ratingsDataset) {
         return []
       }
       const currentPackageId = this.$route.params.id
-
       const packageComments = this.commentsDataset.filter((c) => c.productId == currentPackageId)
 
       return packageComments.map((comment) => {
@@ -588,36 +577,28 @@ export default {
 
         const matchRating = this.ratingsDataset.find((r) => {
           const ratingUserId = r.customerId || r.userAccountDto?.userAccountId
-
           if (r.productId != currentPackageId) return false
           if (commentDate && r.date === commentDate) return true
           if (commentUserId && ratingUserId && commentUserId == ratingUserId) return true
-
           return false
         })
 
         return {
-          // 🟢 ပြင်ဆင်လိုက်သည့်လိုင်း - comment နေရာတွင် matchRating မှ နာမည်ကို လှမ်းယူခြင်း
           user_name: matchRating?.userAccountDto?.profileName || 'Anonymous Traveller',
-
           rating: matchRating ? Number(matchRating.rating) : 0,
           comment: comment.message || comment.comment,
           date: comment.date,
         }
       })
     },
-
     averageRating() {
       if (this.combinedReviews.length === 0) return 0
       const sum = this.combinedReviews.reduce((acc, rev) => acc + rev.rating, 0)
       return (sum / this.combinedReviews.length).toFixed(1)
     },
   },
-
-  //Mounted Hook
 }
 </script>
-
 <style scoped>
 .detail-page {
   background: #f8fafc;
