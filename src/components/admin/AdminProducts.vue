@@ -64,7 +64,7 @@
       </v-row>
     </v-card>
 
-    <!-- Data Table (Fixed Header & Height ထည့်သွင်းထားပါသည်) -->
+    <!-- Data Table -->
     <v-card class="enterprise-card border" variant="flat" rounded="lg">
       <v-data-table
         v-model:items-per-page="itemsPerPage"
@@ -169,46 +169,96 @@
         </template>
       </v-data-table>
     </v-card>
+
+    <!-- Add Product Dialog Form -->
+    <v-dialog v-model="dialog" max-width="600px" persistent>
+      <v-card rounded="lg" class="pa-4">
+        <v-card-title class="text-h6 font-weight-bold text-slate-800 px-2 pb-4">
+          Add New Travel Product
+        </v-card-title>
+        
+        <v-card-text class="pa-2">
+          <v-form ref="productForm">
+            <v-row dense>
+              <v-col cols="12">
+                <v-text-field v-model="newProduct.title" label="Product Title *" variant="outlined" density="compact" required></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field v-model="newProduct.location" label="Location *" variant="outlined" density="compact" required></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-select v-model="newProduct.locationType" label="Region Type *" :items="['DOMESTIC', 'INTERNATIONAL']" variant="outlined" density="compact" required></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-select v-model="newProduct.type" label="Package Type *" :items="['Budget', 'Standard', 'Premium']" variant="outlined" density="compact" required></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field v-model.number="newProduct.amount" label="Price (MMK) *" type="number" variant="outlined" density="compact" required></v-text-field>
+              </v-col>
+              <v-col cols="6" sm="3">
+                <v-text-field v-model.number="newProduct.day" label="Days" type="number" variant="outlined" density="compact"></v-text-field>
+              </v-col>
+              <v-col cols="6" sm="3">
+                <v-text-field v-model.number="newProduct.night" label="Nights" type="number" variant="outlined" density="compact"></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field v-model="newProduct.groupSize" label="Group Size (e.g., 15 Pax)" variant="outlined" density="compact"></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field v-model="newProduct.meals" label="Meals Info" variant="outlined" density="compact"></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field v-model="newProduct.travelDate" label="Travel Date" type="date" variant="outlined" density="compact"></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field v-model.number="newProduct.ticket" label="Available Tickets" type="number" variant="outlined" density="compact"></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-select v-model="newProduct.transport" label="Transport" :items="['FLIGHT', 'CAR']" variant="outlined" density="compact"></v-select>
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-card-text>
+        
+        <v-card-actions class="px-2 pt-4">
+          <v-spacer></v-spacer>
+          <v-btn variant="text" color="slate-600" class="text-none" @click="closeDialog">Cancel</v-btn>
+          <v-btn color="primary" variant="flat" class="text-none px-4" rounded="md" @click="saveProduct">Save Product</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 
+import PackageService from '@/service/PackageService' //[cite: 8]
+
 export default defineComponent({
   name: 'AdminProducts',
   
   data() {
     return {
-      itemsPerPage: 10,
-      loading: false,
-      dialog: false,
-      deleteDialog: false,
-      imageDialog: false,
-      search: '',
-      typeFilter: null as string | null,
-      locationTypeFilter: null as string | null,
-      currentStep: 1,
-      editing: false,
-      itemToDelete: null as any | null,
+      itemsPerPage: 10, 
+      loading: false, 
+      dialog: false, 
+      deleteDialog: false, 
+      imageDialog: false, 
+      search: '', 
+      typeFilter: null as string | null, 
+      locationTypeFilter: null as string | null, 
+      currentStep: 1, 
+      editing: false, 
+      itemToDelete: null as any | null, 
       
-      products: [
-        { productId: 'p1', title: 'Beautiful Bali Gateway', location: 'Bali, Indonesia', type: 'Premium', locationType: 'INTERNATIONAL', day: 5, night: 4, groupSize: '10-12 Pax', amount: 1250, meals: 'Breakfast & Dinner', travelDate: '2026-08-20', ticket: 15, transport: 'FLIGHT', photo: 'https://picsum.photos/id/10/200/200' },
-        { productId: 'p2', title: 'Bagan Heritage Cultural Tour', location: 'Bagan, Myanmar', type: 'Budget', locationType: 'DOMESTIC', day: 3, night: 2, groupSize: '20 Pax', amount: 150, meals: 'Breakfast Only', travelDate: '2026-10-05', ticket: 25, transport: 'CAR', photo: 'https://picsum.photos/id/11/200/200' },
-        { productId: 'p3', title: 'Tokyo Cherry Blossom Special', location: 'Tokyo, Japan', type: 'Premium', locationType: 'INTERNATIONAL', day: 7, night: 6, groupSize: '8-10 Pax', amount: 2100, meals: 'All Meals Included', travelDate: '2026-04-12', ticket: 5, transport: 'FLIGHT', photo: 'https://picsum.photos/id/12/200/200' },
-        { productId: 'p4', title: 'Phuket Beach Relax Package', location: 'Phuket, Thailand', type: 'Standard', locationType: 'INTERNATIONAL', day: 4, night: 3, groupSize: '15 Pax', amount: 450, meals: 'Breakfast & Seafood Dinner', travelDate: '2026-09-15', ticket: 12, transport: 'FLIGHT', photo: 'https://picsum.photos/id/13/200/200' },
-        { productId: 'p5', title: 'Inle Lake Magic & Culture', location: 'Shan State, Myanmar', type: 'Standard', locationType: 'DOMESTIC', day: 3, night: 2, groupSize: '12 Pax', amount: 180, meals: 'Breakfast & Lunch', travelDate: '2026-11-20', ticket: 8, transport: 'CAR', photo: 'https://picsum.photos/id/14/200/200' },
-        { productId: 'p6', title: 'Seoul City Explorer', location: 'Seoul, South Korea', type: 'Standard', locationType: 'INTERNATIONAL', day: 6, night: 5, groupSize: '14 Pax', amount: 980, meals: 'Breakfast', travelDate: '2026-10-10', ticket: 20, transport: 'FLIGHT', photo: 'https://picsum.photos/id/15/200/200' },
-        { productId: 'p7', title: 'Ngapali Luxury Beach Escape', location: 'Rakhine, Myanmar', type: 'Premium', locationType: 'DOMESTIC', day: 4, night: 3, groupSize: '6-8 Pax', amount: 350, meals: 'Breakfast Buffet', travelDate: '2026-12-24', ticket: 4, transport: 'FLIGHT', photo: 'https://picsum.photos/id/16/200/200' },
-        { productId: 'p8', title: 'Bangkok Shopping Spree Tour', location: 'Bangkok, Thailand', type: 'Budget', locationType: 'INTERNATIONAL', day: 3, night: 2, groupSize: '25 Pax', amount: 299, meals: 'None', travelDate: '2026-08-05', ticket: 40, transport: 'FLIGHT', photo: 'https://picsum.photos/id/17/200/200' },
-        { productId: 'p9', title: 'Pyin Oo Lwin Cool Breeze Getaway', location: 'Mandalay, Myanmar', type: 'Budget', locationType: 'DOMESTIC', day: 2, night: 1, groupSize: '30 Pax', amount: 80, meals: 'Traditional Dinner', travelDate: '2026-07-28', ticket: 18, transport: 'CAR', photo: 'https://picsum.photos/id/18/200/200' },
-        { productId: 'p10', title: 'Singapore Modern City Wonders', location: 'Marina Bay, Singapore', type: 'Premium', locationType: 'INTERNATIONAL', day: 5, night: 4, groupSize: '10 Pax', amount: 1400, meals: 'Full Board', travelDate: '2026-09-02', ticket: 9, transport: 'FLIGHT', photo: 'https://picsum.photos/id/19/200/200' }
-      ] as any[],
+      // ✅ ပြင်ဆင်ချက် ၂: TypeScript Type Casting (products: [] as any[]) ထည့်ပေးထားပါသည်
+      products: [] as any[], 
 
       headers: [
         { title: 'Product Info', key: 'title', align: 'start' as const },
         { title: 'Type', key: 'type', align: 'start' as const },
-        { title: 'Region', key: 'locationType', align: 'start' as const },
+        { title: 'locationType', key: 'locationType', align: 'start' as const },
         { title: 'Location', key: 'location', align: 'start' as const },
         { title: 'Duration', key: 'duration' },
         { title: 'Group Size', key: 'groupSize' },
@@ -218,28 +268,111 @@ export default defineComponent({
         { title: 'Transport', key: 'transport' },
         { title: 'Price', key: 'amount', align: 'end' as const },
         { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const }
-      ]
+      ], 
+
+      newProduct: {
+        title: '',
+        location: '',
+        locationType: 'DOMESTIC',
+        type: 'Standard',
+        amount: 0,
+        day: 0,
+        night: 0,
+        groupSize: '',
+        meals: '',
+        travelDate: '',
+        ticket: 0,
+        transport: 'CAR'
+      }
     }
   },
 
   computed: {
     filteredProducts(): any[] {
-      return this.products.filter(p => {
+      // ✅ ပြင်ဆင်ချက် ၃: TypeScript Type error မတက်စေရန် filter function ထဲမှ parameter ကို (p: any) ဟု သတ်မှတ်ပေးပါသည်
+      return this.products.filter((p: any) => {
         const matchesSearch = !this.search || p.title.toLowerCase().includes(this.search.toLowerCase()) || (p.location && p.location.toLowerCase().includes(this.search.toLowerCase()))
         const matchesType = !this.typeFilter || p.type === this.typeFilter
         const matchesLocationType = !this.locationTypeFilter || p.locationType === this.locationTypeFilter
         return matchesSearch && matchesType && matchesLocationType
       })
-    },
-    currencyFormatter() { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }) }
+    }, 
+    currencyFormatter() { 
+  return {
+    format: (value: number) => new Intl.NumberFormat('en-US').format(value) + ' MMK'
+  }
+}
+  },
+
+  mounted() {
+    this.fetchProducts();
   },
 
   methods: {
-    getTypeClass(type: string): string { return `chip-${(type || 'standard').toLowerCase()}` },
-    getDuration(p: any): string { return `${p.day || 0}D / ${p.night || 0}N` },
+    getTypeClass(type: string): string { return `chip-${(type || 'standard').toLowerCase()}` }, 
+    getDuration(p: any): string { return `${p.day || 0}D / ${p.night || 0}N` }, 
     formatDate(dateStr: string): string {
       if (!dateStr) return '-'
       return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    }, 
+
+    async fetchProducts() {
+      try {
+        this.loading = true;
+        const data = await PackageService.getPackages(this.locationTypeFilter || undefined); //[cite: 8]
+        this.products = data; 
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    openAddDialog() {
+      this.dialog = true; 
+    },
+    
+    closeDialog() {
+      this.dialog = false; 
+      this.newProduct = { title: '', location: '', locationType: 'DOMESTIC', type: 'Standard', amount: 0, day: 0, night: 0, groupSize: '', meals: '', travelDate: '', ticket: 0, transport: 'CAR' };
+    },
+    
+    async saveProduct() {
+      try {
+        this.loading = true; 
+        const data = await PackageService.addPackage(this.newProduct); //[cite: 8]
+        
+        if (data > 0) { 
+          alert('Product added successfully!');
+          this.closeDialog();
+          this.fetchProducts(); 
+        } else {
+          alert('Failed to save product.');
+        }
+      } catch (error) {
+        console.error("Error saving product:", error);
+        alert('An error occurred while connecting to the server.');
+      } finally {
+        this.loading = false; 
+      }
+    },
+
+    // ✅ ပြင်ဆင်ချက် ၄: Template ထဲတွင် ခေါ်ယူထားသော်လည်း မရှိသေးသော Method များကို ဖြည့်စွက်ပေးလိုက်ပါသည်
+    openImageDialog(item: any) {
+      this.imageDialog = true;
+      // လိုအပ်သော Image Dialog Control Logic ကို ဤနေရာတွင် ထပ်ထည့်နိုင်ပါသည်
+    },
+
+    openEditDialog(item: any) {
+      this.editing = true;
+      this.newProduct = { ...item }; // ရွေးချယ်လိုက်သော item data များကို form ထဲထည့်ပေးခြင်း
+      this.dialog = true;
+    },
+
+    openDeleteDialog(item: any) {
+      this.itemToDelete = item;
+      this.deleteDialog = true;
+      // လိုအပ်သော Delete Control Logic ကို ဤနေရာတွင် ထပ်ထည့်နိုင်ပါသည်
     }
   }
 })
@@ -257,7 +390,6 @@ export default defineComponent({
 .chip-domestic { background-color: #f1f5f9; color: #475569; }
 .chip-international { background-color: #fff7ed; color: #ea580c; }
 
-/* Sticky Header အလုပ်လုပ်စေရန် နောက်ခံအရောင်နှင့် z-index သတ်မှတ်ချက် */
 .premium-table :deep(th) { 
   font-weight: 600 !important; 
   color: #475569 !important; 

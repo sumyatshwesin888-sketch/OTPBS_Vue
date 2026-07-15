@@ -1,3 +1,314 @@
+<template>
+  <div>
+    <!-- Compact Filter Bar -->
+    <v-card class="filter-bar-card mb-4 pa-3">
+      <v-row align="center" no-gutters class="ga-2">
+        <v-col cols="12" sm="5" md="3">
+          <v-text-field
+            v-model="search"
+            label="Search itineraries..."
+            prepend-inner-icon="mdi-magnify"
+            density="compact"
+            variant="outlined"
+            hide-details
+            clearable
+            class="sleek-input"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" sm="4" md="3">
+          <v-select
+            v-model="productFilter"
+            label="Filter by Product Package"
+            :items="[
+              { title: 'All Products', value: null },
+              ...products.map(p => ({ title: p.title, value: p.productId }))
+            ]"
+            density="compact"
+            variant="outlined"
+            hide-details
+            clearable
+            class="sleek-input"
+          ></v-select>
+        </v-col>
+        <v-spacer class="hidden-xs-only"></v-spacer>
+        <v-col cols="auto" class="text-right">
+          <v-btn
+            color="primary"
+            class="btn-primary text-none text-caption font-weight-bold"
+            prepend-icon="mdi-plus"
+            elevation="0"
+            height="36"
+            @click="openAddDialog"
+          >
+            Add Itinerary
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-card>
+
+    <!-- Product Cards with Itineraries Matrix -->
+    <v-row no-gutters>
+      <v-col cols="12">
+        <!-- Empty State Container for Products -->
+        <v-card class="enterprise-card pa-6 text-center" v-if="products.length === 0 && !loading">
+          <div class="premium-empty-state pa-4">
+            <v-avatar size="48" color="grey-lighten-4" class="mb-2">
+              <v-icon color="grey-darken-1" size="22">mdi-package-variant-remove</v-icon>
+            </v-avatar>
+            <p class="card-title-text mb-0">No destination packages available</p>
+            <p class="card-subtitle-text">Create products first inside the registry before configuring timelines</p>
+          </div>
+        </v-card>
+
+        <!-- Glassmorphic Expansion System -->
+        <div v-else>
+          <v-expansion-panels v-model="expandedProduct" class="premium-expansion">
+            <v-expansion-panel
+              v-for="product in products"
+              :key="product.productId"
+              :value="product.productId"
+              class="mb-3 glass-panel"
+            >
+              <v-expansion-panel-title class="py-3 px-4">
+                <div class="d-flex align-center w-100 pr-2">
+                  <v-avatar size="38" rounded="lg" class="mr-3 glass-avatar shadow-glow-avatar" color="grey-lighten-4">
+                    <v-img v-if="product.photo" :src="product.photo" cover></v-img>
+                    <v-icon v-else size="18" color="grey-darken-1">mdi-package-variant</v-icon>
+                  </v-avatar>
+                  <div class="flex-grow-1 min-width-0">
+                    <p class="card-title-text text-truncate mb-0">{{ product.title }}</p>
+                    <p class="card-subtitle-text text-truncate mb-0 d-flex align-center">
+                      <v-icon size="11" class="mr-1">mdi-map-marker-outline</v-icon>
+                      {{ product.location || 'Location Unspecified' }}
+                    </p>
+                  </div>
+                  <span class="status-chip chip-cyan d-inline-flex align-center ml-2" style="gap: 4px;">
+                    <v-icon size="11">mdi-calendar-clock</v-icon>
+                    {{ getItinerariesForProduct(product.productId).length }} Days Plan
+                  </span>
+                </div>
+              </v-expansion-panel-title>
+
+              <v-expansion-panel-text class="px-2 pt-2 pb-1">
+                <div class="d-flex justify-end mb-3">
+                  <v-btn
+                    color="primary"
+                    class="btn-primary text-none text-caption font-weight-bold"
+                    prepend-icon="mdi-plus"
+                    size="small"
+                    height="30"
+                    @click="openAddForProduct(product.productId)"
+                  >
+                    Add Day Schedule
+                  </v-btn>
+                </div>
+
+                <!-- High-Density Dynamic Itinerary Timeline -->
+                <v-timeline side="end" align="start" truncate-line="both" class="compact-timeline justify-start pa-0">
+                  <v-timeline-item
+                    v-for="itinerary in getItinerariesForProduct(product.productId)"
+                    :key="itinerary.itineraryId"
+                    :dot-color="itinerary.dayNo % 2 === 0 ? 'primary' : 'indigo'"
+                    size="x-small"
+                    class="timeline-item-custom mb-3"
+                  >
+                    <template #opposite>
+                      <span class="day-indicator text-caption font-weight-bold text-primary">
+                        Day {{ itinerary.dayNo }}
+                      </span>
+                    </template>
+
+                    <v-card class="timeline-card enterprise-card ml-2">
+                      <v-card-text class="pa-3">
+                        <div class="d-flex justify-space-between align-start ga-3">
+                          <div class="flex-grow-1">
+                            <p class="font-weight-bold text-grey-darken-4 mb-1" style="font-size: 0.85rem; line-height: 1.3;">
+                              {{ itinerary.title }}
+                            </p>
+                            <p class="text-grey-darken-1 text-wrap mb-0" style="font-size: 0.75rem; line-height: 1.4;" v-if="itinerary.detail">
+                              {{ itinerary.detail }}
+                            </p>
+                            <v-chip v-else variant="tonal" color="grey" size="x-small" class="text-caption mt-1">No contextual info documented</v-chip>
+                          </div>
+                          <div class="d-flex align-center no-shrink">
+                            <v-btn
+                              icon
+                              variant="text"
+                              color="slate-600"
+                              size="small"
+                              density="card"
+                              class="mr-1"
+                              @click="openEditDialog(itinerary)"
+                            >
+                              <v-icon size="16">mdi-pencil-outline</v-icon>
+                              <v-tooltip activator="parent" location="top">Edit Node</v-tooltip>
+                            </v-btn>
+                            <v-btn
+                              icon
+                              variant="text"
+                              color="error"
+                              size="small"
+                              density="card"
+                              @click="openDeleteDialog(itinerary)"
+                            >
+                              <v-icon size="16">mdi-delete-outline</v-icon>
+                              <v-tooltip activator="parent" location="top">Delete Node</v-tooltip>
+                            </v-btn>
+                          </div>
+                        </div>
+                      </v-card-text>
+                    </v-card>
+                  </v-timeline-item>
+
+                  <!-- Inner Panel Empty State Template -->
+                  <v-timeline-item
+                    v-if="getItinerariesForProduct(product.productId).length === 0"
+                    dot-color="grey-lighten-2"
+                    size="x-small"
+                  >
+                    <v-card class="timeline-card enterprise-card ml-2">
+                      <v-card-text class="text-center text-grey pa-4">
+                        <v-icon size="24" class="mb-1 text-grey-lighten-1">mdi-calendar-blank-outline</v-icon>
+                        <p class="card-subtitle-text mb-2">No timeline tracking layer discovered for this product instance</p>
+                        <v-btn
+                          color="primary"
+                          class="btn-primary text-none text-caption font-weight-bold"
+                          size="small"
+                          height="28"
+                          @click="openAddForProduct(product.productId)"
+                        >
+                          Initialize First Day
+                        </v-btn>
+                      </v-card-text>
+                    </v-card>
+                  </v-timeline-item>
+                </v-timeline>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </div>
+      </v-col>
+    </v-row>
+
+    <!-- Add/Edit Matrix Context Dialog -->
+    <v-dialog v-model="dialog" max-width="540px" persistent>
+      <v-card class="premium-dialog">
+        <v-card-title class="d-flex justify-space-between align-center pa-5 pb-2">
+          <div>
+            <h3 class="card-title-text" style="font-size: 1.1rem !important;">
+              {{ editing ? 'Edit Itinerary Layer' : 'Provision Schedule Allocation' }}
+            </h3>
+            <p class="card-subtitle-text">
+              {{ editing ? 'Modify structural localized travel sequence events' : 'Build a new systematic timeline path configuration node' }}
+            </p>
+          </div>
+          <v-btn icon variant="text" size="small" @click="dialog = false">
+            <v-icon size="18">mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-card-text class="px-5 pb-5 pt-2 premium-form">
+          <v-form @submit.prevent="saveItinerary">
+            <v-row class="form-row-spacing">
+              <v-col cols="12">
+                <v-select
+                  v-model="itineraryForm.productId"
+                  label="Target Product Package Relation *"
+                  :items="products"
+                  item-title="title"
+                  item-value="productId"
+                  prepend-inner-icon="mdi-package-variant-closed"
+                  :rules="[v => !!v || 'Product relationship configuration is required']"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="4">
+                <v-text-field
+                  v-model.number="itineraryForm.dayNo"
+                  label="Day Index Sequence *"
+                  type="number"
+                  min="1"
+                  prepend-inner-icon="mdi-sort-numeric-ascending"
+                  :rules="[v => v > 0 || 'Sequence metric must be at least 1']"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="8">
+                <v-text-field
+                  v-model="itineraryForm.title"
+                  label="Timeline Heading Title *"
+                  prepend-inner-icon="mdi-format-title"
+                  :rules="[v => !!v || 'Contextual header title is required']"
+                  required
+                  placeholder="e.g., Transfer to Airport & Departure"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-textarea
+                  v-model="itineraryForm.detail"
+                  label="Detailed Structural Scope Itinerary Description"
+                  rows="4"
+                  prepend-inner-icon="mdi-text-box-outline"
+                  placeholder="Describe step-by-step processing details or day actions..."
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-textarea>
+              </v-col>
+            </v-row>
+
+            <v-card-actions class="pa-0 pt-5">
+              <v-spacer></v-spacer>
+              <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="34" @click="dialog = false">Cancel</v-btn>
+              <v-btn
+                color="primary"
+                type="submit"
+                class="btn-primary text-none text-caption font-weight-bold"
+                height="34"
+                :disabled="!formValid"
+              >
+                {{ editing ? 'Update Sequence' : 'Deploy Ledger Path' }}
+              </v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <!-- Destructive Ledger Isolation Confirmation -->
+    <v-dialog v-model="deleteDialog" max-width="390px" persistent>
+      <v-card class="premium-dialog">
+        <v-card-text class="pa-5 text-center">
+          <v-avatar size="48" class="avatar-error mb-3 shadow-glow-error">
+            <v-icon size="24" color="white">mdi-alert-circle-outline</v-icon>
+          </v-avatar>
+          <h3 class="card-title-text text-center mb-1" style="font-size: 1.05rem !important;">Confirm Sequence Removal</h3>
+          <p class="card-subtitle-text text-center px-2">
+            Are you sure you want to absolute drop timeline schedule layer <strong>{{ itemToDelete?.title }}</strong>? This operational node block cannot be restored.
+          </p>
+        </v-card-text>
+        <v-card-actions class="pa-4 pt-0 justify-center">
+          <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="32" @click="deleteDialog = false">Cancel</v-btn>
+          <v-btn color="error" class="btn-error text-none text-caption font-weight-bold" height="32" @click="deleteItinerary">Purge Node</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { supabase } from '../../lib/supabase'
@@ -206,283 +517,140 @@ export default defineComponent({
 })
 </script>
 
-<template>
-  <div>
-    <!-- Filter Bar -->
-    <v-card class="filter-bar mb-6">
-      <v-row align="center">
-        <v-col cols="12" sm="6" md="3">
-          <v-text-field
-            v-model="search"
-            label="Search itineraries..."
-            prepend-inner-icon="mdi-magnify"
-            density="comfortable"
-            variant="outlined"
-            hide-details
-            clearable
-          ></v-text-field>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <v-select
-            v-model="productFilter"
-            label="Filter by Product"
-            :items="[
-              { title: 'All Products', value: null },
-              ...products.map(p => ({ title: p.title, value: p.productId }))
-            ]"
-            density="comfortable"
-            variant="outlined"
-            hide-details
-            clearable
-          ></v-select>
-        </v-col>
-        <v-col cols="12" md="6" class="text-right">
-          <v-btn
-            color="primary"
-            class="btn-primary"
-            prepend-icon="mdi-plus"
-            @click="openAddDialog"
-          >
-            Add Itinerary
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card>
-
-    <!-- Product Cards with Itineraries -->
-    <v-row>
-      <v-col cols="12">
-        <v-card class="enterprise-card pa-6" v-if="products.length === 0 && !loading">
-          <div class="premium-empty-state">
-            <v-icon>mdi-package-variant</v-icon>
-            <p class="empty-title">No products available</p>
-            <p class="empty-text">Create products first before adding itineraries</p>
-          </div>
-        </v-card>
-
-        <div v-else>
-          <v-expansion-panels v-model="expandedProduct" class="premium-expansion">
-            <v-expansion-panel
-              v-for="product in products"
-              :key="product.productId"
-              :value="product.productId"
-              class="mb-3"
-            >
-              <v-expansion-panel-title class="py-4">
-                <div class="d-flex align-center w-100">
-                  <v-avatar size="48" rounded="lg" class="mr-3" color="grey-lighten-3">
-                    <v-img v-if="product.photo" :src="product.photo" cover></v-img>
-                    <v-icon v-else color="grey">mdi-package-variant</v-icon>
-                  </v-avatar>
-                  <div class="flex-grow-1">
-                    <p class="text-h6 font-weight-bold mb-0" style="color: #0f172a;">{{ product.title }}</p>
-                    <p class="text-caption text-grey mb-0">
-                      <v-icon size="14">mdi-map-marker</v-icon>
-                      {{ product.location || 'Unknown' }}
-                    </p>
-                  </div>
-                  <span class="status-chip" style="background: rgba(59,130,246,0.1); color: #2563eb;">
-                    <v-icon start size="14">mdi-calendar-check</v-icon>
-                    {{ getItinerariesForProduct(product.productId).length }} days
-                  </span>
-                </div>
-              </v-expansion-panel-title>
-
-              <v-expansion-panel-text>
-                <div class="d-flex justify-end mb-4">
-                  <v-btn
-                    color="primary"
-                    class="btn-primary"
-                    prepend-icon="mdi-plus"
-                    size="small"
-                    @click="openAddForProduct(product.productId)"
-                  >
-                    Add Day
-                  </v-btn>
-                </div>
-
-                <v-timeline side="end" align="start" truncate-line="both">
-                  <v-timeline-item
-                    v-for="itinerary in getItinerariesForProduct(product.productId)"
-                    :key="itinerary.itineraryId"
-                    :dot-color="itinerary.dayNo % 2 === 0 ? 'primary' : 'info'"
-                    size="small"
-                  >
-                    <template #opposite>
-                      <div class="text-h6 font-weight-bold" style="color: #2563eb;">
-                        Day {{ itinerary.dayNo }}
-                      </div>
-                    </template>
-
-                    <v-card class="enterprise-card ml-4">
-                      <v-card-text class="pa-4">
-                        <div class="d-flex justify-space-between align-start">
-                          <div>
-                            <p class="text-subtitle-1 font-weight-bold mb-2" style="color: #0f172a;">{{ itinerary.title }}</p>
-                            <p class="text-body-2 text-grey" v-if="itinerary.detail">
-                              {{ itinerary.detail }}
-                            </p>
-                            <v-chip v-else color="grey-lighten-2" size="x-small">No details</v-chip>
-                          </div>
-                          <div>
-                            <v-btn
-                              icon
-                              variant="text"
-                              color="primary"
-                              size="small"
-                              class="mr-1"
-                              @click="openEditDialog(itinerary)"
-                            >
-                              <v-icon>mdi-pencil-outline</v-icon>
-                              <v-tooltip activator="parent" location="top">Edit</v-tooltip>
-                            </v-btn>
-                            <v-btn
-                              icon
-                              variant="text"
-                              color="error"
-                              size="small"
-                              @click="openDeleteDialog(itinerary)"
-                            >
-                              <v-icon>mdi-delete-outline</v-icon>
-                              <v-tooltip activator="parent" location="top">Delete</v-tooltip>
-                            </v-btn>
-                          </div>
-                        </div>
-                      </v-card-text>
-                    </v-card>
-                  </v-timeline-item>
-
-                  <v-timeline-item
-                    v-if="getItinerariesForProduct(product.productId).length === 0"
-                    dot-color="grey-lighten-1"
-                    size="small"
-                  >
-                    <v-card class="enterprise-card ml-4">
-                      <v-card-text class="text-center text-grey pa-6">
-                        <v-icon size="32" class="mb-2">mdi-calendar-remove</v-icon>
-                        <p class="mb-2">No itinerary added yet</p>
-                        <v-btn
-                          color="primary"
-                          class="btn-primary"
-                          size="small"
-                          @click="openAddForProduct(product.productId)"
-                        >
-                          Add First Day
-                        </v-btn>
-                      </v-card-text>
-                    </v-card>
-                  </v-timeline-item>
-                </v-timeline>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </div>
-      </v-col>
-    </v-row>
-
-    <!-- Add/Edit Dialog -->
-    <v-dialog v-model="dialog" max-width="600" persistent>
-      <v-card class="premium-dialog">
-        <v-card-title class="d-flex justify-space-between align-center pa-6 pb-0">
-          <div>
-            <h3 class="text-h6 font-weight-bold text-grey-darken-3">{{ editing ? 'Edit Itinerary' : 'Add New Itinerary' }}</h3>
-            <p class="text-caption text-grey mt-1">{{ editing ? 'Update itinerary details' : 'Create a new itinerary day' }}</p>
-          </div>
-          <v-btn icon variant="text" size="small" @click="dialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-
-        <v-form @submit.prevent="saveItinerary" class="pa-6 pt-4 premium-form">
-          <v-row>
-            <v-col cols="12">
-              <v-select
-                v-model="itineraryForm.productId"
-                label="Product"
-                :items="products"
-                item-title="title"
-                item-value="productId"
-                :rules="[v => !!v || 'Product is required']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-select>
-            </v-col>
-            <v-col cols="12" sm="4">
-              <v-text-field
-                v-model.number="itineraryForm.dayNo"
-                label="Day Number"
-                type="number"
-                min="1"
-                :rules="[v => v > 0 || 'Day number must be at least 1']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="8">
-              <v-text-field
-                v-model="itineraryForm.title"
-                label="Title"
-                :rules="[v => !!v || 'Title is required']"
-                required
-                placeholder="e.g., Arrival & City Tour"
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-textarea
-                v-model="itineraryForm.detail"
-                label="Details"
-                rows="4"
-                placeholder="Describe the activities for this day..."
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-textarea>
-            </v-col>
-          </v-row>
-
-          <v-card-actions class="pa-0 pt-6">
-            <v-spacer></v-spacer>
-            <v-btn variant="outlined" class="mr-2" @click="dialog = false">Cancel</v-btn>
-            <v-btn
-              color="primary"
-              type="submit"
-              class="btn-primary"
-              :disabled="!formValid"
-            >
-              {{ editing ? 'Update' : 'Create' }}
-            </v-btn>
-          </v-card-actions>
-        </v-form>
-      </v-card>
-    </v-dialog>
-
-    <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="420" persistent>
-      <v-card class="premium-dialog">
-        <v-card-text class="pa-6 text-center">
-          <v-avatar size="56" class="avatar-error mb-4">
-            <v-icon size="28" color="white">mdi-alert-outline</v-icon>
-          </v-avatar>
-          <h3 class="text-h6 font-weight-bold text-grey-darken-3 mb-2">Confirm Delete</h3>
-          <p class="text-body-2 text-grey">
-            Are you sure you want to delete <strong>{{ itemToDelete?.title }}</strong>? This action cannot be undone.
-          </p>
-        </v-card-text>
-        <v-card-actions class="pa-4 pt-0 justify-center">
-          <v-btn variant="outlined" class="mr-2" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" class="btn-error" @click="deleteItinerary">Delete</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
-</template>
-
 <style scoped>
+/* Glassmorphic Smooth Architecture Base Blueprint */
+.enterprise-card, .filter-bar-card {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(16px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 4px 20px 0 rgba(31, 38, 135, 0.02) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.enterprise-card:hover, .filter-bar-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 8px 30px 0 rgba(59, 130, 246, 0.06) !important;
+}
+
+/* Micro Compact Typography Hierarchy */
+.card-title-text {
+  font-size: 0.925rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  letter-spacing: -0.01em !important;
+}
+
+.card-subtitle-text {
+  font-size: 0.725rem !important;
+  color: #64748b !important;
+  font-weight: 400 !important;
+  margin-top: 1px !important;
+}
+
+/* Premium Panel System Adaptations */
+.premium-expansion :deep(.glass-panel) {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(14px) saturate(110%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.015) !important;
+}
+.premium-expansion :deep(.v-expansion-panel-title) {
+  background: transparent !important;
+  transition: all 0.25s ease;
+}
+.premium-expansion :deep(.v-expansion-panel-title--active) {
+  background: rgba(255, 255, 255, 0.4) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
+}
+
+/* Glass Inputs Control Framework */
+.sleek-input :deep(.v-field) {
+  border-radius: 8px !important;
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  transition: all 0.25s ease-in-out;
+}
+.sleek-input :deep(.v-field--focused) {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+}
+.sleek-input :deep(.v-field__outline) {
+  display: none !important;
+}
+.sleek-input :deep(.v-label) {
+  font-size: 0.8rem !important;
+  color: #64748b !important;
+}
+
+/* Micro Action Badges & Glow Elements */
+.status-chip {
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.chip-cyan { background: rgba(6, 182, 212, 0.08); color: #0891b2; }
+
+.glass-avatar {
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+}
+.shadow-glow-avatar {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Timeline High Density Custom Matrix */
+.compact-timeline :deep(.v-timeline-item__body) {
+  padding-inline-start: 8px !important;
+}
+.timeline-card {
+  border-left: 3px solid #3b82f6 !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+.day-indicator {
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 0.725rem !important;
+}
+
+/* Elegant Soft Dialog Architectural Setups */
+.premium-dialog {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(24px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08) !important;
+}
+.form-row-spacing > div {
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+
+/* Core Buttons Configurations */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px 0 rgba(59, 130, 246, 0.18) !important;
+}
+.btn-primary:hover {
+  box-shadow: 0 4px 16px 0 rgba(59, 130, 246, 0.3) !important;
+}
+.btn-error {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: white !important;
+  border-radius: 8px !important;
+}
+.avatar-error {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+.shadow-glow-error {
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.25) !important;
+}
 </style>

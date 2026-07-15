@@ -1,3 +1,516 @@
+<template>
+  <div>
+    <!-- Premium Glassmorphic Summary Cards Matrix -->
+    <v-row class="mb-4" no-gutters style="gap: 12px; display: flex; flex-wrap: nowrap; overflow-x: auto;">
+      <v-col style="min-width: 220px; flex: 1;">
+        <v-card class="stat-card glass-card shadow-glow-amber">
+          <div class="card-accent accent-amber"></div>
+          <v-card-text class="pa-3">
+            <div class="d-flex justify-space-between align-start">
+              <div>
+                <p class="stat-label">Average Rating</p>
+                <p class="stat-value text-amber-darken-2">
+                  {{ averageRating }}
+                  <v-icon size="14" color="amber" class="ml-1">mdi-star</v-icon>
+                </p>
+              </div>
+              <v-avatar size="28" class="stat-icon-container bg-amber-lighten-5">
+                <v-icon size="16" color="amber-darken-2">mdi-star-face</v-icon>
+              </v-avatar>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col style="min-width: 220px; flex: 1;">
+        <v-card class="stat-card glass-card shadow-glow-blue">
+          <div class="card-accent accent-blue"></div>
+          <v-card-text class="pa-3">
+            <div class="d-flex justify-space-between align-start">
+              <div>
+                <p class="stat-label">Total Ratings</p>
+                <p class="stat-value text-blue-darken-2">{{ ratings.length }}</p>
+              </div>
+              <v-avatar size="28" class="stat-icon-container bg-blue-lighten-5">
+                <v-icon size="16" color="blue-darken-2">mdi-star-outline</v-icon>
+              </v-avatar>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col style="min-width: 220px; flex: 1;">
+        <v-card class="stat-card glass-card shadow-glow-purple">
+          <div class="card-accent accent-purple"></div>
+          <v-card-text class="pa-3">
+            <div class="d-flex justify-space-between align-start">
+              <div>
+                <p class="stat-label">Total Comments</p>
+                <p class="stat-value text-purple-darken-2">{{ comments.length }}</p>
+              </div>
+              <v-avatar size="28" class="stat-icon-container bg-purple-lighten-5">
+                <v-icon size="16" color="purple-darken-2">mdi-comment-text-outline</v-icon>
+              </v-avatar>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col style="min-width: 220px; flex: 1;">
+        <v-card class="stat-card glass-card shadow-glow-green">
+          <div class="card-accent accent-green"></div>
+          <v-card-text class="pa-3">
+            <div class="d-flex justify-space-between align-start">
+              <div>
+                <p class="stat-label">Customer Messages</p>
+                <p class="stat-value text-green-darken-2">{{ messages.length }}</p>
+              </div>
+              <v-avatar size="28" class="stat-icon-container bg-green-lighten-5">
+                <v-icon size="16" color="green-darken-2">mdi-email-outline</v-icon>
+              </v-avatar>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <!-- Navigation Control System -->
+    <v-tabs v-model="activeTab" class="premium-tabs mb-4" color="primary" align-tabs="start">
+      <v-tab value="ratings" class="text-none font-weight-bold text-caption rounded-t-lg">
+        <v-icon start size="16">mdi-star-box-outline</v-icon>
+        Ratings
+        <v-badge :content="ratings.length" color="amber-darken-2" inline class="ml-2 core-badge"></v-badge>
+      </v-tab>
+      <v-tab value="comments" class="text-none font-weight-bold text-caption rounded-t-lg">
+        <v-icon start size="16">mdi-comment-multiple-outline</v-icon>
+        Comments
+        <v-badge :content="comments.length" color="purple-darken-2" inline class="ml-2 core-badge"></v-badge>
+      </v-tab>
+      <v-tab value="messages" class="text-none font-weight-bold text-caption rounded-t-lg">
+        <v-icon start size="16">mdi-inbox-text-outline</v-icon>
+        Messages
+        <v-badge :content="messages.length" color="green-darken-2" inline class="ml-2 core-badge"></v-badge>
+      </v-tab>
+    </v-tabs>
+
+    <v-window v-model="activeTab">
+      <!-- ================= RATINGS LEDGER LAYER ================= -->
+      <v-window-item value="ratings">
+        <v-card class="filter-bar-card mb-4 pa-3">
+          <v-row align="center" no-gutters>
+            <v-col cols="12" sm="5" md="4">
+              <v-text-field
+                v-model="ratingSearch"
+                label="Search product ratings index..."
+                prepend-inner-icon="mdi-magnify"
+                density="compact"
+                variant="outlined"
+                hide-details
+                clearable
+                class="sleek-input"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-card>
+
+        <v-card class="enterprise-card">
+          <v-card-text class="pa-3">
+            <v-data-table
+              :headers="ratingHeaders"
+              :items="filteredRatings"
+              :loading="ratingLoading"
+              item-value="ratingId"
+              hide-default-footer
+              class="premium-table elevation-0"
+              fixed-header
+              height="380"
+            >
+              <template #item.product.title="{ item }">
+                <span class="font-weight-semibold text-grey-darken-3 text-caption-custom">
+                  {{ item.product?.title || 'System Inventory Void' }}
+                </span>
+              </template>
+
+              <template #item.rating="{ item }">
+                <v-rating
+                  :model-value="item.rating"
+                  readonly
+                  color="amber"
+                  half-increments
+                  density="compact"
+                  size="x-small"
+                ></v-rating>
+              </template>
+
+              <template #item.date="{ item }">
+                <span class="text-grey-darken-1 text-caption-custom">{{ formatDate(item.date) }}</span>
+              </template>
+
+              <template #item.actions>
+                <v-btn icon variant="text" color="error" size="small" density="comfortable">
+                  <v-icon size="16">mdi-delete-outline</v-icon>
+                  <v-tooltip activator="parent" location="top">Purge Log</v-tooltip>
+                </v-btn>
+              </template>
+
+              <template #no-data>
+                <div class="premium-empty-state pa-6 text-center">
+                  <v-avatar size="42" color="grey-lighten-4" class="mb-2">
+                    <v-icon color="grey-darken-1" size="20">mdi-star-off-outline</v-icon>
+                  </v-avatar>
+                  <p class="card-title-text mb-0">No scores logged</p>
+                  <p class="card-subtitle-text">Score transactions populate upon public alignment verification submissions</p>
+                </div>
+              </template>
+            </v-data-table>
+          </v-card-text>
+        </v-card>
+      </v-window-item>
+
+      <!-- ================= COMMENTS LEDGER LAYER ================= -->
+      <v-window-item value="comments">
+        <v-card class="filter-bar-card mb-4 pa-3">
+          <v-row align="center" no-gutters>
+            <v-col cols="12" sm="5" md="4">
+              <v-text-field
+                v-model="commentSearch"
+                label="Search user review parameters..."
+                prepend-inner-icon="mdi-magnify"
+                density="compact"
+                variant="outlined"
+                hide-details
+                clearable
+                class="sleek-input"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-card>
+
+        <v-card class="enterprise-card">
+          <v-card-text class="pa-3">
+            <v-data-table
+              :headers="commentHeaders"
+              :items="filteredComments"
+              :loading="commentLoading"
+              item-value="commentId"
+              hide-default-footer
+              class="premium-table elevation-0"
+              fixed-header
+              height="380"
+            >
+              <template #item.product.title="{ item }">
+                <span class="font-weight-semibold text-grey-darken-3 text-caption-custom">
+                  {{ item.product?.title || 'System Inventory Void' }}
+                </span>
+              </template>
+
+              <template #item.message="{ item }">
+                <span class="text-grey-darken-3 text-caption-custom d-block py-1 text-truncate" style="max-width: 320px;">
+                  {{ truncateText(item.message, 80) }}
+                </span>
+              </template>
+
+              <template #item.date="{ item }">
+                <span class="text-grey-darken-1 text-caption-custom">{{ formatDate(item.date) }}</span>
+              </template>
+
+              <template #item.actions="{ item }">
+                <v-btn icon variant="text" color="slate-600" size="small" density="comfortable" class="mr-1" @click="openEditCommentDialog(item)">
+                  <v-icon size="16">mdi-pencil-outline</v-icon>
+                  <v-tooltip activator="parent" location="top">Edit Node</v-tooltip>
+                </v-btn>
+                <v-btn icon variant="text" color="error" size="small" density="comfortable" @click="openDeleteCommentDialog(item)">
+                  <v-icon size="16">mdi-delete-outline</v-icon>
+                  <v-tooltip activator="parent" location="top">Purge Node</v-tooltip>
+                </v-btn>
+              </template>
+
+              <template #no-data>
+                <div class="premium-empty-state pa-6 text-center">
+                  <v-avatar size="42" color="grey-lighten-4" class="mb-2">
+                    <v-icon color="grey-darken-1" size="20">mdi-comment-off-outline</v-icon>
+                  </v-avatar>
+                  <p class="card-title-text mb-0">No textual critiques</p>
+                  <p class="card-subtitle-text">Operational text modules map automatically down from consumer input nodes</p>
+                </div>
+              </template>
+            </v-data-table>
+          </v-card-text>
+        </v-card>
+      </v-window-item>
+
+      <!-- ================= MESSAGES INBOX LAYER ================= -->
+      <v-window-item value="messages">
+        <v-card class="filter-bar-card mb-4 pa-3">
+          <v-row align="center" no-gutters class="ga-2">
+            <v-col cols="12" sm="5" md="3">
+              <v-text-field
+                v-model="messageSearch"
+                label="Search communications index..."
+                prepend-inner-icon="mdi-magnify"
+                density="compact"
+                variant="outlined"
+                hide-details
+                clearable
+                class="sleek-input"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="4" md="3">
+              <v-select
+                v-model="messageFilter"
+                label="Filter by Topic Structural Class"
+                :items="[
+                  { title: 'All Categories', value: null },
+                  ...questionTypes.map(q => ({ title: q.typeName, value: q.questionTypeId }))
+                ]"
+                density="compact"
+                variant="outlined"
+                hide-details
+                clearable
+                class="sleek-input"
+              ></v-select>
+            </v-col>
+          </v-row>
+        </v-card>
+
+        <v-card class="enterprise-card">
+          <v-card-text class="pa-3">
+            <v-data-table
+              :headers="messageHeaders"
+              :items="filteredMessages"
+              :loading="messageLoading"
+              item-value="messageId"
+              hide-default-footer
+              class="premium-table elevation-0"
+              fixed-header
+              height="380"
+            >
+              <template #item.name="{ item }">
+                <div class="d-flex align-center py-1">
+                  <v-avatar size="24" class="purple-gradient mr-2 glass-avatar shadow-glow-mini">
+                    <span class="text-white font-weight-bold" style="font-size: 0.65rem;">{{ item.name.charAt(0).toUpperCase() }}</span>
+                  </v-avatar>
+                  <span class="font-weight-semibold text-grey-darken-3 text-caption-custom">{{ item.name }}</span>
+                </div>
+              </template>
+
+              <template #item.email="{ item }">
+                <span class="text-grey-darken-2 text-caption-custom">{{ item.email }}</span>
+              </template>
+
+              <template #item.questionType.typeName="{ item }">
+                <span v-if="item.questionType" class="status-chip chip-cyan d-inline-flex align-center">
+                  {{ item.questionType.typeName }}
+                </span>
+                <span v-else class="status-chip chip-void text-caption-custom">General Query</span>
+              </template>
+
+              <template #item.messageText="{ item }">
+                <span class="text-grey-darken-3 text-caption-custom d-block text-truncate" style="max-width: 200px;">
+                  {{ truncateText(item.messageText, 50) }}
+                </span>
+              </template>
+
+              <template #item.date="{ item }">
+                <span class="text-grey-darken-1 text-caption-custom">{{ formatDate(item.date) }}</span>
+              </template>
+
+              <template #item.actions="{ item }">
+                <v-btn icon variant="text" color="primary" size="small" density="comfortable" class="mr-1" @click="openEditMessageDialog(item)">
+                  <v-icon size="16">mdi-eye-outline</v-icon>
+                  <v-tooltip activator="parent" location="top">Inspect / Modify</v-tooltip>
+                </v-btn>
+                <v-btn icon variant="text" color="error" size="small" density="comfortable" @click="openDeleteMessageDialog(item)">
+                  <v-icon size="16">mdi-delete-outline</v-icon>
+                  <v-tooltip activator="parent" location="top">Drop Ledger</v-tooltip>
+                </v-btn>
+              </template>
+
+              <template #no-data>
+                <div class="premium-empty-state pa-6 text-center">
+                  <v-avatar size="42" color="grey-lighten-4" class="mb-2">
+                    <v-icon color="grey-darken-1" size="20">mdi-email-off-outline</v-icon>
+                  </v-avatar>
+                  <p class="card-title-text mb-0">Inbox clear</p>
+                  <p class="card-subtitle-text">External lead capture dispatches append matrix vectors inside this channel space</p>
+                </div>
+              </template>
+            </v-data-table>
+          </v-card-text>
+        </v-card>
+      </v-window-item>
+    </v-window>
+
+    <!-- ================= MODAL SCHEMATICS DIALOGS ================= -->
+
+    <!-- Edit Comment Structural Dialog -->
+    <v-dialog v-model="commentDialog" max-width="450px" persistent>
+      <v-card class="premium-dialog">
+        <v-card-title class="d-flex justify-space-between align-center pa-4 pb-1">
+          <div>
+            <h3 class="card-title-text" style="font-size: 1rem !important;">Update Review Parameter</h3>
+            <p class="card-subtitle-text">Modify contextual statement parameters inside the localized content record</p>
+          </div>
+          <v-btn icon variant="text" size="small" @click="commentDialog = false">
+            <v-icon size="16">mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-card-text class="px-4 pb-4 pt-2 premium-form">
+          <v-form @submit.prevent="saveComment">
+            <v-row class="form-row-spacing">
+              <v-col cols="12">
+                <v-textarea
+                  v-model="commentForm.message"
+                  label="Statement Corpus Content *"
+                  rows="4"
+                  prepend-inner-icon="mdi-comment-text-edit-outline"
+                  :rules="[v => !!v || 'Message content mapping index state required']"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-textarea>
+              </v-col>
+            </v-row>
+            <v-card-actions class="pa-0 pt-4">
+              <v-spacer></v-spacer>
+              <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="32" @click="commentDialog = false">Cancel</v-btn>
+              <v-btn color="primary" type="submit" class="btn-primary text-none text-caption font-weight-bold" height="32" :disabled="!commentFormValid">
+                Commit Variable
+              </v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <!-- Inspect/Edit Message Parameters Dialog -->
+    <v-dialog v-model="messageDialog" max-width="520px" persistent>
+      <v-card class="premium-dialog">
+        <v-card-title class="d-flex justify-space-between align-center pa-4 pb-1">
+          <div>
+            <h3 class="card-title-text" style="font-size: 1rem !important;">Audit Communication Node</h3>
+            <p class="card-subtitle-text">Inspect structural metadata parameters or redirect question type vectors</p>
+          </div>
+          <v-btn icon variant="text" size="small" @click="messageDialog = false">
+            <v-icon size="16">mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+
+        <v-card-text class="px-4 pb-4 pt-2 premium-form">
+          <v-form @submit.prevent="saveMessage">
+            <v-row class="form-row-spacing">
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="messageForm.name"
+                  label="Identity Lead Label *"
+                  prepend-inner-icon="mdi-account-outline"
+                  :rules="[v => !!v || 'Sender label declaration required']"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="messageForm.email"
+                  label="Network Destination Email *"
+                  type="email"
+                  prepend-inner-icon="mdi-at"
+                  :rules="[v => !!v || 'Routing address vector required']"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-model="messageForm.questionTypeId"
+                  label="Structural Categorization Hub Allocation"
+                  :items="questionTypes"
+                  item-title="typeName"
+                  item-value="questionTypeId"
+                  prepend-inner-icon="mdi-shape-outline"
+                  clearable
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-select>
+              </v-col>
+              <v-col cols="12">
+                <v-textarea
+                  v-model="messageForm.messageText"
+                  label="Transmission Core Text Payload *"
+                  rows="4"
+                  prepend-inner-icon="mdi-text-alignment-left"
+                  :rules="[v => !!v || 'Message payload state required']"
+                  required
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  class="sleek-input"
+                ></v-textarea>
+              </v-col>
+            </v-row>
+            <v-card-actions class="pa-0 pt-4">
+              <v-spacer></v-spacer>
+              <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="32" @click="messageDialog = false">Cancel</v-btn>
+              <v-btn color="primary" type="submit" class="btn-primary text-none text-caption font-weight-bold" height="32" :disabled="!messageFormValid">
+                Synchronize Log
+              </v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <!-- Destructive Comment Removal Isolation Modal -->
+    <v-dialog v-model="deleteCommentDialog" max-width="380px" persistent>
+      <v-card class="premium-dialog">
+        <v-card-text class="pa-4 text-center">
+          <v-avatar size="44" class="avatar-error mb-2 shadow-glow-error">
+            <v-icon size="20" color="white">mdi-alert-circle-outline</v-icon>
+          </v-avatar>
+          <h3 class="card-title-text text-center mb-1">Confirm Review Purge</h3>
+          <p class="card-subtitle-text text-center px-1">
+            Are you absolutely sure you want to decouple this statement node? This entity ledger action removes data down from the system schema space permanently.
+          </p>
+        </v-card-text>
+        <v-card-actions class="pa-3 pt-0 justify-center">
+          <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="30" @click="deleteCommentDialog = false">Cancel</v-btn>
+          <v-btn color="error" class="btn-error text-none text-caption font-weight-bold" height="30" @click="deleteComment">Execute Purge</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Destructive Message Removal Isolation Modal -->
+    <v-dialog v-model="deleteMessageDialog" max-width="380px" persistent>
+      <v-card class="premium-dialog">
+        <v-card-text class="pa-4 text-center">
+          <v-avatar size="44" class="avatar-error mb-2 shadow-glow-error">
+            <v-icon size="20" color="white">mdi-trash-can-outline</v-icon>
+          </v-avatar>
+          <h3 class="card-title-text text-center mb-1">Drop Ticket Ledger</h3>
+          <p class="card-subtitle-text text-center px-1">
+            Are you sure you want to drop the message sequence allocated to <strong>{{ messageToDelete?.name }}</strong>? Reversing this schema layer drop is unsupported.
+          </p>
+        </v-card-text>
+        <v-card-actions class="pa-3 pt-0 justify-center">
+          <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="30" @click="deleteMessageDialog = false">Cancel</v-btn>
+          <v-btn color="error" class="btn-error text-none text-caption font-weight-bold" height="30" @click="deleteMessage">Drop Node</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
+
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { supabase } from '../../lib/supabase'
@@ -322,473 +835,171 @@ export default defineComponent({
 })
 </script>
 
-<template>
-  <div>
-    <!-- Summary Cards -->
-    <v-row class="mb-6">
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-amber"></div>
-          <v-card-text class="pa-5">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Average Rating</p>
-                <p class="stat-value">{{ averageRating }}<v-icon size="16" color="amber" class="ml-1">mdi-star</v-icon></p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-amber">
-                <v-icon size="22">mdi-star-outline</v-icon>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-blue"></div>
-          <v-card-text class="pa-5">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Total Ratings</p>
-                <p class="stat-value">{{ ratings.length }}</p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-blue">
-                <v-icon size="22">mdi-star-outline</v-icon>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-purple"></div>
-          <v-card-text class="pa-5">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Total Comments</p>
-                <p class="stat-value">{{ comments.length }}</p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-purple">
-                <v-icon size="22">mdi-comment-outline</v-icon>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-green"></div>
-          <v-card-text class="pa-5">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Customer Messages</p>
-                <p class="stat-value">{{ messages.length }}</p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-green">
-                <v-icon size="22">mdi-email-outline</v-icon>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <!-- Tabs -->
-    <v-tabs v-model="activeTab" class="premium-tabs mb-6">
-      <v-tab value="ratings">
-        <v-icon start size="18">mdi-star</v-icon>
-        Ratings
-        <v-badge :content="ratings.length" color="primary" inline class="ml-2" size="small"></v-badge>
-      </v-tab>
-      <v-tab value="comments">
-        <v-icon start size="18">mdi-comment</v-icon>
-        Comments
-        <v-badge :content="comments.length" color="primary" inline class="ml-2" size="small"></v-badge>
-      </v-tab>
-      <v-tab value="messages">
-        <v-icon start size="18">mdi-email</v-icon>
-        Messages
-        <v-badge :content="messages.length" color="primary" inline class="ml-2" size="small"></v-badge>
-      </v-tab>
-    </v-tabs>
-
-    <v-window v-model="activeTab">
-      <!-- Ratings Tab -->
-      <v-window-item value="ratings">
-        <v-card class="filter-bar mb-6">
-          <v-row align="center">
-            <v-col cols="12" sm="6" md="4">
-              <v-text-field
-                v-model="ratingSearch"
-                label="Search ratings..."
-                prepend-inner-icon="mdi-magnify"
-                density="comfortable"
-                variant="outlined"
-                hide-details
-                clearable
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-card>
-
-        <v-card class="enterprise-card">
-          <v-data-table
-            :headers="ratingHeaders"
-            :items="filteredRatings"
-            :loading="ratingLoading"
-            item-value="ratingId"
-            class="premium-table elevation-0"
-          >
-            <template #item.product.title="{ item }">
-              <span class="font-weight-medium text-body-2">{{ item.product?.title || 'N/A' }}</span>
-            </template>
-
-            <template #item.rating="{ item }">
-              <v-rating
-                :model-value="item.rating"
-                readonly
-                color="amber"
-                half-increments
-                density="compact"
-              ></v-rating>
-            </template>
-
-            <template #item.date="{ item }">
-              <span class="text-body-2 text-grey">{{ formatDate(item.date) }}</span>
-            </template>
-
-            <template #item.actions>
-              <v-btn icon variant="text" color="error" size="small" @click="">
-                <v-icon>mdi-delete-outline</v-icon>
-                <v-tooltip activator="parent" location="top">Delete</v-tooltip>
-              </v-btn>
-            </template>
-
-            <template #no-data>
-              <div class="premium-empty-state">
-                <v-icon>mdi-star-outline</v-icon>
-                <p class="empty-title">No ratings yet</p>
-                <p class="empty-text">Ratings will appear here when customers submit feedback</p>
-              </div>
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-window-item>
-
-      <!-- Comments Tab -->
-      <v-window-item value="comments">
-        <v-card class="filter-bar mb-6">
-          <v-row align="center">
-            <v-col cols="12" sm="6" md="4">
-              <v-text-field
-                v-model="commentSearch"
-                label="Search comments..."
-                prepend-inner-icon="mdi-magnify"
-                density="comfortable"
-                variant="outlined"
-                hide-details
-                clearable
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-card>
-
-        <v-card class="enterprise-card">
-          <v-data-table
-            :headers="commentHeaders"
-            :items="filteredComments"
-            :loading="commentLoading"
-            item-value="commentId"
-            class="premium-table elevation-0"
-          >
-            <template #item.product.title="{ item }">
-              <span class="font-weight-medium text-body-2">{{ item.product?.title || 'N/A' }}</span>
-            </template>
-
-            <template #item.message="{ item }">
-              <p class="text-body-2 py-2">{{ truncateText(item.message, 80) }}</p>
-            </template>
-
-            <template #item.date="{ item }">
-              <span class="text-body-2 text-grey">{{ formatDate(item.date) }}</span>
-            </template>
-
-            <template #item.actions="{ item }">
-              <v-btn
-                icon
-                variant="text"
-                color="primary"
-                size="small"
-                class="mr-1"
-                @click="openEditCommentDialog(item)"
-              >
-                <v-icon>mdi-pencil-outline</v-icon>
-                <v-tooltip activator="parent" location="top">Edit</v-tooltip>
-              </v-btn>
-              <v-btn
-                icon
-                variant="text"
-                color="error"
-                size="small"
-                @click="openDeleteCommentDialog(item)"
-              >
-                <v-icon>mdi-delete-outline</v-icon>
-                <v-tooltip activator="parent" location="top">Delete</v-tooltip>
-              </v-btn>
-            </template>
-
-            <template #no-data>
-              <div class="premium-empty-state">
-                <v-icon>mdi-comment-outline</v-icon>
-                <p class="empty-title">No comments yet</p>
-                <p class="empty-text">Comments will appear here when customers share their thoughts</p>
-              </div>
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-window-item>
-
-      <!-- Messages Tab -->
-      <v-window-item value="messages">
-        <v-card class="filter-bar mb-6">
-          <v-row align="center">
-            <v-col cols="12" sm="6" md="3">
-              <v-text-field
-                v-model="messageSearch"
-                label="Search messages..."
-                prepend-inner-icon="mdi-magnify"
-                density="comfortable"
-                variant="outlined"
-                hide-details
-                clearable
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" md="3">
-              <v-select
-                v-model="messageFilter"
-                label="Filter by Category"
-                :items="[
-                  { title: 'All Categories', value: null },
-                  ...questionTypes.map(q => ({ title: q.typeName, value: q.questionTypeId }))
-                ]"
-                density="comfortable"
-                variant="outlined"
-                hide-details
-                clearable
-              ></v-select>
-            </v-col>
-          </v-row>
-        </v-card>
-
-        <v-card class="enterprise-card">
-          <v-data-table
-            :headers="messageHeaders"
-            :items="filteredMessages"
-            :loading="messageLoading"
-            item-value="messageId"
-            class="premium-table elevation-0"
-          >
-            <template #item.name="{ item }">
-              <div class="d-flex align-center py-2">
-                <v-avatar size="36" class="avatar-gradient mr-2">
-                  <span class="text-white text-caption font-weight-bold">{{ item.name.charAt(0) }}</span>
-                </v-avatar>
-                <span class="font-weight-medium text-body-2">{{ item.name }}</span>
-              </div>
-            </template>
-
-            <template #item.questionType.typeName="{ item }">
-              <v-chip
-                v-if="item.questionType"
-                size="small"
-                class="status-chip"
-                style="background: rgba(59,130,246,0.1); color: #2563eb;"
-              >
-                {{ item.questionType.typeName }}
-              </v-chip>
-              <span v-else class="text-grey text-body-2">N/A</span>
-            </template>
-
-            <template #item.messageText="{ item }">
-              <span class="text-body-2">{{ truncateText(item.messageText, 50) }}</span>
-            </template>
-
-            <template #item.date="{ item }">
-              <span class="text-body-2 text-grey">{{ formatDate(item.date) }}</span>
-            </template>
-
-            <template #item.actions="{ item }">
-              <v-btn
-                icon
-                variant="text"
-                color="primary"
-                size="small"
-                class="mr-1"
-                @click="openEditMessageDialog(item)"
-              >
-                <v-icon>mdi-eye-outline</v-icon>
-                <v-tooltip activator="parent" location="top">View/Edit</v-tooltip>
-              </v-btn>
-              <v-btn
-                icon
-                variant="text"
-                color="error"
-                size="small"
-                @click="openDeleteMessageDialog(item)"
-              >
-                <v-icon>mdi-delete-outline</v-icon>
-                <v-tooltip activator="parent" location="top">Delete</v-tooltip>
-              </v-btn>
-            </template>
-
-            <template #no-data>
-              <div class="premium-empty-state">
-                <v-icon>mdi-email-outline</v-icon>
-                <p class="empty-title">No messages yet</p>
-                <p class="empty-text">Customer inquiries will appear here</p>
-              </div>
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-window-item>
-    </v-window>
-
-    <!-- Edit Comment Dialog -->
-    <v-dialog v-model="commentDialog" max-width="500" persistent>
-      <v-card class="premium-dialog">
-        <v-card-title class="d-flex justify-space-between align-center pa-6 pb-0">
-          <h3 class="text-h6 font-weight-bold text-grey-darken-3">Edit Comment</h3>
-          <v-btn icon variant="text" size="small" @click="commentDialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-
-        <v-form @submit.prevent="saveComment" class="pa-6 pt-4 premium-form">
-          <v-textarea
-            v-model="commentForm.message"
-            label="Comment"
-            rows="4"
-            :rules="[v => !!v || 'Comment is required']"
-            required
-            variant="outlined"
-            density="comfortable"
-            hide-details="auto"
-          ></v-textarea>
-
-          <v-card-actions class="pa-0 pt-6">
-            <v-spacer></v-spacer>
-            <v-btn variant="outlined" class="mr-2" @click="commentDialog = false">Cancel</v-btn>
-            <v-btn color="primary" type="submit" class="btn-primary" :disabled="!commentFormValid">Update</v-btn>
-          </v-card-actions>
-        </v-form>
-      </v-card>
-    </v-dialog>
-
-    <!-- View/Edit Message Dialog -->
-    <v-dialog v-model="messageDialog" max-width="600" persistent>
-      <v-card class="premium-dialog">
-        <v-card-title class="d-flex justify-space-between align-center pa-6 pb-0">
-          <h3 class="text-h6 font-weight-bold text-grey-darken-3">Message Details</h3>
-          <v-btn icon variant="text" size="small" @click="messageDialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-
-        <v-form @submit.prevent="saveMessage" class="pa-6 pt-4 premium-form">
-          <v-row>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="messageForm.name"
-                label="Name"
-                :rules="[v => !!v || 'Name is required']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="messageForm.email"
-                label="Email"
-                type="email"
-                :rules="[v => !!v || 'Email is required']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-select
-                v-model="messageForm.questionTypeId"
-                label="Category"
-                :items="questionTypes"
-                item-title="typeName"
-                item-value="questionTypeId"
-                clearable
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-select>
-            </v-col>
-            <v-col cols="12">
-              <v-textarea
-                v-model="messageForm.messageText"
-                label="Message"
-                rows="4"
-                :rules="[v => !!v || 'Message is required']"
-                required
-                variant="outlined"
-                density="comfortable"
-                hide-details="auto"
-              ></v-textarea>
-            </v-col>
-          </v-row>
-
-          <v-card-actions class="pa-0 pt-6">
-            <v-spacer></v-spacer>
-            <v-btn variant="outlined" class="mr-2" @click="messageDialog = false">Cancel</v-btn>
-            <v-btn color="primary" type="submit" class="btn-primary" :disabled="!messageFormValid">Update</v-btn>
-          </v-card-actions>
-        </v-form>
-      </v-card>
-    </v-dialog>
-
-    <!-- Delete Comment Dialog -->
-    <v-dialog v-model="deleteCommentDialog" max-width="420" persistent>
-      <v-card class="premium-dialog">
-        <v-card-text class="pa-6 text-center">
-          <v-avatar size="56" class="avatar-error mb-4">
-            <v-icon size="28" color="white">mdi-alert-outline</v-icon>
-          </v-avatar>
-          <h3 class="text-h6 font-weight-bold text-grey-darken-3 mb-2">Confirm Delete</h3>
-          <p class="text-body-2 text-grey">Are you sure you want to delete this comment? This action cannot be undone.</p>
-        </v-card-text>
-        <v-card-actions class="pa-4 pt-0 justify-center">
-          <v-btn variant="outlined" class="mr-2" @click="deleteCommentDialog = false">Cancel</v-btn>
-          <v-btn color="error" class="btn-error" @click="deleteComment">Delete</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Delete Message Dialog -->
-    <v-dialog v-model="deleteMessageDialog" max-width="420" persistent>
-      <v-card class="premium-dialog">
-        <v-card-text class="pa-6 text-center">
-          <v-avatar size="56" class="avatar-error mb-4">
-            <v-icon size="28" color="white">mdi-alert-outline</v-icon>
-          </v-avatar>
-          <h3 class="text-h6 font-weight-bold text-grey-darken-3 mb-2">Confirm Delete</h3>
-          <p class="text-body-2 text-grey">Are you sure you want to delete this message from <strong>{{ messageToDelete?.name }}</strong>? This action cannot be undone.</p>
-        </v-card-text>
-        <v-card-actions class="pa-4 pt-0 justify-center">
-          <v-btn variant="outlined" class="mr-2" @click="deleteMessageDialog = false">Cancel</v-btn>
-          <v-btn color="error" class="btn-error" @click="deleteMessage">Delete</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
-</template>
-
 <style scoped>
+/* Glassmorphism Structural Architecture Paradigms */
+.enterprise-card, .filter-bar-card, .glass-card {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(16px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.enterprise-card:hover, .filter-bar-card:hover, .glass-card:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Micro Typography Spec Definitions */
+.card-title-text {
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  letter-spacing: -0.01em !important;
+}
+
+.card-subtitle-text {
+  font-size: 0.7rem !important;
+  color: #64748b !important;
+  font-weight: 400 !important;
+}
+
+.text-caption-custom {
+  font-size: 0.78rem !important;
+}
+
+/* Glass Data Input Schematics */
+.sleek-input :deep(.v-field) {
+  border-radius: 8px !important;
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  transition: all 0.2s ease;
+}
+.sleek-input :deep(.v-field--focused) {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+.sleek-input :deep(.v-field__outline) {
+  display: none !important;
+}
+.sleek-input :deep(.v-label) {
+  font-size: 0.78rem !important;
+  color: #64748b !important;
+}
+
+/* Navigation Subsystem Adjustments */
+.premium-tabs :deep(.v-btn) {
+  letter-spacing: normal !important;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  margin-right: 4px;
+}
+.premium-tabs :deep(.v-tab--selected) {
+  background: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.05) !important;
+  border-bottom: 2px solid #3b82f6 !important;
+}
+.core-badge :deep(.v-badge__wrapper) {
+  font-size: 0.65rem !important;
+  height: 15px !important;
+  min-width: 15px !important;
+}
+
+/* High-Density Matrix Table Specifications */
+.premium-table {
+  background: transparent !important;
+}
+.premium-table :deep(th) {
+  font-size: 0.725rem !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+  background: rgba(241, 245, 249, 0.4) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
+  padding: 6px 10px !important;
+}
+.premium-table :deep(td) {
+  border-bottom: 1px solid rgba(241, 245, 249, 0.25) !important;
+  padding: 4px 10px !important;
+}
+
+/* Micro Action Badges & Gradients */
+.status-chip {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+.chip-cyan { background: rgba(6, 182, 212, 0.08); color: #0891b2; }
+.chip-void { background: rgba(148, 163, 184, 0.08); color: #64748b; }
+.purple-gradient { background: linear-gradient(135deg, #a855f7, #7c3aed) !important; }
+.glass-avatar { border: 1px solid rgba(255, 255, 255, 0.5) !important; }
+
+/* Micro Summary Cards Metrics with Smooth Glows */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.01) !important;
+}
+.card-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+}
+.accent-amber { background: #f59e0b; }
+.accent-blue { background: #3b82f6; }
+.accent-purple { background: #a855f7; }
+.accent-green { background: #10b981; }
+
+.shadow-glow-amber:hover { box-shadow: 0 0 15px rgba(245, 158, 11, 0.12) !important; }
+.shadow-glow-blue:hover { box-shadow: 0 0 15px rgba(59, 130, 246, 0.12) !important; }
+.shadow-glow-purple:hover { box-shadow: 0 0 15px rgba(168, 85, 247, 0.12) !important; }
+.shadow-glow-green:hover { box-shadow: 0 0 15px rgba(16, 185, 129, 0.12) !important; }
+
+.stat-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.stat-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* Elegant Soft Dialog Setups */
+.premium-dialog {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 30px 0 rgba(31, 38, 135, 0.06) !important;
+}
+.form-row-spacing > div {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+/* Global Visual Elements Framework */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  color: white !important;
+  border-radius: 6px !important;
+  box-shadow: 0 3px 10px 0 rgba(59, 130, 246, 0.15) !important;
+}
+.btn-error {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: white !important;
+  border-radius: 6px !important;
+}
+.avatar-error { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+.shadow-glow-error { box-shadow: 0 0 12px rgba(239, 68, 68, 0.2) !important; }
+.shadow-glow-mini { box-shadow: 0 2px 6px rgba(168, 85, 247, 0.2); }
 </style>
