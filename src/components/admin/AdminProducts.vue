@@ -271,12 +271,15 @@
             <v-col cols="12" class="mb-4">
               <v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
                 <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
-                  <v-img v-if="imagePreviews.photo" :src="imagePreviews.photo" cover></v-img>
+                  <v-img v-if="imagePreviews.photo!=null" 
+                  :src="filePhoto"
+                   cover></v-img>
                   <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
                 </v-avatar>
                 <div class="flex-grow-1">
                   <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
-                  <v-file-input
+                  <input type="file" id="file" ref="file" @change="changeImage" class="file-input-anim" />
+                  <!-- <v-file-input
                     label="Select Cover Photo"
                     density="compact"
                     variant="outlined"
@@ -285,16 +288,76 @@
                     prepend-icon=""
                     prepend-inner-icon="mdi-camera"
                     @change="handleFileChange($event, 'photo')"
-                  ></v-file-input>
+                  ></v-file-input> -->
                 </div>
               </v-card>
             </v-col>
 
+            <v-col cols="6" md="6">
+                <v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
+                <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
+                  <v-img v-if="imagePreviews.photoOne!=null" 
+                  :src="filePhotoOne"
+                   cover></v-img>
+                  <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
+                </v-avatar>
+                <div class="flex-grow-1">
+                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
+                  <input type="file" id="file" ref="fileOne" @change="changeImageOne" class="file-input-anim" />
+                </div>
+              </v-card>
+            </v-col>
+            <v-col cols="6" md="6">
+<v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
+                <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
+                  <v-img v-if="imagePreviews.photoTwo!=null" 
+                  :src="filePhotoTwo"
+                   cover></v-img>
+                  <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
+                </v-avatar>
+                <div class="flex-grow-1">
+                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
+                  <input type="file" id="file" ref="file" @change="changeImageTwo" class="file-input-anim" />
+                </div>
+              </v-card>
+            </v-col>
+
+            
+            <v-col cols="6" md="6">
+                <v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
+                <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
+                  <v-img v-if="imagePreviews.photoThree!=null" 
+                  :src="filePhotoThree"
+                   cover></v-img>
+                  <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
+                </v-avatar>
+                <div class="flex-grow-1">
+                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
+                  <input type="file" id="file" ref="file" @change="changeImageThree" class="file-input-anim" />
+                </div>
+              </v-card>
+            </v-col>
+            <v-col cols="6" md="6">
+<v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
+                <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
+                  <v-img v-if="imagePreviews.photoFour!=null" 
+                  :src="filePhotoFour"
+                   cover></v-img>
+                  <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
+                </v-avatar>
+                <div class="flex-grow-1">
+                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
+                  <input type="file" id="file" ref="file" @change="changeImageFour" class="file-input-anim" />
+                </div>
+              </v-card>
+            </v-col>
             <!-- Sub Photos (4 Slots) -->
-            <v-col cols="12" sm="6" v-for="num in ['One', 'Two', 'Three', 'Four']" :key="num">
+            <!-- <v-col cols="12" sm="6" v-for="num in ['One', 'Two', 'Three', 'Four']" :key="num">
               <v-card variant="outlined" class="pa-3 bg-white border d-flex align-center mb-3" rounded="lg">
                 <v-avatar size="64" rounded="lg" class="mr-3 border bg-grey-lighten-4">
-                  <v-img v-if="imagePreviews['photo' + num]" :src="imagePreviews['photo' + num]" cover></v-img>
+                  <v-img v-if="imagePreviews['photo' + num]" 
+                  :src="'http://localhost:8088/api/v1/productphoto/' + imagePreviews['photo' + num]"
+                   cover></v-img>
                   <v-icon v-else size="24" color="grey-darken-1">mdi-image-outline</v-icon>
                 </v-avatar>
                 <div class="flex-grow-1">
@@ -311,7 +374,7 @@
                   ></v-file-input>
                 </div>
               </v-card>
-            </v-col>
+            </v-col> -->
           </v-row>
         </v-card-text>
 
@@ -430,7 +493,12 @@ export default defineComponent({
         photoThree: '',
         photoFour: ''
       } as Record<string, string>,
-      uploadingImages: false
+      uploadingImages: false,
+      filePhoto:'',
+      filePhotoOne:'',
+      filePhotoTwo:'',
+      filePhotoThree:'',
+      filePhotoFour:'',
     }
   },
 
@@ -453,8 +521,60 @@ export default defineComponent({
   mounted() {
     this.fetchProducts();
   },
+  watch: {
+    
+    search() {
+      this.fetchProducts();
+    },
+    typeFilter() {
+      this.fetchProducts();
+    },
+    locationTypeFilter() {
+      this.fetchProducts();
+    }
+  },
 
   methods: {
+    changeImage: function (e) {
+      let image = e.target.files[0];
+      let reader = new FileReader();
+      reader.readAsDataURL(image);
+      reader.onload = (e) => {
+        this.filePhoto = e.target.result;
+      };
+    },
+    changeImageOne: function (e) {
+      let image = e.target.files[0];
+      let reader = new FileReader();
+      reader.readAsDataURL(image);
+      reader.onload = (e) => {
+        this.filePhotoOne = e.target.result;
+      };
+    },
+    changeImageTwo: function (e) {
+      let image = e.target.files[0];
+      let reader = new FileReader();
+      reader.readAsDataURL(image);
+      reader.onload = (e) => {
+        this.filePhotoTwo = e.target.result;
+      };
+    },
+    changeImageThree: function (e) {
+      let image = e.target.files[0];
+      let reader = new FileReader();
+      reader.readAsDataURL(image);
+      reader.onload = (e) => {
+        this.filePhotoThree = e.target.result;
+      };
+    },
+    changeImageFour: function (e) {
+      let image = e.target.files[0];
+      let reader = new FileReader();
+      reader.readAsDataURL(image);
+      reader.onload = (e) => {
+        this.filePhotoFour = e.target.result;
+      };
+    },
     getTypeClass(type: string): string { return `chip-${(type || 'standard').toLowerCase()}` }, 
     getDuration(p: any): string { return `${p.day || 0}D / ${p.night || 0}N` }, 
     formatDate(dateStr: string): string {
@@ -465,7 +585,12 @@ export default defineComponent({
     async fetchProducts() {
       try {
         this.loading = true;
-        const data = await PackageService.getProduct(this.locationTypeFilter || undefined);
+        
+        const data = await PackageService.getProduct(
+          this.locationTypeFilter || undefined,
+          this.typeFilter || undefined,
+          this.search || undefined
+        );
         this.products = data; 
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -487,10 +612,18 @@ export default defineComponent({
     async saveProduct() {
       try {
         this.loading = true; 
-        const data = await PackageService.addPackage(this.newProduct);
+        let response;
         
-        if (data > 0) { 
-          alert('Product saved successfully!');
+        if (this.editing) {
+          // --- EDIT PRODUCT---
+          response = await PackageService.updateProduct(this.newProduct);
+        } else {
+          // --- ADD PRODUCT ---
+          response = await PackageService.addProduct(this.newProduct);
+        }
+        
+        if (response > 0) { 
+          alert(this.editing ? 'Product updated successfully!' : 'Product saved successfully!');
           this.closeDialog();
           this.fetchProducts(); 
         } else {
@@ -507,6 +640,7 @@ export default defineComponent({
     openEditDialog(item: any) {
       this.editing = true;
       this.newProduct = { ...item };
+
       this.dialog = true;
     },
 
@@ -519,12 +653,21 @@ export default defineComponent({
       if (!this.itemToDelete) return;
       try {
         this.loading = true;
-        this.products = this.products.filter((p: any) => p.productId !== this.itemToDelete.productId);
+      
+        const response = await PackageService.deleteProduct(this.itemToDelete.productId);
+        
+        if (response > 0) {
+          this.products = this.products.filter((p: any) => p.productId !== this.itemToDelete.productId);
+          alert('Product deleted successfully.');
+        } else {
+          alert('Failed to delete product from server.');
+        }
+        
         this.deleteDialog = false;
         this.itemToDelete = null;
-        alert('Product deleted successfully.');
       } catch (error) {
         console.error("Error deleting product:", error);
+        alert('An error occurred while deleting.');
       } finally {
         this.loading = false;
       }
@@ -555,32 +698,38 @@ export default defineComponent({
       return 'primary';
     },
 
-    openImageDialog(product: any) {
-      this.imageForm = {
-        productId: product.productId,
-        title: product.title,
-        photo: product.photo || '',
-        photoOne: product.photoOne || '',
-        photoTwo: product.photoTwo || '',
-        photoThree: product.photoThree || '',
-        photoFour: product.photoFour || ''
-      };
+    openImageDialog(item) {
+      this.imagePreviews = Object.assign({},item);
+      this.filePhoto = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photo;
+      this.filePhotoOne = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoOne;
+      this.filePhotoTwo = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoTwo;
+      this.filePhotoThree = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoThree;
+      this.filePhotoFour = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoFour;
+      // this.imageForm = {
+      //   productId: product.productId,
+      //   title: product.title,
+      //   photo: product.photo || '',
+      //   photoOne: product.photoOne || '',
+      //   photoTwo: product.photoTwo || '',
+      //   photoThree: product.photoThree || '',
+      //   photoFour: product.photoFour || ''
+      // };
 
-      this.imageFiles = {
-        photo: null,
-        photoOne: null,
-        photoTwo: null,
-        photoThree: null,
-        photoFour: null
-      };
+      // this.imageFiles = {
+      //   photo: null,
+      //   photoOne: null,
+      //   photoTwo: null,
+      //   photoThree: null,
+      //   photoFour: null
+      // };
 
-      this.imagePreviews = {
-        photo: product.photo || '',
-        photoOne: product.photoOne || '',
-        photoTwo: product.photoTwo || '',
-        photoThree: product.photoThree || '',
-        photoFour: product.photoFour || ''
-      };
+      // this.imagePreviews = {
+      //   photo: product.photo || '',
+      //   photoOne: product.photoOne || '',
+      //   photoTwo: product.photoTwo || '',
+      //   photoThree: product.photoThree || '',
+      //   photoFour: product.photoFour || ''
+      // };
 
       this.imageDialog = true;
     },
@@ -622,42 +771,62 @@ export default defineComponent({
     },
 
     async saveProductImages() {
-      this.uploadingImages = true;
-      try {
-        const payload: Record<string, string | null> = {};
-        const keys = ['photo', 'photoOne', 'photoTwo', 'photoThree', 'photoFour'];
+      var formData = new FormData();
+      formData.append("file", this.$refs.file.files[0]);
+      PackageService
+        .updateProductPhoto(formData, this.imagePreviews.productId,0)
+        .then((response) => {
+          this.fetchProducts();
+        })
+        .catch((error) => {
+          this.$swal( error.response.data.message, "error");
+        });
+      var formData = new FormData();
+      formData.append("file", this.$refs.fileOne.files[0]);
+      PackageService
+        .updateProductPhoto(formData, this.imagePreviews.productId,1)
+        .then((response) => {
+          this.fetchProducts();
+        })
+        .catch((error) => {
+          this.$swal( error.response.data.message, "error");
+        });
+    //   this.uploadingImages = true;
+    //   try {
+    //     const payload: Record<string, string | null> = {};
+    //     const keys = ['photo', 'photoOne', 'photoTwo', 'photoThree', 'photoFour'];
 
-        for (const key of keys) {
-          const file = this.imageFiles[key];
-          if (file) {
-            const uploadedUrl = await this.uploadImageFile(file);
-            payload[key] = uploadedUrl;
-          } else {
-            payload[key] = this.imageForm[key as keyof typeof this.imageForm] || null;
-          }
-        }
+    //     for (const key of keys) {
+    //       const file = this.imageFiles[key];
+    //       if (file) {
+    //         const uploadedUrl = await this.uploadImageFile(file);
+    //         payload[key] = uploadedUrl;
+    //       } else {
+    //         payload[key] = this.imageForm[key as keyof typeof this.imageForm] || null;
+    //       }
+    //     }
 
-        const idx = this.products.findIndex(p => p.productId === this.imageForm.productId);
-        if (idx !== -1) {
-          this.products[idx] = { ...this.products[idx], ...payload };
-        }
+    //     const idx = this.products.findIndex(p => p.productId === this.imageForm.productId);
+    //     if (idx !== -1) {
+    //       this.products[idx] = { ...this.products[idx], ...payload };
+    //     }
 
-        if (supabase) {
-          await supabase
-            .from('product')
-            .update(payload)
-            .eq('productId', this.imageForm.productId);
-        }
+    //     if (supabase) {
+    //       await supabase
+    //         .from('product')
+    //         .update(payload)
+    //         .eq('productId', this.imageForm.productId);
+    //     }
 
-        this.imageDialog = false;
-        alert('Photos uploaded successfully!');
-      } catch (error) {
-        console.error('Error saving images:', error);
-        alert('Failed to save images.');
-      } finally {
-        this.uploadingImages = false;
-      }
-    }
+    //     this.imageDialog = false;
+    //     alert('Photos uploaded successfully!');
+    //   } catch (error) {
+    //     console.error('Error saving images:', error);
+    //     alert('Failed to save images.');
+    //   } finally {
+    //     this.uploadingImages = false;
+    //   }
+     }
   }
 })
 </script>
@@ -674,7 +843,7 @@ export default defineComponent({
 .chip-domestic { background-color: #f1f5f9; color: #475569; }
 .chip-international { background-color: #fff7ed; color: #ea580c; }
 
-/* Table cells တွေအားလုံးကို တစ်ကြောင်းတည်း ဖြစ်အောင် ထိန်းသည့် အပိုင်း */
+
 .premium-table :deep(td) { 
   white-space: nowrap !important;
 }

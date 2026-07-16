@@ -456,7 +456,7 @@ export default {
       const userId = this.loginUser?.userAccountId || 'guest';
       const wishlistKey = `wishlist_${userId}`;
       const currentWishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
-      // loose equality (==) သုံးပြီး id တိုက်စစ်ပါမည်
+     
       this.inWishlist = currentWishlist.some(item => item.productId == this.productId);
     },
 

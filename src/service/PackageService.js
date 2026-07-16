@@ -28,21 +28,41 @@ class PackageService{
     }
 
 
-//For Admin Product
+    //For Admin Product
 
-    getProduct(locationType) {
-        let url = `/package`
+    getProduct(locationType ,type, search) {
+        let url = `/product`
         return axios.get(url,{
             params: {
-                locationType
+                locationType ,type, search
             }
         }).then(request => request.data);
     }
+
     addProduct(pkg) {
-        let url = `/package`;
+        let url = `/product`;
         return this.axios.post(url, pkg).then(request => request.data);
     }
 
+    updateProduct(pkg) {
+        let url = `/product/${pkg.productId}`;
+        return this.axios.put(url, pkg).then(request => request.data);
+    }
+
+    deleteProduct(productId) {
+        let url = `/product/${productId}`;
+        return this.axios.delete(url).then(request => request.data);
+    }
+  updateProductPhoto(formData, productId,photoIndex) {
+    let url = `product/photo/${productId}/${photoIndex}`;
+    return axios
+      .put(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((request) => request.data);
+  }
 
 }
 

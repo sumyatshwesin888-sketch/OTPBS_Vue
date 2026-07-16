@@ -137,17 +137,16 @@
             </v-col>
             <v-col cols="12" sm="4" md="3">
               <v-select
-                v-model="hotelCityFilter"
-                label="Filter by Hub Location"
-                :items="[
-                  { title: 'All Cities', value: null },
-                  ...cities.map(c => ({ title: c.cityName, value: c.cityId }))
-                ]"
+                v-model="cityAll"
+                label="City"
+                :items="cityAllList"
                 density="compact"
                 variant="outlined"
                 hide-details
                 clearable
                 class="sleek-input"
+                item-title="cityName"
+    item-value="cityName"
               ></v-select>
             </v-col>
             <v-spacer class="hidden-xs-only"></v-spacer>
@@ -178,7 +177,7 @@
           <v-card-text class="pt-0 px-4 pb-4">
             <v-data-table
               :headers="hotelHeaders"
-              :items="filteredHotels"
+              :items="hotels"
               :loading="hotelLoading"
               item-value="hotelId"
               hide-default-footer
@@ -202,7 +201,7 @@
               <template #item.city.cityName="{ item }">
                 <span class="status-chip chip-indigo d-inline-flex align-center" style="gap: 4px;">
                   <v-icon size="11">mdi-map-marker-outline</v-icon>
-                  {{ item.city?.cityName || 'Unlinked Ledger' }}
+                  {{ item.cityDto.cityName}}
                 </span>
               </template>
 
@@ -282,6 +281,7 @@
                 class="btn-primary text-none text-caption font-weight-bold"
                 height="34"
                 :disabled="!cityFormValid"
+                
               >
                 {{ editingCity ? 'Update Parameters' : 'Deploy Node' }}
               </v-btn>
@@ -325,17 +325,17 @@
               </v-col>
               <v-col cols="12">
                 <v-select
-                  v-model="hotelForm.cityId"
+                  v-model="hotelForm.cityDto"
                   label="Assigned Administrative Hub Area *"
-                  :items="cities"
+                  :items="cityList"
                   item-title="cityName"
-                  item-value="cityId"
                   prepend-inner-icon="mdi-map-marker-radius-outline"
                   required
                   variant="outlined"
                   density="compact"
                   hide-details="auto"
                   class="sleek-input"
+                  return-object
                 ></v-select>
               </v-col>
             </v-row>
@@ -402,11 +402,14 @@
 import { defineComponent } from 'vue'
 import { supabase } from '../../lib/supabase'
 import type { Hotel, City } from '../../lib/supabase'
-
+import cityService from '@/service/CityService'
 export default defineComponent({
   name: 'AdminHotels',
   data() {
     return {
+      cityList:[],
+      cityAllList:[],
+      cityAll:{},
       cities: [] as City[],
       cityLoading: false,
       cityDialog: false,
@@ -427,8 +430,8 @@ export default defineComponent({
       hotelCityFilter: null as string | null,
       hotelForm: {
         hotelId: '',
-        cityId: '',
-        hotelName: ''
+        hotelName: '',
+        cityDto:{cityId:0,cityName:""},
       },
       editingHotel: false,
       hotelToDelete: null as Hotel | null,
@@ -455,33 +458,68 @@ export default defineComponent({
       return this.cities.filter(c => c.cityName.toLowerCase().includes(term))
     },
 
-    filteredHotels(): Hotel[] {
-      let result = this.hotels
-      if (this.hotelSearch) {
-        const term = this.hotelSearch.toLowerCase()
-        result = result.filter(h =>
-          h.hotelName.toLowerCase().includes(term) ||
-          (h.city && h.city.cityName.toLowerCase().includes(term))
-        )
-      }
-      if (this.hotelCityFilter) {
-        result = result.filter(h => h.cityId === this.hotelCityFilter)
-      }
-      return result
-    },
+    // filteredHotels(): Hotel[] {
+    //   // let result = this.hotels
+    //   // if (this.hotelSearch) {
+    //   //   const term = this.hotelSearch.toLowerCase()
+    //   //   result = result.filter(h =>
+    //   //     h.hotelName.toLowerCase().includes(term) ||
+    //   //     (h.city && h.city.cityName.toLowerCase().includes(term))
+    //   //   )
+    //   // }
+    //   // if (this.hotelCityFilter) {
+    //   //   result = result.filter(h => h.cityId === this.hotelCityFilter)
+    //   // }
+
+    //   return result
+    // },
 
     cityFormValid(): boolean {
       return !!this.cityForm.cityName
     },
 
     hotelFormValid(): boolean {
-      return !!this.hotelForm.hotelName && !!this.hotelForm.cityId
+      return true;// !!this.hotelForm.hotelName && !!this.hotelForm.cityDto.cityId
     }
   },
   async mounted() {
+    
+    this.getCityMethod();
+    this.getHotelListMethod();
     await Promise.all([this.fetchCities(), this.fetchHotels()])
   },
   methods: {
+    getHotelListMethod:function(){
+            cityService
+        .getHotel()
+        .then((response) => {
+
+          this.hotels.splice(0);
+          this.hotels.push(...response);
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+    },
+    getCityMethod(){
+      cityService
+        .getCity()
+        .then((response) => {
+
+          this.cityList.splice(0);
+          this.cityList.push(...response);
+
+          this.cityAllList.splice(0);
+          this.cityAllList.push({cityName:"ALL",cityId:0});
+          this.cityAllList.push(...response);
+
+          this.hotelForm.cityDto  = this.cityList[0];
+          this.cityAll  = this.cityAllList[0];
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+    },
     async fetchCities() {
       this.cityLoading = true
       try {
@@ -596,44 +634,21 @@ export default defineComponent({
       this.hotelDialog = true
     },
 
-    openEditHotelDialog(hotel: Hotel) {
-      this.editingHotel = true
-      this.hotelForm = {
-        hotelId: hotel.hotelId,
-        cityId: hotel.cityId,
-        hotelName: hotel.hotelName
-      }
-      this.hotelDialog = true
+    openEditHotelDialog(item) {
+      this.editingHotel = true;
+      this.hotelForm = Object.assign({},item);
+      this.hotelDialog = true;
     },
 
     async saveHotel() {
-      try {
-        if (this.editingHotel) {
-          const { error } = await supabase
-            .from('hotel')
-            .update({
-              cityId: this.hotelForm.cityId,
-              hotelName: this.hotelForm.hotelName
-            })
-            .eq('hotelId', this.hotelForm.hotelId)
-
-          if (error) throw error
-        } else {
-          const { error } = await supabase
-            .from('hotel')
-            .insert([{
-              cityId: this.hotelForm.cityId,
-              hotelName: this.hotelForm.hotelName
-            }])
-
-          if (error) throw error
-        }
-
-        this.hotelDialog = false
-        await this.fetchHotels()
-      } catch (error) {
-        console.error('Error saving hotel:', error)
-      }
+        cityService
+        .addHotel(this.hotelForm)
+        .then((response) => {
+          
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
     },
 
     openDeleteHotelDialog(hotel: Hotel) {
