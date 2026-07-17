@@ -14,6 +14,23 @@ class PackageService{
             }
         }).then(request => request.data);
     }
+
+    getPackageDetailById(productId) {
+    
+        let url = `/package/detail/${productId}`
+    
+        return axios.get(url)
+            .then(request => request.data);
+    
+    }
+        getProductById(productId) {
+    
+        let url = `/product/${productId}`
+    
+        return axios.get(url)
+            .then(request => request.data);
+    
+    }
     addPackage(pkg) {
         let url = `/package`;
         return this.axios.post(url, pkg).then(request => request.data);

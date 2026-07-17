@@ -28,7 +28,7 @@
           <div class="row"><span>Traveler Name</span> <strong>{{ booking.travelerInfo.name }}</strong></div>
           <div class="row"><span>Email</span> <strong>{{ booking.travelerInfo.email }}</strong></div>
           <div class="row"><span>Contact</span> <strong>{{ booking.travelerInfo.phone }}</strong></div>
-          <div class="row"><span>Date</span> <strong>{{ booking.travelerInfo.date }}</strong></div>
+          <!-- <div class="row"><span>Date</span> <strong>{{ booking.travelerInfo.date }}</strong></div> -->
           <div class="row"><span>Travelers</span> <strong>{{ booking.travelerInfo.travelers }}</strong></div>
           <div class="row"><span>Payment</span> <strong>{{ booking.paymentMethod }}</strong></div>
           
@@ -46,7 +46,7 @@
 
     <div class="action-buttons">
       <button class="back-btn" @click="$router.go(-1)">Back</button>
-      <button class="btn-outline" @click="downloadReceipt">Download Receipt</button>
+      <!-- <button class="btn-outline" @click="downloadReceipt">Download Receipt</button> -->
       <button class="btn-primary" @click="$router.push('/packages')">Browse More Packages</button>
     </div>
   </div>
