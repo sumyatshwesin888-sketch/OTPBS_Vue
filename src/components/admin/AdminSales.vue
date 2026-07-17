@@ -15,8 +15,9 @@
                   <span class="ml-1">Gross earnings</span>
                 </p>
               </div>
+              
               <div class="stat-icon-container stat-icon-container-green">
-                <v-icon size="18">mdi-currency-usd</v-icon>
+                <v-icon size="18">mdi-cash-multiple</v-icon>
               </div>
             </div>
           </v-card-text>
@@ -110,7 +111,7 @@
               { title: 'All', value: null },
               { title: 'Confirmed', value: 'CONFIRM' },
               { title: 'Approved', value: 'APPROVED' },
-              { title: 'Cancelled', value: 'DELETE' }
+              { title: 'Cancelled', value: 'DELETE' },
             ]"
             density="compact"
             variant="outlined"
@@ -140,10 +141,12 @@
       <v-card-title class="pa-4 pb-2">
         <div>
           <h3 class="card-title-text mb-0">Booking & Sales Registry</h3>
-          <p class="card-subtitle-text mb-0">Manage tour client statements, operator validation and confirmations</p>
+          <p class="card-subtitle-text mb-0">
+            Manage tour client statements, operator validation and confirmations
+          </p>
         </div>
       </v-card-title>
-      
+
       <v-card-text class="pt-0 px-4 pb-4">
         <v-data-table
           :headers="headers"
@@ -155,9 +158,22 @@
           fixed-header
           height="480"
         >
+          <!-- Auto Increment No. Column -->
+          <template #item.index="{ index }">
+            <span
+              class="text-caption font-weight-medium text-grey-darken-1"
+              style="font-size: 0.8rem !important"
+            >
+              {{ index + 1 }}
+            </span>
+          </template>
+
           <!-- Booking ID -->
           <template #item.saleId="{ item }">
-            <span class="text-caption font-weight-bold text-primary" style="font-size: 0.75rem !important;">
+            <span
+              class="text-caption font-weight-bold text-primary"
+              style="font-size: 0.75rem !important"
+            >
               #{{ item.saleId.slice(0, 8).toUpperCase() }}
             </span>
           </template>
@@ -166,11 +182,14 @@
           <template #item.customer.profileName="{ item }">
             <div class="d-flex align-center py-1">
               <v-avatar size="28" class="avatar-gradient mr-2 glass-avatar">
-                <span class="text-white font-weight-bold" style="font-size: 0.7rem;">
+                <span class="text-white font-weight-bold" style="font-size: 0.7rem">
                   {{ item.customer?.profileName?.charAt(0) || 'U' }}
                 </span>
               </v-avatar>
-              <span class="font-weight-semibold text-grey-darken-3" style="font-size: 0.8rem !important;">
+              <span
+                class="font-weight-semibold text-grey-darken-3"
+                style="font-size: 0.8rem !important"
+              >
                 {{ item.customer?.profileName || 'N/A' }}
               </span>
             </div>
@@ -178,48 +197,92 @@
 
           <!-- Product Title -->
           <template #item.product.title="{ item }">
-            <span class="text-grey-darken-2 d-inline-block text-truncate" style="max-width: 180px; font-size: 0.8rem !important;">
+            <span
+              class="text-grey-darken-2 d-inline-block text-truncate"
+              style="max-width: 180px; font-size: 0.8rem !important"
+            >
               {{ item.product?.title || 'N/A' }}
+            </span>
+          </template>
+
+          <!-- Unit Price -->
+          <template #item.unitPrice="{ item }">
+            <span
+              class="text-grey-darken-1 font-weight-medium"
+              style="font-size: 0.8rem !important"
+            >
+              {{ currencyFormatter.format(item.unitPrice || 0) }}
             </span>
           </template>
 
           <!-- Qty -->
           <template #item.qty="{ item }">
-            <span class="text-grey-darken-1 font-weight-medium" style="font-size: 0.8rem !important;">
+            <span
+              class="text-grey-darken-1 font-weight-medium"
+              style="font-size: 0.8rem !important"
+            >
               {{ item.qty }}
             </span>
           </template>
 
           <!-- Amount -->
           <template #item.amount="{ item }">
-            <span class="font-weight-bold text-primary" style="font-size: 0.8rem !important;">
+            <span class="font-weight-bold text-primary" style="font-size: 0.8rem !important">
               {{ currencyFormatter.format(item.amount) }}
             </span>
           </template>
 
-          <!-- Status Dropdown Trigger -->
+          <!-- Voucher Code -->
+          <template #item.voucherCode="{ item }">
+            <v-chip
+              v-if="item.voucherCode"
+              size="x-small"
+              color="indigo-lighten-1"
+              variant="tonal"
+              class="font-weight-medium"
+            >
+              {{ item.voucherCode }}
+            </v-chip>
+            <span v-else class="text-grey-lighten-1">-</span>
+          </template>
+
+          <!-- Payment Type -->
+          <template #item.paymentType="{ item }">
+            <span class="text-grey-darken-1 text-caption" style="font-size: 0.8rem !important">
+              {{ item.paymentType || '-' }}
+            </span>
+          </template>
+
+          <!-- Status Dropdown Trigger (စတေးတပ်စ် ပြောင်းလဲရန် နေရာ) -->
           <template #item.status="{ item }">
             <v-menu location="bottom end" offset="4">
               <template #activator="{ props }">
                 <span
                   v-bind="props"
-                  :class="['status-chip', item.status === 'CONFIRM' ? 'status-confirm' : item.status === 'APPROVED' ? 'chip-standard' : 'status-delete']"
+                  :class="['status-chip', getStatusClass(item.status)]"
                   class="cursor-pointer d-inline-flex align-center"
-                  style="gap: 2px;"
+                  style="gap: 4px; padding: 4px 10px; border-radius: 20px;"
                 >
-                  {{ item.status === 'DELETE' ? 'Cancelled' : item.status }}
-                  <v-icon end size="11">mdi-chevron-down</v-icon>
+                  <v-icon size="12" class="mr-1">{{ getStatusIcon(item.status) }}</v-icon>
+                  {{ formatStatusDisplay(item.status) }}
+                  <v-icon end size="11" class="ml-1">mdi-chevron-down</v-icon>
                 </span>
               </template>
               <v-list density="compact" class="pa-1 glass-menu">
                 <v-list-item class="menu-item rounded-lg" @click="updateStatus(item, 'CONFIRM')">
-                  <v-list-item-title class="text-caption font-weight-medium text-success">Confirm</v-list-item-title>
+                  <v-list-item-title class="text-caption font-weight-medium text-success d-flex align-center">
+                    <v-icon size="14" class="mr-2" color="success">mdi-clock-outline</v-icon> Confirm
+                  </v-list-item-title>
                 </v-list-item>
                 <v-list-item class="menu-item rounded-lg" @click="updateStatus(item, 'APPROVED')">
-                  <v-list-item-title class="text-caption font-weight-medium text-primary">Approve</v-list-item-title>
+                  <v-list-item-title class="text-caption font-weight-medium text-primary d-flex align-center">
+                    <v-icon size="14" class="mr-2" color="primary">mdi-check-circle-outline</v-icon> Approve
+                  </v-list-item-title>
                 </v-list-item>
                 <v-list-item class="menu-item rounded-lg" @click="updateStatus(item, 'DELETE')">
-                  <v-list-item-title class="text-caption font-weight-medium text-error">Cancel</v-list-item-title>
+                  <v-list-item-title class="text-caption font-weight-medium text-error d-flex align-center">
+                    <v-icon size="14" class="mr-2" color="error">mdi-cancel</v-icon> Cancel (Delete)
+                  </v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -227,21 +290,37 @@
 
           <!-- Date -->
           <template #item.date="{ item }">
-            <span class="text-grey-darken-1" style="font-size: 0.8rem !important;">
+            <span class="text-grey-darken-1" style="font-size: 0.8rem !important">
               {{ formatDate(item.date) }}
             </span>
           </template>
 
-          <!-- Actions -->
+          <!-- Modified Date -->
+          <template #item.modifiedDate="{ item }">
+            <span class="text-grey-darken-1" style="font-size: 0.8rem !important">
+              {{ formatDate(item.modifiedDate) }}
+            </span>
+          </template>
+
+          <!-- Actions (လုံးဝ ဖျက်ပစ်မည့် ခလုတ်) -->
           <template #item.actions="{ item }">
-            <v-btn icon variant="text" color="slate-600" size="small" class="mr-1" @click="openEditDialog(item)">
-              <v-icon size="18">mdi-pencil-outline</v-icon>
-              <v-tooltip activator="parent" location="top">Edit</v-tooltip>
-            </v-btn>
-            <v-btn icon variant="text" color="error" size="small" @click="openDeleteDialog(item)">
-              <v-icon size="18">mdi-delete-outline</v-icon>
-              <v-tooltip activator="parent" location="top">Delete</v-tooltip>
-            </v-btn>
+            <div class="d-flex align-center justify-end text-no-wrap">
+              <v-btn
+                icon
+                variant="text"
+                color="slate-600"
+                size="small"
+                class="mr-1"
+                @click="openEditDialog(item)"
+              >
+                <v-icon size="18">mdi-pencil-outline</v-icon>
+                <v-tooltip activator="parent" location="top">Edit</v-tooltip>
+              </v-btn>
+              <v-btn icon variant="text" color="error" size="small" @click="openDeleteDialog(item)">
+                <v-icon size="18">mdi-delete-outline</v-icon>
+                <v-tooltip activator="parent" location="top">Delete</v-tooltip>
+              </v-btn>
+            </div>
           </template>
 
           <!-- Empty State -->
@@ -251,10 +330,9 @@
                 <v-icon color="grey-darken-1" size="22">mdi-cart-off-outline</v-icon>
               </v-avatar>
               <p class="card-title-text mb-0">No bookings discovered</p>
-              <p class="card-subtitle-text">Try modifying your text parameters or register a statement</p>
-              <v-btn color="primary" class="btn-primary text-none text-caption font-weight-bold mt-3" prepend-icon="mdi-plus" size="small" @click="openAddDialog">
-                New Booking
-              </v-btn>
+              <p class="card-subtitle-text">
+                Try modifying your text parameters or register a statement
+              </p>
             </div>
           </template>
         </v-data-table>
@@ -266,11 +344,15 @@
       <v-card class="premium-dialog">
         <v-card-title class="d-flex justify-space-between align-center pa-5 pb-2">
           <div>
-            <h3 class="card-title-text" style="font-size: 1.1rem !important;">
+            <h3 class="card-title-text" style="font-size: 1.1rem !important">
               {{ editing ? 'Edit Booking Entry' : 'Create Booking Statement' }}
             </h3>
             <p class="card-subtitle-text">
-              {{ editing ? 'Modify standard sales pipeline parameters' : 'Provision a new customer seat itinerary allocation' }}
+              {{
+                editing
+                  ? 'Modify standard sales pipeline parameters'
+                  : 'Provision a new customer seat itinerary allocation'
+              }}
             </p>
           </div>
           <v-btn icon variant="text" size="small" @click="dialog = false">
@@ -282,25 +364,13 @@
           <v-form @submit.prevent="saveSale">
             <v-row class="form-row-spacing">
               <v-col cols="12" sm="6">
-                <v-select
-                  v-model="saleForm.userAccountId"
-                  label="Tour Operator *"
-                  :items="users"
-                  item-title="profileName"
-                  item-value="userAccountId"
-                  prepend-inner-icon="mdi-account-tie-outline"
-                  required
-                  variant="outlined"
-                  density="compact"
-                  hide-details="auto"
-                  class="sleek-input"
-                ></v-select>
+                <!-- Tour Operator Space -->
               </v-col>
               <v-col cols="12" sm="6">
                 <v-select
                   v-model="saleForm.customerId"
                   label="Customer Account *"
-                  :items="users.filter(u => u.userType === 'CUSTOMER')"
+                  :items="users.filter((u) => u.userType === 'CUSTOMER')"
                   item-title="profileName"
                   item-value="userAccountId"
                   prepend-inner-icon="mdi-account-outline"
@@ -341,21 +411,24 @@
                   class="sleek-input"
                 ></v-text-field>
               </v-col>
+
+              <!-- Unit Price Field -->
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model.number="saleForm.unitPrice"
-                  label="Unit Rate *"
+                  label="Unit Rate (Auto-filled) *"
                   type="number"
-                  min="0"
-                  prefix="$"
+                  suffix="MMK"
                   prepend-inner-icon="mdi-tag-outline"
                   required
+                  readonly
                   variant="outlined"
                   density="compact"
                   hide-details="auto"
-                  class="sleek-input"
+                  class="sleek-input field-readonly"
                 ></v-text-field>
               </v-col>
+
               <v-col cols="12">
                 <v-text-field
                   :model-value="currencyFormatter.format(saleForm.amount)"
@@ -371,7 +444,7 @@
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="saleForm.voucherCode"
-                  label="Promotional Voucher"
+                  label="Voucher Code"
                   prepend-inner-icon="mdi-ticket-percent-outline"
                   variant="outlined"
                   density="compact"
@@ -379,18 +452,21 @@
                   class="sleek-input"
                 ></v-text-field>
               </v-col>
+
+              <!-- Payment Type Select Box -->
               <v-col cols="12" sm="6">
-                <v-text-field
+                <v-select
                   v-model="saleForm.paymentType"
-                  label="Payment Channel"
-                  placeholder="e.g., Bank, Card, Cash"
+                  label="Payment Type"
+                  :items="['KBZpay', 'WAVEpay', 'AYApay']"
                   prepend-inner-icon="mdi-credit-card-outline"
                   variant="outlined"
                   density="compact"
                   hide-details="auto"
                   class="sleek-input"
-                ></v-text-field>
+                ></v-select>
               </v-col>
+
               <v-col cols="12" sm="6">
                 <v-select
                   v-model="saleForm.status"
@@ -420,7 +496,13 @@
 
             <v-card-actions class="pa-0 pt-4">
               <v-spacer></v-spacer>
-              <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="34" @click="dialog = false">Cancel</v-btn>
+              <v-btn
+                variant="outlined"
+                class="mr-2 text-none text-caption font-weight-bold"
+                height="34"
+                @click="dialog = false"
+                >Cancel</v-btn
+              >
               <v-btn
                 color="primary"
                 type="submit"
@@ -443,14 +525,29 @@
           <v-avatar size="48" class="avatar-error mb-3">
             <v-icon size="24" color="white">mdi-alert-outline</v-icon>
           </v-avatar>
-          <h3 class="card-title-text text-center mb-1" style="font-size: 1.05rem !important;">Confirm Absolute Removal</h3>
+          <h3 class="card-title-text text-center mb-1" style="font-size: 1.05rem !important">
+            Confirm Absolute Removal
+          </h3>
           <p class="card-subtitle-text text-center">
-            Are you sure you want to drop booking statement? This operations ledger layer cannot be restored.
+            Are you sure you want to drop booking statement? This operations ledger layer cannot be
+            restored.
           </p>
         </v-card-text>
         <v-card-actions class="pa-4 pt-0 justify-center">
-          <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="32" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" class="btn-error text-none text-caption font-weight-bold" height="32" @click="deleteSale">Delete</v-btn>
+          <v-btn
+            variant="outlined"
+            class="mr-2 text-none text-caption font-weight-bold"
+            height="32"
+            @click="deleteDialog = false"
+            >Cancel</v-btn
+          >
+          <v-btn
+            color="error"
+            class="btn-error text-none text-caption font-weight-bold"
+            height="32"
+            @click="deleteSale"
+            >Delete</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -483,22 +580,27 @@ export default defineComponent({
         qty: 1,
         unitPrice: 0,
         amount: 0,
-        paymentType: '',
+        paymentType: 'KBZpay',
         status: 'CONFIRM' as 'CONFIRM' | 'APPROVED' | 'DELETE',
-        date: ''
+        date: '',
       },
       editing: false,
       itemToDelete: null as Sale | null,
       headers: [
+        { title: 'No.', key: 'index', align: 'start' as const, sortable: false },
         { title: 'Booking ID', key: 'saleId', align: 'start' as const },
         { title: 'Customer', key: 'customer.profileName', align: 'start' as const },
         { title: 'Product', key: 'product.title', align: 'start' as const },
+        { title: 'Unit Price', key: 'unitPrice', align: 'end' as const },
         { title: 'Qty', key: 'qty', align: 'center' as const },
-        { title: 'Amount', key: 'amount', align: 'end' as const },
+        { title: 'Total Amount', key: 'amount', align: 'end' as const },
+        { title: 'Voucher Code', key: 'voucherCode', align: 'start' as const },
+        { title: 'Payment Type', key: 'paymentType', align: 'start' as const },
         { title: 'Status', key: 'status', align: 'center' as const },
         { title: 'Date', key: 'date', align: 'start' as const },
-        { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const }
-      ]
+        { title: 'Modified Date', key: 'modifiedDate', align: 'start' as const },
+        { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
+      ],
     }
   },
   computed: {
@@ -506,14 +608,17 @@ export default defineComponent({
       let result = this.sales
       if (this.search) {
         const term = this.search.toLowerCase()
-        result = result.filter(s =>
-          s.saleId.toLowerCase().includes(term) ||
-          (s.customer?.profileName && s.customer.profileName.toLowerCase().includes(term)) ||
-          (s.product?.title && s.product.title.toLowerCase().includes(term))
+        result = result.filter(
+          (s) =>
+            s.saleId.toLowerCase().includes(term) ||
+            (s.customer?.profileName && s.customer.profileName.toLowerCase().includes(term)) ||
+            (s.product?.title && s.product.title.toLowerCase().includes(term)),
         )
       }
       if (this.statusFilter) {
-        result = result.filter(s => s.status === this.statusFilter)
+        result = result.filter(
+          (s) => (s.status || '').toUpperCase() === this.statusFilter?.toUpperCase()
+        )
       }
       return result
     },
@@ -523,26 +628,44 @@ export default defineComponent({
         this.saleForm.customerId &&
         this.saleForm.productId &&
         this.saleForm.qty > 0 &&
-        this.saleForm.unitPrice > 0
+        this.saleForm.unitPrice >= 0
       )
     },
+
     currencyFormatter() {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+      const formatter = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      })
+
+      return {
+        format: (value: number) => `${formatter.format(value || 0)} MMK`,
+      }
     },
     totalRevenue(): number {
       return this.sales
-        .filter(s => s.status !== 'DELETE')
+        .filter((s) => (s.status || '').toUpperCase() !== 'DELETE')
         .reduce((sum, s) => sum + (s.amount || 0), 0)
     },
     confirmedBookings(): number {
-      return this.sales.filter(s => s.status === 'CONFIRM').length
+      return this.sales.filter(
+        (s) => {
+          const status = (s.status || '').toUpperCase();
+          return status === 'CONFIRM' || status === 'CONFIRMED';
+        }
+      ).length
     },
     approvedBookings(): number {
-      return this.sales.filter(s => s.status === 'APPROVED').length
+      return this.sales.filter(
+        (s) => {
+          const status = (s.status || '').toUpperCase();
+          return status === 'APPROVED' || status === 'APPROVE';
+        }
+      ).length
     },
     cancelledBookings(): number {
-      return this.sales.filter(s => s.status === 'DELETE').length
-    }
+      return this.sales.filter((s) => (s.status || '').toUpperCase() === 'DELETE').length
+    },
   },
   async mounted() {
     await Promise.all([this.fetchSales(), this.fetchUsers(), this.fetchProducts()])
@@ -595,9 +718,9 @@ export default defineComponent({
         qty: 1,
         unitPrice: 0,
         amount: 0,
-        paymentType: '',
+        paymentType: 'KBZpay',
         status: 'CONFIRM',
-        date: today
+        date: today,
       }
       this.dialog = true
     },
@@ -613,9 +736,9 @@ export default defineComponent({
         qty: sale.qty,
         unitPrice: sale.unitPrice,
         amount: sale.amount,
-        paymentType: sale.paymentType || '',
+        paymentType: sale.paymentType || 'KBZpay',
         status: sale.status,
-        date: sale.date ? new Date(sale.date).toISOString().split('T')[0] : ''
+        date: sale.date ? new Date(sale.date).toISOString().split('T')[0] : '',
       }
       this.dialog = true
     },
@@ -633,7 +756,7 @@ export default defineComponent({
           amount,
           paymentType: this.saleForm.paymentType || null,
           status: this.saleForm.status,
-          date: this.saleForm.date || null
+          date: this.saleForm.date || null,
         }
 
         if (this.editing) {
@@ -643,9 +766,7 @@ export default defineComponent({
             .eq('saleId', this.saleForm.saleId)
           if (error) throw error
         } else {
-          const { error } = await supabase
-            .from('sale')
-            .insert([payload])
+          const { error } = await supabase.from('sale').insert([payload])
           if (error) throw error
         }
 
@@ -691,7 +812,7 @@ export default defineComponent({
     },
 
     onProductChange() {
-      const product = this.products.find(p => p.productId === this.saleForm.productId)
+      const product = this.products.find((p) => p.productId === this.saleForm.productId)
       if (product) {
         this.saleForm.unitPrice = product.amount
         this.calculateAmount()
@@ -702,13 +823,27 @@ export default defineComponent({
       this.saleForm.amount = this.saleForm.qty * this.saleForm.unitPrice
     },
 
-    getStatusColor(status: string): string {
-      switch (status) {
-        case 'CONFIRM': return 'success'
-        case 'APPROVED': return 'primary'
-        case 'DELETE': return 'error'
-        default: return 'grey'
-      }
+    // Case-insensitive helpers for UI
+    getStatusClass(status: string): string {
+      const s = (status || '').toUpperCase()
+      if (s === 'CONFIRM' || s === 'CONFIRMED') return 'status-confirm'
+      if (s === 'APPROVED' || s === 'APPROVE') return 'chip-standard'
+      return 'status-delete'
+    },
+
+    getStatusIcon(status: string): string {
+      const s = (status || '').toUpperCase()
+      if (s === 'CONFIRM' || s === 'CONFIRMED') return 'mdi-clock-outline'
+      if (s === 'APPROVED' || s === 'APPROVE') return 'mdi-check-circle-outline'
+      return 'mdi-cancel'
+    },
+
+    formatStatusDisplay(status: string): string {
+      const s = (status || '').toUpperCase()
+      if (s === 'CONFIRM' || s === 'CONFIRMED') return 'Confirmed'
+      if (s === 'APPROVED' || s === 'APPROVE') return 'Approved'
+      if (s === 'DELETE' || s === 'CANCELLED') return 'Cancelled'
+      return status || 'N/A'
     },
 
     formatDate(date: string | null): string {
@@ -716,14 +851,18 @@ export default defineComponent({
       return new Date(date).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
       })
-    }
+    },
   },
   watch: {
-    'saleForm.qty'() { this.calculateAmount() },
-    'saleForm.unitPrice'() { this.calculateAmount() }
-  }
+    'saleForm.qty'() {
+      this.calculateAmount()
+    },
+    'saleForm.unitPrice'() {
+      this.calculateAmount()
+    },
+  },
 })
 </script>
 
@@ -740,7 +879,8 @@ export default defineComponent({
   overflow: hidden;
 }
 
-.enterprise-card, .filter-bar-card {
+.enterprise-card,
+.filter-bar-card {
   background: rgba(255, 255, 255, 0.45) !important;
   backdrop-filter: blur(16px) saturate(120%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
@@ -766,7 +906,9 @@ export default defineComponent({
 }
 
 /* Interactivity & Neon Edge Glow Effect */
-.stat-card:hover, .enterprise-card:hover, .filter-bar-card:hover {
+.stat-card:hover,
+.enterprise-card:hover,
+.filter-bar-card:hover {
   transform: translateY(-3px);
   background: rgba(255, 255, 255, 0.65) !important;
 }
@@ -780,15 +922,35 @@ export default defineComponent({
   height: 100%;
 }
 
-.stat-card:has(.card-accent-green):hover { box-shadow: 0 6px 24px 0 rgba(76, 175, 80, 0.15) !important; border-color: rgba(76, 175, 80, 0.3) !important; }
-.stat-card:has(.card-accent-blue):hover { box-shadow: 0 6px 24px 0 rgba(33, 150, 243, 0.15) !important; border-color: rgba(33, 150, 243, 0.3) !important; }
-.stat-card:has(.card-accent-amber):hover { box-shadow: 0 6px 24px 0 rgba(255, 193, 7, 0.15) !important; border-color: rgba(255, 193, 7, 0.3) !important; }
-.stat-card:has(.card-accent-red):hover { box-shadow: 0 6px 24px 0 rgba(244, 67, 54, 0.15) !important; border-color: rgba(244, 67, 54, 0.3) !important; }
+.stat-card:has(.card-accent-green):hover {
+  box-shadow: 0 6px 24px 0 rgba(76, 175, 80, 0.15) !important;
+  border-color: rgba(76, 175, 80, 0.3) !important;
+}
+.stat-card:has(.card-accent-blue):hover {
+  box-shadow: 0 6px 24px 0 rgba(33, 150, 243, 0.15) !important;
+  border-color: rgba(33, 150, 243, 0.3) !important;
+}
+.stat-card:has(.card-accent-amber):hover {
+  box-shadow: 0 6px 24px 0 rgba(255, 193, 7, 0.15) !important;
+  border-color: rgba(255, 193, 7, 0.3) !important;
+}
+.stat-card:has(.card-accent-red):hover {
+  box-shadow: 0 6px 24px 0 rgba(244, 67, 54, 0.15) !important;
+  border-color: rgba(244, 67, 54, 0.3) !important;
+}
 
-.card-accent-green { background: linear-gradient(180deg, #4caf50, #81c784); }
-.card-accent-blue { background: linear-gradient(180deg, #2196f3, #64b5f6); }
-.card-accent-amber { background: linear-gradient(180deg, #ffc107, #ffe082); }
-.card-accent-red { background: linear-gradient(180deg, #f44336, #ef5350); }
+.card-accent-green {
+  background: linear-gradient(180deg, #4caf50, #81c784);
+}
+.card-accent-blue {
+  background: linear-gradient(180deg, #2196f3, #64b5f6);
+}
+.card-accent-amber {
+  background: linear-gradient(180deg, #ffc107, #ffe082);
+}
+.card-accent-red {
+  background: linear-gradient(180deg, #f44336, #ef5350);
+}
 
 /* Minimal Layout Elements */
 .stat-icon-container {
@@ -798,10 +960,22 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
 }
-.stat-icon-container-green { background: rgba(76, 175, 80, 0.08); color: #2e7d32 !important; }
-.stat-icon-container-blue { background: rgba(33, 150, 243, 0.08); color: #1565c0 !important; }
-.stat-icon-container-amber { background: rgba(255, 193, 7, 0.08); color: #b78103 !important; }
-.stat-icon-container-red { background: rgba(244, 67, 54, 0.08); color: #c62828 !important; }
+.stat-icon-container-green {
+  background: rgba(76, 175, 80, 0.08);
+  color: #2e7d32 !important;
+}
+.stat-icon-container-blue {
+  background: rgba(33, 150, 243, 0.08);
+  color: #1565c0 !important;
+}
+.stat-icon-container-amber {
+  background: rgba(255, 193, 7, 0.08);
+  color: #b78103 !important;
+}
+.stat-icon-container-red {
+  background: rgba(244, 67, 54, 0.08);
+  color: #c62828 !important;
+}
 
 .stat-label {
   font-size: 0.725rem;
@@ -860,10 +1034,12 @@ export default defineComponent({
   background: rgba(241, 245, 249, 0.4) !important;
   border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
   padding: 8px 12px !important;
+  white-space: nowrap !important;
 }
 .premium-table :deep(td) {
   border-bottom: 1px solid rgba(241, 245, 249, 0.3) !important;
   padding: 6px 12px !important;
+  white-space: nowrap !important;
 }
 
 .avatar-gradient {
@@ -877,15 +1053,26 @@ export default defineComponent({
 .status-chip {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: 9999px;
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
+  border: 1px solid transparent;
 }
-.status-confirm { background: rgba(76, 175, 80, 0.1); color: #2e7d32; }
-.chip-standard { background: rgba(33, 150, 243, 0.1); color: #1565c0; }
-.status-delete { background: rgba(244, 67, 54, 0.1); color: #c62828; }
+.status-confirm {
+  background: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+  border-color: rgba(76, 175, 80, 0.2);
+}
+.chip-standard {
+  background: rgba(33, 150, 243, 0.1);
+  color: #1565c0;
+  border-color: rgba(33, 150, 243, 0.2);
+}
+.status-delete {
+  background: rgba(244, 67, 54, 0.1);
+  color: #c62828;
+  border-color: rgba(244, 67, 54, 0.2);
+}
 
 .glass-menu {
   background: rgba(255, 255, 255, 0.85) !important;

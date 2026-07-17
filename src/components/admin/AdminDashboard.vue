@@ -1,91 +1,107 @@
 <template>
   <div>
-    <!-- Summary Cards -->
-    <v-row class="mb-4">
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-green"></div>
-          <v-card-text class="pa-4 pr-6">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Total Revenue</p>
-                <p class="stat-value">{{ currencyFormatter.format(totalRevenue) }}</p>
-                <p class="stat-trend">
-                  <v-icon size="11" color="success">mdi-trending-up</v-icon>
-                  <span class="ml-1">+12.5% from last month</span>
-                </p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-green">
-                <v-icon size="18">mdi-currency-usd</v-icon>
-              </div>
+    <!-- Summary Cards (CSS Grid သုံးပြီး ၅ ကတ်လုံး ၁ တန်းတည်း ကွက်တိညှပ်ထားသည့် နေရာ) -->
+    <div class="stats-grid mb-6">
+      <!-- 1. Total Revenue -->
+      <v-card class="stat-card" style="position: relative;">
+        <div class="card-accent card-accent-green"></div>
+        <v-card-text class="pa-4 pr-6">
+          <div class="d-flex justify-space-between align-start">
+            <div>
+              <p class="stat-label">Total Revenue</p>
+              <p class="stat-value">{{ currencyFormatter.format(totalRevenue) }}</p>
+              <p class="stat-trend">
+                <v-icon size="11" color="success">mdi-trending-up</v-icon>
+                <span class="ml-1">+12.5% from last month</span>
+              </p>
             </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
+            <div class="stat-icon-container stat-icon-container-green">
+              <v-icon size="18">mdi-currency-usd</v-icon>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
 
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-blue"></div>
-          <v-card-text class="pa-4 pr-6">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Total Sales</p>
-                <p class="stat-value">{{ numberFormatter.format(totalSales) }}</p>
-                <p class="stat-trend">
-                  <v-icon size="11" color="success">mdi-trending-up</v-icon>
-                  <span class="ml-1">+8.2% from last month</span>
-                </p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-blue">
-                <v-icon size="18">mdi-cart-outline</v-icon>
-              </div>
+      <!-- 2. Total Sales -->
+      <v-card class="stat-card" style="position: relative;">
+        <div class="card-accent card-accent-blue"></div>
+        <v-card-text class="pa-4 pr-6">
+          <div class="d-flex justify-space-between align-start">
+            <div>
+              <p class="stat-label">Total Sales</p>
+              <p class="stat-value">{{ numberFormatter.format(totalSales) }}</p>
+              <p class="stat-trend">
+                <v-icon size="11" color="success">mdi-trending-up</v-icon>
+                <span class="ml-1">+8.2% from last month</span>
+              </p>
             </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
+            <div class="stat-icon-container stat-icon-container-blue">
+              <v-icon size="18">mdi-cart-outline</v-icon>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
 
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-amber"></div>
-          <v-card-text class="pa-4 pr-6">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Total Products</p>
-                <p class="stat-value">{{ numberFormatter.format(totalProducts) }}</p>
-                <p class="stat-trend">
-                  <v-icon size="11" color="primary">mdi-package-variant</v-icon>
-                  <span class="ml-1">{{ topProducts.length }} trending</span>
-                </p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-amber">
-                <v-icon size="18">mdi-package-variant-closed</v-icon>
-              </div>
+      <!-- 3. Total Products -->
+      <v-card class="stat-card" style="position: relative;">
+        <div class="card-accent card-accent-amber"></div>
+        <v-card-text class="pa-4 pr-6">
+          <div class="d-flex justify-space-between align-start">
+            <div>
+              <p class="stat-label">Total Products</p>
+              <p class="stat-value">{{ numberFormatter.format(totalProducts) }}</p>
+              <p class="stat-trend">
+                <v-icon size="11" color="primary">mdi-package-variant</v-icon>
+                <span class="ml-1">{{ topProducts.length }} trending</span>
+              </p>
             </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
+            <div class="stat-icon-container stat-icon-container-amber">
+              <v-icon size="18">mdi-package-variant-closed</v-icon>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
 
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stat-card" style="position: relative;">
-          <div class="card-accent card-accent-purple"></div>
-          <v-card-text class="pa-4 pr-6">
-            <div class="d-flex justify-space-between align-start">
-              <div>
-                <p class="stat-label">Active Users</p>
-                <p class="stat-value">{{ numberFormatter.format(activeUsers) }}</p>
-                <p class="stat-trend">
-                  <v-icon size="11" color="primary">mdi-account-plus-outline</v-icon>
-                  <span class="ml-1">3 new this week</span>
-                </p>
-              </div>
-              <div class="stat-icon-container stat-icon-container-purple">
-                <v-icon size="18">mdi-account-group-outline</v-icon>
-              </div>
+      <!-- 4. Active Users -->
+      <v-card class="stat-card" style="position: relative;">
+        <div class="card-accent card-accent-purple"></div>
+        <v-card-text class="pa-4 pr-6">
+          <div class="d-flex justify-space-between align-start">
+            <div>
+              <p class="stat-label">Active Users</p>
+              <p class="stat-value">{{ numberFormatter.format(activeUsers) }}</p>
+              <p class="stat-trend">
+                <v-icon size="11" color="primary">mdi-account-plus-outline</v-icon>
+                <span class="ml-1">3 new this week</span>
+              </p>
             </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+            <div class="stat-icon-container stat-icon-container-purple">
+              <v-icon size="18">mdi-account-group-outline</v-icon>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
+
+      <!-- 5. Inactive Users -->
+      <v-card class="stat-card" style="position: relative;">
+        <div class="card-accent card-accent-rose"></div>
+        <v-card-text class="pa-4 pr-6">
+          <div class="d-flex justify-space-between align-start">
+            <div>
+              <p class="stat-label">Inactive Users</p>
+              <p class="stat-value">{{ numberFormatter.format(inactiveUsers) }}</p>
+              <p class="stat-trend">
+                <v-icon size="11" color="error">mdi-account-minus-outline</v-icon>
+                <span class="ml-1">Requires attention</span>
+              </p>
+            </div>
+            <div class="stat-icon-container stat-icon-container-rose">
+              <v-icon size="18">mdi-account-off-outline</v-icon>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
+    </div>
 
     <!-- Main Content Row -->
     <v-row>
@@ -252,6 +268,7 @@ export default {
     totalSales: 0,
     totalProducts: 0,
     activeUsers: 0,
+    inactiveUsers: 0,
     totalRevenue: 0,
     recentBookings: [],
     topProducts: [],
@@ -282,6 +299,7 @@ export default {
 
         if (usersResult.data) {
           this.activeUsers = usersResult.data.filter(u => u.status === 1).length
+          this.inactiveUsers = usersResult.data.filter(u => u.status !== 1).length
         }
 
         if (salesResult.data) {
@@ -367,6 +385,23 @@ export default {
 </script>
 
 <style scoped>
+/* 5 Cards on Exactly 1 Row (CSS Grid Solution) */
+.stats-grid {
+  display: grid;
+  /* Mobile & Tablet: ၂ တန်းစီ (၂ ကတ်၊ ၂ ကတ်၊ ၁ ကတ်) ပေါ်စေမည် */
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 12px; /* ကတ်တွေကြား အကွာအဝေး (စိတ်ကြိုက်လျှော့ချနိုင်သည်) */
+  width: 100%;
+}
+
+/* Large Screens/Desktop (၁ တန်းတည်း မရရအောင် အညီအမျှ ညှပ်ထည့်မည့် နေရာ) */
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 14px; /* Desktop အတွက် ကတ်ကြား အကွာအဝေးကို အနည်းငယ် တိုးထားပါသည် */
+  }
+}
+
 /* Modern Compact Glassmorphic UI */
 .stat-card {
   background: rgba(255, 255, 255, 0.5) !important;
@@ -377,6 +412,7 @@ export default {
   border-radius: 12px !important;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
   overflow: hidden;
+  height: 100%; /* ကတ်အမြင့်အားလုံး ညီနေစေရန် */
 }
 
 .enterprise-card {
@@ -389,7 +425,7 @@ export default {
   transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
 }
 
-/* Specific Card Title Styling (Fixed Huge Fonts) */
+/* Specific Card Title Styling */
 .card-title-text {
   font-size: 0.95rem !important;
   font-weight: 700 !important;
@@ -424,11 +460,13 @@ export default {
 .stat-card:has(.card-accent-blue):hover { box-shadow: 0 6px 24px 0 rgba(33, 150, 243, 0.15) !important; border-color: rgba(33, 150, 243, 0.3) !important; }
 .stat-card:has(.card-accent-amber):hover { box-shadow: 0 6px 24px 0 rgba(255, 193, 7, 0.15) !important; border-color: rgba(255, 193, 7, 0.3) !important; }
 .stat-card:has(.card-accent-purple):hover { box-shadow: 0 6px 24px 0 rgba(156, 39, 176, 0.15) !important; border-color: rgba(156, 39, 176, 0.3) !important; }
+.stat-card:has(.card-accent-rose):hover { box-shadow: 0 6px 24px 0 rgba(244, 63, 94, 0.15) !important; border-color: rgba(244, 63, 94, 0.3) !important; }
 
 .card-accent-green { background: linear-gradient(180deg, #4caf50, #81c784); }
 .card-accent-blue { background: linear-gradient(180deg, #2196f3, #64b5f6); }
 .card-accent-amber { background: linear-gradient(180deg, #ffc107, #ffe082); }
 .card-accent-purple { background: linear-gradient(180deg, #9c27b0, #ba68c8); }
+.card-accent-rose { background: linear-gradient(180deg, #f43f5e, #fb7185); }
 
 /* Compact Icons */
 .stat-icon-container {
@@ -442,6 +480,7 @@ export default {
 .stat-icon-container-blue { background: rgba(33, 150, 243, 0.08); color: #1565c0 !important; }
 .stat-icon-container-amber { background: rgba(255, 193, 7, 0.08); color: #b78103 !important; }
 .stat-icon-container-purple { background: rgba(156, 39, 176, 0.08); color: #6a1b9a !important; }
+.stat-icon-container-rose { background: rgba(244, 63, 94, 0.08); color: #be123c !important; }
 
 /* Mini Stats Typography */
 .stat-label {
@@ -490,7 +529,7 @@ export default {
   align-items: center;
   padding: 2px 8px;
   border-radius: 9999px;
-  font-size: 0.7rem;
+  font-size: 0.70rem;
   font-weight: 600;
 }
 .status-confirm { background: rgba(76, 175, 80, 0.1); color: #1b5e20; }
