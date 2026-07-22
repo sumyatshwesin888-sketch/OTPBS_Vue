@@ -51,15 +51,21 @@
 
       <aside class="summary-section" v-if="booking && booking.package">
         <div class="card summary-card">
-          <img :src="booking.package.image" :alt="booking.package.title" class="summary-img" />
+          <!-- <img :src="booking.package.image" :alt="booking.package.title" class="summary-img" /> -->
+            <img
+              :src="booking.package.photo ? 'http://localhost:8088/api/v1/productphoto/' + booking.package.photo : ''"
+              :alt="booking.package.title"
+              class="summary-img"
+            />
           <div class="summary-content">
             <h3>{{ booking.package.title }}</h3>
             <p class="destination">{{ booking.package.city }}</p>
             
             <div class="summary-details">
               <div class="row"><span>Travelers</span><strong>{{ booking.travelerInfo.travelers }}</strong></div>
-              <div class="row"><span>Duration</span><strong>{{ booking.package.duration }}</strong></div>
-              <div class="row"><span>Date</span><strong>{{ booking.travelerInfo.date }}</strong></div>
+              <div class="row"><span>Duration</span><strong>{{ booking.package.day }} Days 
+                {{ booking.package.night }} Nights</strong></div>
+              <!-- <div class="row"><span>Date</span><strong>{{ booking.travelerInfo.date }}</strong></div> -->
               <hr />
               <div class="row total"><span>Total Amount</span><strong>{{ booking.totalAmount.toLocaleString() }} MMK</strong></div>
             </div>
@@ -71,20 +77,49 @@
 </template>
 
 <script>
+import packageService from '@/service/PackageService'
+
+import saleService from '@/service/SaleService'
+
 export default {
   data() {
     return {
+      selectedImg: '',
+      packageDetail: {},
       selectedMethod: 'kbzpay',
       booking: null,
       paymentMethods: [
         { id: 'kbzpay', name: 'KBZPay', abbr: 'KBZ', color: '#2563EB' },
         { id: 'wavepay', name: 'WavePay', abbr: 'Wave', color: '#F59E0B' },
         { id: 'ayapay', name: 'AYAPay', abbr: 'AYA', color: '#7C3AED' },
-      ]
+      ],
+       loginUser:{},
+       productId:0,
     };
+   
   },
 
   mounted() {
+    this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
+    this.productId = localStorage.getItem('productId');
+    if(this.productId){
+
+    packageService.getProductById(this.productId)
+    .then(response => {
+
+        console.log("Payment Package Detail:", response);
+
+        this.packageDetail = response;
+
+        // image
+        this.selectedImg = response.photo;
+
+    })
+    .catch(err=>{
+        console.log(err);
+    });
+
+}
   const savedData = localStorage.getItem('booking_data');
   
   if (savedData) {
@@ -118,12 +153,33 @@ export default {
       if (!this.selectedMethod) {
         alert("Please select a payment method.");
         return;
-      }
+      } 
+      let saleDto = {product:{}};
+      saleDto.qty = localStorage.getItem( 'traveller');
+      saleDto.unitPrice = localStorage.getItem( 'amount');
+      saleDto.paymentType =this.selectedMethod;
+      saleDto.customerId = this.loginUser.userAccountId;
+      saleDto.product.productId = this.productId;
+      saleService
+ .addSale(saleDto)
 
+ .then(response=>{
+
+    console.log("Package Sale>>> ",response);
+
+ })
+
+ .catch(err=>{
+
+    console.log(err);
+
+ });
+
+     // localStorage.setItem('payment', this.selectedMethod);
       const savedData = localStorage.getItem('booking_data');
       let booking = savedData ? JSON.parse(savedData) : {};
 
-      booking.paymentMethod = this.selectedMethod;
+      booking.paymentMethod = this.selectedMethod;  
       booking.id = "BK-" + Math.floor(Math.random() * 90000 + 10000);
       booking.status = 'confirmed';
       booking.timestamp = new Date().toISOString();

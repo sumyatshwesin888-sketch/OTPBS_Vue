@@ -173,9 +173,14 @@ export default {
             const data = Array.isArray(response) ? response[0] : response;
 
             if (data) {
-              this.travelerCount = data.traveler !== undefined ? data.traveler + '+' : '0+';
-              this.packagesCount = data.packages !== undefined ? data.packages + '+' : '0+';
-              this.citiesCount = data.cities !== undefined ? data.cities + '+' : '0+';
+              console.log("Check Data fields:", data);
+              const travelers = data.traveler ?? data.travelerCount ?? 0;
+              const packages = data.packages ?? data.packagesCount ?? 0;
+              const cities = data.cities ?? data.citiesCount ?? 0;
+
+              this.travelerCount = travelers + '+';
+              this.packagesCount = packages + '+';
+              this.citiesCount = cities + '+';
             }
           }
         })

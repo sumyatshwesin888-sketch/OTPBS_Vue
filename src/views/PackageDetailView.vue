@@ -496,6 +496,7 @@ export default {
       localStorage.setItem(wishlistKey, JSON.stringify(currentWishlist));
     },
     async submitReview() {
+      
       if (this.newRating === 0) {
         alert('Please select a star rating.')
         return
@@ -517,9 +518,11 @@ export default {
       obj.userAccountDto.userAccountId = loggedInCustomerId
       obj.rating = this.newRating
       obj.comment = this.newComment
+      console.log(obj);
+      
       try {
         await axios.post('http://localhost:8088/api/v1/package/ratingcomment', obj)
-        alert('Review Success')
+        // alert('Review Success')
         this.newComment = ''
         this.newRating = 0
         this.getPackageDetail()

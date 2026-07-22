@@ -150,9 +150,7 @@
       <v-card-text class="pt-0 px-4 pb-4">
         <v-data-table
           :headers="headers"
-          :items="filteredSales"
-          :loading="loading"
-          item-value="saleId"
+          :items="saleList"
           hide-default-footer
           class="premium-table elevation-0"
           fixed-header
@@ -160,26 +158,21 @@
         >
           <!-- Auto Increment No. Column -->
           <template #item.index="{ index }">
-            <span
-              class="text-caption font-weight-medium text-grey-darken-1"
-              style="font-size: 0.8rem !important"
-            >
-              {{ index + 1 }}
-            </span>
+           <span>{{index+1}}</span>
           </template>
 
           <!-- Booking ID -->
-          <template #item.saleId="{ item }">
+          <!-- <template #item.saleId="{ item }">
             <span
               class="text-caption font-weight-bold text-primary"
               style="font-size: 0.75rem !important"
             >
               #{{ item.saleId.slice(0, 8).toUpperCase() }}
             </span>
-          </template>
+          </template> -->
 
           <!-- Customer Name -->
-          <template #item.customer.profileName="{ item }">
+          <!-- <template #item.customer.profileName="{ item }">
             <div class="d-flex align-center py-1">
               <v-avatar size="28" class="avatar-gradient mr-2 glass-avatar">
                 <span class="text-white font-weight-bold" style="font-size: 0.7rem">
@@ -193,68 +186,61 @@
                 {{ item.customer?.profileName || 'N/A' }}
               </span>
             </div>
-          </template>
+          </template> -->
 
           <!-- Product Title -->
-          <template #item.product.title="{ item }">
+          <!-- <template #item.product.title="{ item }">
             <span
               class="text-grey-darken-2 d-inline-block text-truncate"
               style="max-width: 180px; font-size: 0.8rem !important"
             >
               {{ item.product?.title || 'N/A' }}
             </span>
-          </template>
+          </template> -->
 
           <!-- Unit Price -->
-          <template #item.unitPrice="{ item }">
+          <!-- <template #item.unitPrice="{ item }">
             <span
               class="text-grey-darken-1 font-weight-medium"
               style="font-size: 0.8rem !important"
             >
-              {{ currencyFormatter.format(item.unitPrice || 0) }}
+              {{ item.unitPrice }}
             </span>
-          </template>
+          </template> -->
 
           <!-- Qty -->
-          <template #item.qty="{ item }">
+          <!-- <template #item.qty="{ item }">
             <span
               class="text-grey-darken-1 font-weight-medium"
               style="font-size: 0.8rem !important"
             >
               {{ item.qty }}
             </span>
-          </template>
+          </template> -->
 
           <!-- Amount -->
-          <template #item.amount="{ item }">
+          <!-- <template #item.amount="{ item }">
             <span class="font-weight-bold text-primary" style="font-size: 0.8rem !important">
-              {{ currencyFormatter.format(item.amount) }}
+              {{ item.amount }}
             </span>
-          </template>
+          </template> -->
 
           <!-- Voucher Code -->
-          <template #item.voucherCode="{ item }">
-            <v-chip
-              v-if="item.voucherCode"
-              size="x-small"
-              color="indigo-lighten-1"
-              variant="tonal"
-              class="font-weight-medium"
-            >
+          <!-- <template #item.voucherCode="{ item }">
+            <span>
               {{ item.voucherCode }}
-            </v-chip>
-            <span v-else class="text-grey-lighten-1">-</span>
-          </template>
+           </span>
+          </template> -->
 
           <!-- Payment Type -->
-          <template #item.paymentType="{ item }">
+          <!-- <template #item.paymentType="{ item }">
             <span class="text-grey-darken-1 text-caption" style="font-size: 0.8rem !important">
-              {{ item.paymentType || '-' }}
+              {{ item.paymentType }}
             </span>
-          </template>
+          </template> -->
 
           <!-- Status Dropdown Trigger (စတေးတပ်စ် ပြောင်းလဲရန် နေရာ) -->
-          <template #item.status="{ item }">
+          <!-- <template #item.status="{ item }">
             <v-menu location="bottom end" offset="4">
               <template #activator="{ props }">
                 <span
@@ -267,8 +253,8 @@
                   {{ formatStatusDisplay(item.status) }}
                   <v-icon end size="11" class="ml-1">mdi-chevron-down</v-icon>
                 </span>
-              </template>
-              <v-list density="compact" class="pa-1 glass-menu">
+              </template> -->
+              <!-- <v-list density="compact" class="pa-1 glass-menu">
                 <v-list-item class="menu-item rounded-lg" @click="updateStatus(item, 'CONFIRM')">
                   <v-list-item-title class="text-caption font-weight-medium text-success d-flex align-center">
                     <v-icon size="14" class="mr-2" color="success">mdi-clock-outline</v-icon> Confirm
@@ -284,9 +270,9 @@
                     <v-icon size="14" class="mr-2" color="error">mdi-cancel</v-icon> Cancel (Delete)
                   </v-list-item-title>
                 </v-list-item>
-              </v-list>
-            </v-menu>
-          </template>
+              </v-list> -->
+            <!-- </v-menu>
+          </template> -->
 
           <!-- Date -->
           <template #item.date="{ item }">
@@ -324,7 +310,7 @@
           </template>
 
           <!-- Empty State -->
-          <template #no-data>
+          <!-- <template #no-data>
             <div class="premium-empty-state pa-6 text-center">
               <v-avatar size="48" color="grey-lighten-4" class="mb-2">
                 <v-icon color="grey-darken-1" size="22">mdi-cart-off-outline</v-icon>
@@ -334,7 +320,7 @@
                 Try modifying your text parameters or register a statement
               </p>
             </div>
-          </template>
+          </template> -->
         </v-data-table>
       </v-card-text>
     </v-card>
@@ -368,11 +354,10 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <v-select
-                  v-model="saleForm.customerId"
-                  label="Customer Account *"
-                  :items="users.filter((u) => u.userType === 'CUSTOMER')"
+                  v-model="saleForm.customer"
+                  label="Customer"
+                  :items="userList"
                   item-title="profileName"
-                  item-value="userAccountId"
                   prepend-inner-icon="mdi-account-outline"
                   required
                   variant="outlined"
@@ -558,7 +543,7 @@
 import { defineComponent } from 'vue'
 import { supabase } from '../../lib/supabase'
 import type { Sale, UserAccount, Product } from '../../lib/supabase'
-
+import saleService from '@/service/SaleService'
 export default defineComponent({
   name: 'AdminSales',
   data() {
@@ -583,7 +568,10 @@ export default defineComponent({
         paymentType: 'KBZpay',
         status: 'CONFIRM' as 'CONFIRM' | 'APPROVED' | 'DELETE',
         date: '',
+        customer:{},
+        product:{},
       },
+      userList:[],
       editing: false,
       itemToDelete: null as Sale | null,
       headers: [
@@ -601,25 +589,27 @@ export default defineComponent({
         { title: 'Modified Date', key: 'modifiedDate', align: 'start' as const },
         { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
       ],
+      saleList:[],
     }
   },
   computed: {
     filteredSales(): Sale[] {
-      let result = this.sales
-      if (this.search) {
-        const term = this.search.toLowerCase()
-        result = result.filter(
-          (s) =>
-            s.saleId.toLowerCase().includes(term) ||
-            (s.customer?.profileName && s.customer.profileName.toLowerCase().includes(term)) ||
-            (s.product?.title && s.product.title.toLowerCase().includes(term)),
-        )
-      }
-      if (this.statusFilter) {
-        result = result.filter(
-          (s) => (s.status || '').toUpperCase() === this.statusFilter?.toUpperCase()
-        )
-      }
+      let result = [];
+      this.getSaleMethod();
+      // if (this.search) {
+      //   const term = this.search.toLowerCase()
+      //   result = result.filter(
+      //     (s) =>
+      //       s.saleId.toLowerCase().includes(term) ||
+      //       (s.customer?.profileName && s.customer.profileName.toLowerCase().includes(term)) ||
+      //       (s.product?.title && s.product.title.toLowerCase().includes(term)),
+      //   )
+      // }
+      // if (this.statusFilter) {
+      //   result = result.filter(
+      //     (s) => (s.status || '').toUpperCase() === this.statusFilter?.toUpperCase()
+      //   )
+      // }
       return result
     },
     formValid(): boolean {
@@ -668,9 +658,22 @@ export default defineComponent({
     },
   },
   async mounted() {
+    this.getSaleMethod();
     await Promise.all([this.fetchSales(), this.fetchUsers(), this.fetchProducts()])
   },
   methods: {
+    
+    getSaleMethod(){
+            saleService
+        .getSale("All")
+        .then((response) => {
+          this.saleList.splice(0);
+          this.saleList.push(...response);
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+    },
     async fetchSales() {
       this.loading = true
       try {

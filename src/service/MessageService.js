@@ -17,7 +17,7 @@ class MessageService {
   }
 
   getAboutStats() {
-    let url = `/product`;
+    let url = `/product/stats`;
     return axios.get(url).then((request) => request.data);
   }
 
