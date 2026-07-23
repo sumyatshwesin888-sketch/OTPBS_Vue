@@ -384,7 +384,7 @@
 <script>
 import axios from 'axios'
 import packageDetailService from '@/service/packageDetailService'
-import { supabase } from '../lib/supabase'
+
 import { useAuthStore } from '../store/auth'
 export default {
   name: 'PackageDetailView',
@@ -496,6 +496,7 @@ export default {
       localStorage.setItem(wishlistKey, JSON.stringify(currentWishlist));
     },
     async submitReview() {
+      console.log("SUBMIT REVIEW CLICKED");
       if (this.newRating === 0) {
         alert('Please select a star rating.')
         return
@@ -512,12 +513,15 @@ export default {
         loggedInCustomerId = 6 
       }
 
+      console.log(this.newRating)
+
       let obj = { userAccountDto: {} }
       obj.productId = this.productId
       obj.userAccountDto.userAccountId = loggedInCustomerId
       obj.rating = this.newRating
-      obj.comment = this.newComment
+      obj.message = this.newComment
       try {
+        console.log("Review Object => ", obj)
         await axios.post('http://localhost:8088/api/v1/package/ratingcomment', obj)
         alert('Review Success')
         this.newComment = ''

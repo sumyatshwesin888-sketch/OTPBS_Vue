@@ -146,12 +146,21 @@
                 <span class="text-grey-darken-1 text-caption-custom">{{ formatDate(item.date) }}</span>
               </template>
 
-              <template #item.actions>
-                <v-btn icon variant="text" color="error" size="small" density="comfortable">
-                  <v-icon size="16">mdi-delete-outline</v-icon>
-                  <v-tooltip activator="parent" location="top">Purge Log</v-tooltip>
-                </v-btn>
-              </template>
+              <template #item.actions="{ item }">
+  <v-btn 
+    icon 
+    variant="text" 
+    color="error" 
+    size="small" 
+    density="comfortable"
+    @click="openDeleteRatingDialog(item)"
+  >
+    <v-icon size="16">mdi-delete-outline</v-icon>
+    <v-tooltip activator="parent" location="top">
+      Delete Rating
+    </v-tooltip>
+  </v-btn>
+</template>
 
               <template #no-data>
                 <div class="premium-empty-state pa-6 text-center">
@@ -490,6 +499,63 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="deleteRatingDialog" max-width="380px" persistent>
+
+  <v-card class="premium-dialog">
+
+    <v-card-text class="pa-4 text-center">
+
+      <v-avatar 
+        size="44" 
+        class="avatar-error mb-2 shadow-glow-error"
+      >
+        <v-icon size="20" color="white">
+          mdi-alert-circle-outline
+        </v-icon>
+      </v-avatar>
+
+
+      <h3 class="card-title-text mb-1">
+        Confirm Rating Delete
+      </h3>
+
+
+      <p class="card-subtitle-text">
+        Are you sure you want to permanently remove this rating record?
+      </p>
+
+    </v-card-text>
+
+
+    <v-card-actions class="pa-3 pt-0 justify-center">
+
+      <v-btn
+        variant="outlined"
+        class="mr-2 text-none"
+        height="30"
+        @click="deleteRatingDialog=false"
+      >
+        Cancel
+      </v-btn>
+
+
+      <v-btn
+        color="error"
+        class="btn-error text-none"
+        height="30"
+        @click="deleteRating"
+      >
+        Delete
+      </v-btn>
+
+
+    </v-card-actions>
+
+
+  </v-card>
+
+</v-dialog>
+
     <!-- Destructive Message Removal Isolation Modal -->
     <v-dialog v-model="deleteMessageDialog" max-width="380px" persistent>
       <v-card class="premium-dialog">
@@ -513,8 +579,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { supabase } from '../../lib/supabase'
-import type { Rating, Comment, Message, QuestionType } from '../../lib/supabase'
+
+import type { Rating, Comment, Message ,QuestionType  } from '../../lib/supabase'
+import feedbackService from '@/service/feedbackService'
+
 
 export default defineComponent({
   name: 'AdminFeedback',
@@ -526,6 +594,9 @@ export default defineComponent({
       ratings: [] as Rating[],
       ratingLoading: false,
       ratingSearch: '',
+
+      deleteRatingDialog: false,
+ratingToDelete: null as Rating | null,
 
       // Comments
       comments: [] as Comment[],
@@ -640,49 +711,99 @@ export default defineComponent({
     }
   },
   async mounted() {
+    
+
     await Promise.all([
-      this.fetchRatings(),
-      this.fetchComments(),
-      this.fetchMessages(),
-      this.fetchQuestionTypes()
+      this.getRatingsMethod(),
+    this.getCommentsMethod(),
+     this.getMessagesMethod(),
+  this.getQuestionTypesMethod()
+
+      // this.fetchRatings(),
+      // this.fetchComments(),
+      // this.fetchMessages(),
+      // this.fetchQuestionTypes()
     ])
   },
   methods: {
-    // === Ratings Methods ===
-    async fetchRatings() {
+
+
+    async getRatingsMethod(){
       this.ratingLoading = true
-      try {
-        const { data, error } = await supabase
-          .from('rating')
-          .select('*, product(*)')
-          .order('date', { ascending: false })
-
-        if (error) throw error
-        this.ratings = data || []
-      } catch (error) {
-        console.error('Error fetching ratings:', error)
-      } finally {
-        this.ratingLoading = false
-      }
+      feedbackService.getRatings()
+        .then((res) => {
+          this.ratings = res || []
+        })
+        .catch((err) => console.error('Rating Fetch Error:', err))
+        .finally(() => { this.ratingLoading = false })
     },
 
-    // === Comments Methods ===
-    async fetchComments() {
+    async getCommentsMethod() {
       this.commentLoading = true
-      try {
-        const { data, error } = await supabase
-          .from('comment')
-          .select('*, product(*)')
-          .order('date', { ascending: false })
-
-        if (error) throw error
-        this.comments = data || []
-      } catch (error) {
-        console.error('Error fetching comments:', error)
-      } finally {
-        this.commentLoading = false
-      }
+      feedbackService.getComments()
+        .then((res) => {
+          this.comments = res || []
+        })
+        .catch((err) => console.error('Comment Fetch Error:', err))
+        .finally(() => { this.commentLoading = false })
     },
+
+    async getMessagesMethod() {
+  this.messageLoading = true
+
+  feedbackService.getMessages()
+    .then((res) => {
+      this.messages = res || []
+    })
+    .catch((err) => console.error('Message Fetch Error:', err))
+    .finally(() => {
+      this.messageLoading = false
+    })
+},
+
+async getQuestionTypesMethod() {
+  feedbackService.getQuestionTypes()
+    .then((res) => {
+      this.questionTypes = res || []
+    })
+    .catch((err) => console.error('Question Type Fetch Error:', err))
+},
+
+    // // === Ratings Methods ===
+    // async fetchRatings() {
+    //   this.ratingLoading = true
+    //   try {
+    //     const { data, error } = await supabase
+    //       .from('rating')
+    //       .select('*, product(*)')
+    //       .order('date', { ascending: false })
+
+    //     if (error) throw error
+    //     this.ratings = data || []
+    //   } catch (error) {
+    //     console.error('Error fetching ratings:', error)
+    //   } finally {
+    //     this.ratingLoading = false
+    //   }
+    // },
+
+    // // === Comments Methods ===
+    // async fetchComments() {
+    //   this.commentLoading = true
+    //   try {
+    //     const { data, error } = await supabase
+    //       .from('comment')
+    //       .select('*, product(*)')
+    //       .order('date', { ascending: false })
+
+    //     if (error) throw error
+    //     this.comments = data || []
+    //   } catch (error) {
+    //     console.error('Error fetching comments:', error)
+    //   } finally {
+    //     this.commentLoading = false
+    //   }
+    // },
 
     openEditCommentDialog(comment: Comment) {
       this.editingComment = true
@@ -695,71 +816,106 @@ export default defineComponent({
     },
 
     async saveComment() {
-      try {
-        const { error } = await supabase
-          .from('comment')
-          .update({ message: this.commentForm.message })
-          .eq('commentId', this.commentForm.commentId)
+      feedbackService.updateComment(this.commentForm.commentId, this.commentForm)
+        .then(() => {
+          this.commentDialog = false
+          this.getCommentsMethod() // Table ချက်ချင်း Update ဖြစ်စေရန်
+        })
+        .catch((err) => console.error('Comment Update Error:', err))
 
-        if (error) throw error
+      // try {
+      //   const { error } = await supabase
+      //     .from('comment')
+      //     .update({ message: this.commentForm.message })
+      //     .eq('commentId', this.commentForm.commentId)
 
-        this.commentDialog = false
-        await this.fetchComments()
-      } catch (error) {
-        console.error('Error saving comment:', error)
-      }
+      //   if (error) throw error
+
+      //   this.commentDialog = false
+      //   await this.fetchComments()
+      // } catch (error) {
+      //   console.error('Error saving comment:', error)
+      // }
     },
 
     openDeleteCommentDialog(comment: Comment) {
       this.commentToDelete = comment
       this.deleteCommentDialog = true
     },
+    openDeleteRatingDialog(rating: Rating) {
+
+  this.ratingToDelete = rating
+  this.deleteRatingDialog = true
+
+},
+async deleteRating(){
+
+  if(!this.ratingToDelete) return
+
+
+  feedbackService
+    .deleteRating(this.ratingToDelete.ratingId)
+
+    .then(()=>{
+
+      this.deleteRatingDialog = false
+
+      this.ratingToDelete = null
+
+      this.getRatingsMethod()
+
+    })
+
+    .catch((err)=>{
+
+      console.error(
+        'Delete Rating Error:',
+        err
+      )
+
+    })
+
+},
 
     async deleteComment() {
-      if (!this.commentToDelete) return
+       if (!this.commentToDelete) return
 
-      try {
-        const { error } = await supabase
-          .from('comment')
-          .delete()
-          .eq('commentId', this.commentToDelete.commentId)
-
-        if (error) throw error
-
-        this.deleteCommentDialog = false
-        this.commentToDelete = null
-        await this.fetchComments()
-      } catch (error) {
-        console.error('Error deleting comment:', error)
-      }
+  feedbackService
+    .deleteComment(this.commentToDelete.commentId)
+    .then(() => {
+      this.deleteCommentDialog = false
+      this.commentToDelete = null
+      this.getCommentsMethod()
+    })
+    .catch((err) => console.error('Delete Comment Error:', err))
     },
 
     // === Messages Methods ===
-    async fetchMessages() {
-      this.messageLoading = true
-      try {
-        const { data, error } = await supabase
-          .from('message')
-          .select('*, questionType(*)')
-          .order('date', { ascending: false })
+    // async fetchMessages() {
+    //   this.messageLoading = true
+    //   try {
+    //     const { data, error } = await supabase
+    //       .from('message')
+    //       .select('*, questionType(*)')
+    //       .order('date', { ascending: false })
 
-        if (error) throw error
-        this.messages = data || []
-      } catch (error) {
-        console.error('Error fetching messages:', error)
-      } finally {
-        this.messageLoading = false
-      }
-    },
+    //     if (error) throw error
+    //     this.messages = data || []
+    //   } catch (error) {
+    //     console.error('Error fetching messages:', error)
+    //   } finally {
+    //     this.messageLoading = false
+    //   }
+    // },
 
-    async fetchQuestionTypes() {
-      try {
-        const { data } = await supabase.from('question_type').select('*')
-        this.questionTypes = data || []
-      } catch (error) {
-        console.error('Error fetching question types:', error)
-      }
-    },
+    // async fetchQuestionTypes() {
+    //   try {
+    //     const { data } = await supabase.from('question_type').select('*')
+    //     this.questionTypes = data || []
+    //   } catch (error) {
+    //     console.error('Error fetching question types:', error)
+    //   }
+    // },
 
     openEditMessageDialog(message: Message) {
       this.editingMessage = true
@@ -774,25 +930,13 @@ export default defineComponent({
     },
 
     async saveMessage() {
-      try {
-        const { error } = await supabase
-          .from('message')
-          .update({
-            name: this.messageForm.name,
-            email: this.messageForm.email,
-            messageText: this.messageForm.messageText,
-            questionTypeId: this.messageForm.questionTypeId || null
-          })
-          .eq('messageId', this.messageForm.messageId)
-
-        if (error) throw error
-
-        this.messageDialog = false
-        await this.fetchMessages()
-      } catch (error) {
-        console.error('Error saving message:', error)
-      }
-    },
+     feedbackService
+    .updateMessage(this.messageForm.messageId, this.messageForm)
+    .then(() => {
+      this.messageDialog = false
+      this.getMessagesMethod()
+    })
+    .catch((err) => console.error('Message Update Error:', err))    },
 
     openDeleteMessageDialog(message: Message) {
       this.messageToDelete = message
@@ -802,20 +946,14 @@ export default defineComponent({
     async deleteMessage() {
       if (!this.messageToDelete) return
 
-      try {
-        const { error } = await supabase
-          .from('message')
-          .delete()
-          .eq('messageId', this.messageToDelete.messageId)
-
-        if (error) throw error
-
-        this.deleteMessageDialog = false
-        this.messageToDelete = null
-        await this.fetchMessages()
-      } catch (error) {
-        console.error('Error deleting message:', error)
-      }
+  feedbackService
+    .deleteMessage(this.messageToDelete.messageId)
+    .then(() => {
+      this.deleteMessageDialog = false
+      this.messageToDelete = null
+      this.getMessagesMethod()
+    })
+    .catch((err) => console.error('Delete Message Error:', err))
     },
 
     formatDate(date: string | null): string {
@@ -827,10 +965,15 @@ export default defineComponent({
       })
     },
 
-    truncateText(text: string, maxLength: number): string {
-      if (text.length <= maxLength) return text
-      return text.slice(0, maxLength) + '...'
-    }
+    truncateText(text: string | null | undefined, maxLength: number): string {
+  if (!text) return '-'
+
+  if (text.length <= maxLength) {
+    return text
+  }
+
+  return text.slice(0, maxLength) + '...'
+}
   }
 })
 </script>
