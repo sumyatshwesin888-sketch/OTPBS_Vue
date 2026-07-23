@@ -1,4 +1,4 @@
-import axios from "../config" 
+import axios from "../config" //saleService.js
 
 class SaleService{
     axios;
@@ -6,14 +6,29 @@ class SaleService{
         this.axios = axios;
     }
 
+
+    getPackages(locationType) {
+        let url = "/sale"
+        return axios.get(url,{
+            params: {
+                locationType
+            }
+        }).then(request => request.data);
+    }
+    addSale(sale) {
+        let url = "/sale";
+        return this.axios.post(url, sale).then(request => request.data);
+    }
     getSale(status) {
-        let url = `/sale`;
-        return axios.get(url, {
+        let url = "/sale"
+        return axios.get(url,{
+
             params: {
                 status
             }
         }).then(request => request.data);
     }
+
     addSale(saleDto) {
          let url = `/sale`;
         return this.axios.post(url, saleDto).then(request => request.data);
@@ -22,6 +37,8 @@ class SaleService{
         let url = `/sale/${saleId}`;
         return this.axios.put(url, saleDto).then(request => request.data);
     }
+
+
 
     deleteSale(saleId) {
         let url = `/sale/${saleId}`;

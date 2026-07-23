@@ -100,26 +100,6 @@ export default {
   },
 
   mounted() {
-    this.loginUser = JSON.parse(localStorage.getItem('loginUser'));
-    this.productId = localStorage.getItem('productId');
-    if(this.productId){
-
-    packageService.getPackageDetailById(this.productId)
-    .then(response => {
-
-        console.log("Payment Package Detail:", response);
-
-        this.packageDetail = response;
-
-        // image
-        this.selectedImg = response.photo;
-
-    })
-    .catch(err=>{
-        console.log(err);
-    });
-
-}
   const savedData = localStorage.getItem('booking_data');
   
   if (savedData) {

@@ -9,7 +9,7 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Total Users</p>
-                <p class="stat-value">{{ users.length }}</p>
+                <p class="stat-value">{{ filteredUsers.length }}</p>
                 <p class="stat-trend">
                   <v-icon size="11" color="primary">mdi-account-plus-outline</v-icon>
                   <span class="ml-1">Registered accounts</span>
@@ -30,7 +30,7 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Admins</p>
-                <p class="stat-value">{{ totalAdmins }}</p>
+                <p class="stat-value">{{ filteredUsers.filter(u => u.userType === 'ADMIN').length }}</p>
                 <p class="stat-trend">
                   <v-icon size="11" color="warning">mdi-shield-crown-outline</v-icon>
                   <span class="ml-1">Platform managers</span>
@@ -51,7 +51,7 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Customers</p>
-                <p class="stat-value">{{ totalCustomers }}</p>
+                <p class="stat-value">{{ filteredUsers.filter(u => u.userType === 'CUSTOMER').length }}</p>
                 <p class="stat-trend">
                   <v-icon size="11" color="secondary">mdi-account-outline</v-icon>
                   <span class="ml-1">Standard consumers</span>
@@ -72,7 +72,7 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Active Users</p>
-                <p class="stat-value">{{ users.filter((u) => u.status === 1).length }}</p>
+                <p class="stat-value">{{ filteredUsers.filter(u => u.status === 1).length }}</p>
                 <p class="stat-trend">
                   <v-icon size="11" color="success">mdi-check-circle-outline</v-icon>
                   <span class="ml-1">Currently enabled</span>
@@ -356,8 +356,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { supabase } from '../../lib/supabase'
-import type { UserAccount } from '../../lib/supabase'
+//import { supabase } from '../../lib/supabase'
+//import type { UserAccount } from '../../lib/supabase'
 
 import userAccountService from '@/service/UserAccountService'
 export default defineComponent({
