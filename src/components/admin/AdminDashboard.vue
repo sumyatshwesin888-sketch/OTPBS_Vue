@@ -247,7 +247,7 @@
     </v-row>
 
     <!-- Monthly Revenue Overview (Wave Chart) -->
-    <!-- Revenue Activity Overview (Right Image Design) -->
+    
 <v-row>
   <v-col cols="12">
     <v-card class="enterprise-card">

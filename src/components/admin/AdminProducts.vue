@@ -771,16 +771,16 @@ export default defineComponent({
     },
 
     async saveProductImages() {
-      var formData = new FormData();
-      formData.append("file", this.$refs.file.files[0]);
-      PackageService
-        .updateProductPhoto(formData, this.imagePreviews.productId,0)
-        .then((response) => {
-          this.fetchProducts();
-        })
-        .catch((error) => {
-          this.$swal( error.response.data.message, "error");
-        });
+      // var formData = new FormData();
+      // formData.append("file", this.$refs.file.files[0]);
+      // PackageService
+      //   .updateProductPhoto(formData, this.imagePreviews.productId,0)
+      //   .then((response) => {
+      //     this.fetchProducts();
+      //   })
+      //   .catch((error) => {
+      //     this.$swal( error.response.data.message, "error");
+      //   });
       var formData = new FormData();
       formData.append("file", this.$refs.fileOne.files[0]);
       PackageService
