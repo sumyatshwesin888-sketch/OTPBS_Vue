@@ -11,61 +11,142 @@
     </div>
 
     <div class="checkout-grid" v-if="booking">
-      <div class="card success-card">
-        <div class="success-icon">✓</div>
-        <h1>Booking Confirmed!</h1>
-        <p>Thank you for your payment. Your booking has been successfully processed.</p>
+      
+      <div :class="['card success-card', statusCardConfig.class]">
+        <div class="success-icon">{{ statusCardConfig.icon }}</div>
+        <h1>{{ statusCardConfig.title }}</h1>
+        <p>{{ statusCardConfig.message }}</p>
       </div>
 
-      
-        
-
-        <div class="card details-card">
-          <div class="package-header">
-            <h2>{{ booking.package.title }}</h2>
-            <p>{{ booking.id || 'N/A' }}</p>
-            <span class="duration-badge">{{ booking.package.duration }}</span>
+      <div class="card details-card">
+        <div class="package-header">
+          <h2>{{ booking.package.title }}</h2>
+          <p>{{ booking.id || 'N/A' }}</p>
+          <span class="duration-badge">{{ booking.package.duration }}</span>
+        </div>
+        <div class="summary-details">
+          <div class="row"><span>Traveler Name</span> <strong>{{ booking.travelerInfo.name }}</strong></div>
+          <div class="row"><span>Email</span> <strong>{{ booking.travelerInfo.email }}</strong></div>
+          <div class="row"><span>Contact</span> <strong>{{ booking.travelerInfo.phone }}</strong></div>
+          <!-- <div class="row"><span>Date</span> <strong>{{ booking.travelerInfo.date }}</strong></div> -->
+          <div class="row"><span>Travelers</span> <strong>{{ booking.travelerInfo.travelers }}</strong></div>
+          <div class="row"><span>Payment</span> <strong>{{ booking.paymentMethod }}</strong></div>
+          
+          <!-- Live Status Row  -->
+          <div class="row">
+            <span>Booking Status</span> 
+            <strong :style="{ color: statusCardConfig.statusColor }">{{ currentStatus }}</strong>
           </div>
-          <div class="summary-details">
-            
-            <div class="row"><span>Traveler Name</span> <strong>{{ booking.travelerInfo.name }}</strong></div>
-            <div class="row"><span>Email</span> <strong>{{ booking.travelerInfo.email }}</strong></div>
-            <div class="row"><span>Contact</span> <strong>{{ booking.travelerInfo.phone }}</strong></div>
-            <div class="row"><span>Date</span> <strong>{{ booking.travelerInfo.date }}</strong></div>
-            <div class="row"><span>Travelers</span> <strong>{{ booking.travelerInfo.travelers }}</strong></div>
-            <div class="row"><span>Payment</span> <strong>{{ booking.paymentMethod }}</strong></div>
-            <hr />
-            <div class="row total"><span>Total Amount</span> <strong>{{ booking.totalAmount }} MMK</strong></div>
-          </div>
+          
+          <hr />
+          <div class="row total"><span>Total Amount</span> <strong>{{ booking.totalAmount }} MMK</strong></div>
         </div>
       </div>
-
-      <div class="action-buttons">
-        <button class="back-btn" @click="$router.go(-1)">Back</button>
-        <button class="btn-outline" @click="downloadReceipt">Download Receipt</button>
-        <button class="btn-primary" @click="$router.push('/packages')">Browse More Packages</button>
-      </div>
     </div>
-  
+
+    <div class="action-buttons">
+      <button class="back-btn" @click="$router.go(-1)">Back</button>
+      <!-- <button class="btn-outline" @click="downloadReceipt">Download Receipt</button> -->
+      <button class="btn-primary" @click="$router.push('/packages')">Browse More Packages</button>
+    </div>
+  </div>
 </template>
 
 <script>
+
+import { supabase } from '../lib/supabase'
+
 export default {
   data() {
     return {
-      booking: null
+      booking: null,
+      currentStatus: 'CONFIRM', 
+      realtimeChannel: null
     };
   },
+  computed: {
+    
+    statusCardConfig() {
+      switch (this.currentStatus) {
+        case 'APPROVED':
+          return {
+            title: 'Booking Approved!',
+            message: 'Congratulations! Your booking has been officially approved. Have a wonderful trip!',
+            icon: '✓',
+            class: 'status-approved',
+            statusColor: '#10b981'
+          };
+        case 'DELETE':
+          return {
+            title: 'Booking Cancelled',
+            message: 'This booking has been cancelled or declined. Please contact support for assistance.',
+            icon: '✕',
+            class: 'status-cancelled',
+            statusColor: '#ef4444'
+          };
+        case 'CONFIRM':
+        default:
+          return {
+            title: 'Payment Confirmed!',
+            message: 'Thank you for your payment. Your booking is currently awaiting admin approval.',
+            icon: '✓',
+            class: 'status-confirming',
+            statusColor: '#2563eb'
+          };
+      }
+    }
+  },
   mounted() {
-    // Retrieve data saved from PaymentPage.vue via localStorage
+   
     const savedData = localStorage.getItem('booking_data');
     if (savedData) {
       this.booking = JSON.parse(savedData);
+      
+      
+      this.currentStatus = this.booking.status || 'CONFIRM';
+
+     
+      this.subscribeToBookingStatus();
     } else {
-      this.$router.push('/'); // Redirect if no data found
+      this.$router.push('/'); 
+    }
+  },
+  beforeUnmount() {
+    
+    if (this.realtimeChannel) {
+      supabase.removeChannel(this.realtimeChannel);
     }
   },
   methods: {
+    subscribeToBookingStatus() {
+      
+      const bookingId = this.booking.id || this.booking.saleId;
+      if (!bookingId) return;
+
+      
+      this.realtimeChannel = supabase
+        .channel(`booking-status-${bookingId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'sale',
+            filter: `saleId=eq.${bookingId}`
+          },
+          (payload) => {
+            if (payload.new && payload.new.status) {
+              
+              this.currentStatus = payload.new.status;
+              
+              
+              this.booking.status = payload.new.status;
+              localStorage.setItem('booking_data', JSON.stringify(this.booking));
+            }
+          }
+        )
+        .subscribe();
+    },
     downloadReceipt() {
       alert("Receipt download initiated!");
     }
@@ -74,8 +155,6 @@ export default {
 </script>
 
 <style scoped>
-
-
 .template{
    background: radial-gradient(circle at top, #eaf3ff, #f6f9ff);
 }
@@ -84,10 +163,9 @@ export default {
   margin: 0 auto;
   padding: 42px 20px;
   font-family: "Inter", sans-serif;
- 
 }
 
-/* STEP PROGRESS (premium blue glass) */
+
 .stepper-container {
   display: flex;
   justify-content: center;
@@ -164,7 +242,7 @@ export default {
 }
 
 /* =========================
-   ✨ SUCCESS CARD (AIR TICKET STYLE)
+   ✨ SUCCESS CARD (DYNAMIC AIR TICKET STYLE)
 ========================= */
 .success-card {
   position: relative;
@@ -172,8 +250,23 @@ export default {
   padding: 42px 25px;
   border-radius: 22px;
   color: white;
-  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
   overflow: hidden;
+  transition: background 0.5s ease, box-shadow 0.5s ease; /* အခြေအနေပြောင်းတဲ့အခါ animation ချောမွေ့စေရန် */
+}
+
+/* Dynamic Live Status Classes for Success Card */
+.status-confirming {
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9) !important;
+}
+
+.status-approved {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 18px 45px rgba(16, 185, 129, 0.25) !important;
+}
+
+.status-cancelled {
+  background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+  box-shadow: 0 18px 45px rgba(239, 68, 68, 0.25) !important;
 }
 
 /* animated glow */

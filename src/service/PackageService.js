@@ -14,6 +14,23 @@ class PackageService{
             }
         }).then(request => request.data);
     }
+
+    getPackageDetailById(productId) {
+    
+        let url = `/package/detail/${productId}`
+    
+        return axios.get(url)
+            .then(request => request.data);
+    
+    }
+        getProductById(productId) {
+    
+        let url = `/product/${productId}`
+    
+        return axios.get(url)
+            .then(request => request.data);
+    
+    }
     addPackage(pkg) {
         let url = `/package`;
         return this.axios.post(url, pkg).then(request => request.data);
@@ -27,7 +44,33 @@ class PackageService{
         return this.axios.delete(url).then(request => request.data);
     }
 
+    getComments() {
+            let url = `/comment`;
+            return this.axios.get(url).then(request => request.data);
+        }
+    
+       
+        getRatings() {
+            let url = `/rating`;
+            return this.axios.get(url).then(request => request.data);
+        }
+        addRatingComment(ratingDto) {
+            let url = `/package/ratingcomment`;
+            return this.axios.post(url, ratingDto).then(request => request.data);
+        }
 
+//Booking
+    getProductById(productId) {
+
+    let url = `/product/${productId}`
+
+    return axios.get(url)
+        .then(request => request.data);
+
+}
+
+
+  
     //For Admin Product
 
     getProduct(locationType ,type, search) {

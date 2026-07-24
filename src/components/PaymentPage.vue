@@ -51,15 +51,21 @@
 
       <aside class="summary-section" v-if="booking && booking.package">
         <div class="card summary-card">
-          <img :src="booking.package.image" :alt="booking.package.title" class="summary-img" />
+          <!-- <img :src="booking.package.image" :alt="booking.package.title" class="summary-img" /> -->
+            <img
+              :src="booking.package.photo ? 'http://localhost:8088/api/v1/productphoto/' + booking.package.photo : ''"
+              :alt="booking.package.title"
+              class="summary-img"
+            />
           <div class="summary-content">
             <h3>{{ booking.package.title }}</h3>
             <p class="destination">{{ booking.package.city }}</p>
             
             <div class="summary-details">
               <div class="row"><span>Travelers</span><strong>{{ booking.travelerInfo.travelers }}</strong></div>
-              <div class="row"><span>Duration</span><strong>{{ booking.package.duration }}</strong></div>
-              <div class="row"><span>Date</span><strong>{{ booking.travelerInfo.date }}</strong></div>
+              <div class="row"><span>Duration</span><strong>{{ booking.package.day }} Days 
+                {{ booking.package.night }} Nights</strong></div>
+              <!-- <div class="row"><span>Date</span><strong>{{ booking.travelerInfo.date }}</strong></div> -->
               <hr />
               <div class="row total"><span>Total Amount</span><strong>{{ booking.totalAmount.toLocaleString() }} MMK</strong></div>
             </div>
@@ -71,34 +77,56 @@
 </template>
 
 <script>
+import packageService from '@/service/PackageService'
+
+import saleService from '@/service/SaleService'
+
 export default {
   data() {
     return {
+      selectedImg: '',
+      packageDetail: {},
       selectedMethod: 'kbzpay',
       booking: null,
       paymentMethods: [
         { id: 'kbzpay', name: 'KBZPay', abbr: 'KBZ', color: '#2563EB' },
         { id: 'wavepay', name: 'WavePay', abbr: 'Wave', color: '#F59E0B' },
         { id: 'ayapay', name: 'AYAPay', abbr: 'AYA', color: '#7C3AED' },
-      ]
+      ],
+       loginUser:{},
+       productId:0,
     };
+   
   },
 
   mounted() {
+   
   const savedData = localStorage.getItem('booking_data');
   
   if (savedData) {
     try {
       this.booking = JSON.parse(savedData);
+      this.productId = this.booking.package.productId;
       console.log("Successfully loaded booking:", this.booking);
+      console.log("PRODUCT ID =>", this.productId);
+      
     } catch (e) {
       console.error("Failed to parse booking data", e);
     }
   } else {
     console.warn("No booking data found in localStorage");
-    // data မရှိရင် အရင် page ကို ပြန်ပို့ပါ
-    // this.$router.push('/');
+    
   }
+  console.log(JSON.parse(localStorage.getItem("booking_data")));
+
+  const loginUser = localStorage.getItem("loginUser");
+
+  if (loginUser) {
+    this.loginUser = JSON.parse(loginUser);
+    console.log("LOGIN USER =>", this.loginUser);
+  }
+
+
 },
 
   computed: {
@@ -106,31 +134,74 @@ export default {
       // 1. Check if booking exists to avoid null errors
       if (!this.booking) return 0;
       
-      // 2. Access the nested properties correctly
-      // price comes from the package object
-      // travelers comes from the travelerInfo object
+      
       return this.booking.package.price * this.booking.travelerInfo.travelers;
     }
   },
 
   methods: {
     handlePayment() {
+      
       if (!this.selectedMethod) {
         alert("Please select a payment method.");
         return;
-      }
+      } 
+     let saleDto = {};
 
+     saleDto.productId = Number(this.productId);
+
+  saleDto.customerId = this.loginUser.userAccountId;
+
+  saleDto.userAccountId = this.loginUser.userAccountId;
+
+  saleDto.qty = Number(localStorage.getItem('traveller'));
+
+  saleDto.unitPrice = Number(localStorage.getItem('amount'));
+
+  saleDto.amount = saleDto.qty * saleDto.unitPrice;
+
+  if(this.selectedMethod === 'kbzpay'){
+      saleDto.paymentType = 'KBZpay';
+  }
+  else if(this.selectedMethod === 'wavepay'){
+      saleDto.paymentType = 'WAVEpay';
+  }
+  else if(this.selectedMethod === 'ayapay'){
+      saleDto.paymentType = 'AYApay';
+  }
+
+
+      console.log("SALE DTO =>", saleDto);
+
+      saleService
+ .addSale(saleDto)
+
+ .then(response=>{
+
+    console.log("Package Sale>>> ",response);
+
+ })
+
+ .catch(err=>{
+
+    console.log(err);
+
+ });
+
+     // localStorage.setItem('payment', this.selectedMethod);
       const savedData = localStorage.getItem('booking_data');
       let booking = savedData ? JSON.parse(savedData) : {};
 
-      booking.paymentMethod = this.selectedMethod;
+      booking.paymentMethod = this.selectedMethod;  
       booking.id = "BK-" + Math.floor(Math.random() * 90000 + 10000);
-      booking.status = 'confirmed';
+      booking.status = 'CONFIRM';
       booking.timestamp = new Date().toISOString();
 
       localStorage.setItem('booking_data', JSON.stringify(booking));
 
       alert('Payment Confirmed!');
+
+      // saleService.addSale()
       this.$router.push('/confirmation')
     }
   }

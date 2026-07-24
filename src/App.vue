@@ -122,7 +122,7 @@ export default {
   mounted() {
     this.checkUser();
   },
-  //  Route ပြောင်းလဲမှုကို စောင့်ကြည့်ပြီး User Data ကို အော်တို Update လုပ်ခိုင်းခြင်း
+  
   watch: {
     $route() {
       this.checkUser();

@@ -6,10 +6,6 @@ class CityService{
         this.axios = axios;
     }
 
-    // getCity() {
-    //     let url = `/city`
-    //     return axios.get(url).then(request => request.data);
-    // }
     getCity(cityName ,search) {
     let url = `/city`;
     return axios.get(url,{

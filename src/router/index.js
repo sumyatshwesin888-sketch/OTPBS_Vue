@@ -67,7 +67,7 @@ const router = createRouter({
     },
 
     {
-      path: '/destination/:name',
+      path: '/destination/:id',
       name: 'destination',
       component: () => import('../views/DestinationDetail.vue')
     },

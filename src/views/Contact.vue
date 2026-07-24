@@ -83,6 +83,7 @@
             <div class="select-wrapper">
               <select id="subject" v-model="formData.questionType" required>
                 <option value="" disabled selected>Select a subject</option>
+                <option value="" disabled selected>Select a subject</option>
                 <option v-for="type in questionType" :key="type.questionTypeId" :value="type">
                   {{ type.question }}
                 </option>
