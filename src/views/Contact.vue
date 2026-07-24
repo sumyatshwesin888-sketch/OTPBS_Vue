@@ -141,9 +141,9 @@ export default {
         })
     },
     saveMessage() {
-      let qt = {}
-      qt.questionTypeId = 1
-      this.formData.questionType = qt
+      // let qt = {}
+      // qt.questionTypeId = 1
+      // this.formData.questionType = qt
       MessageService.addMessage(this.formData)
         .then((response) => {
           alert('Your message has been sent successfully!')

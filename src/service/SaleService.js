@@ -15,10 +15,10 @@ class SaleService{
             }
         }).then(request => request.data);
     }
-    addSale(sale) {
-        let url = "/sale";
-        return this.axios.post(url, sale).then(request => request.data);
-    }
+    // addSale(sale) {
+    //     let url = "/sale";
+    //     return this.axios.post(url, sale).then(request => request.data);
+    // }
     getSale(status) {
         let url = "/sale"
         return axios.get(url,{
@@ -38,7 +38,7 @@ class SaleService{
         return this.axios.put(url, saleDto).then(request => request.data);
     }
 
-
+   
 
     deleteSale(saleId) {
         let url = `/sale/${saleId}`;

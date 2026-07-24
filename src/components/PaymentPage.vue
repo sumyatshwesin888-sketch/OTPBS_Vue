@@ -100,20 +100,33 @@ export default {
   },
 
   mounted() {
+   
   const savedData = localStorage.getItem('booking_data');
   
   if (savedData) {
     try {
       this.booking = JSON.parse(savedData);
+      this.productId = this.booking.package.productId;
       console.log("Successfully loaded booking:", this.booking);
+      console.log("PRODUCT ID =>", this.productId);
+      
     } catch (e) {
       console.error("Failed to parse booking data", e);
     }
   } else {
     console.warn("No booking data found in localStorage");
-    // data မရှိရင် အရင် page ကို ပြန်ပို့ပါ
-    // this.$router.push('/');
+    
   }
+  console.log(JSON.parse(localStorage.getItem("booking_data")));
+
+  const loginUser = localStorage.getItem("loginUser");
+
+  if (loginUser) {
+    this.loginUser = JSON.parse(loginUser);
+    console.log("LOGIN USER =>", this.loginUser);
+  }
+
+
 },
 
   computed: {
@@ -121,9 +134,7 @@ export default {
       // 1. Check if booking exists to avoid null errors
       if (!this.booking) return 0;
       
-      // 2. Access the nested properties correctly
-      // price comes from the package object
-      // travelers comes from the travelerInfo object
+      
       return this.booking.package.price * this.booking.travelerInfo.travelers;
     }
   },

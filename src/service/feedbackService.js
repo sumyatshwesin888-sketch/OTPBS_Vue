@@ -6,17 +6,29 @@ class feedbackService{
         this.axios = axios;
     }
 
-    getComments() {
-        let url = `/comment`;
-        return this.axios.get(url).then(request => request.data);
-    }
-    
-    // Rating များရယူရန်
+     // Rating များရယူရန်
     getRatings() {
         let url = `/rating`;
         return this.axios.get(url).then(request => request.data);
     }
 
+
+    deleteRating(id){
+
+    let url = `/rating/${id}`
+
+    return this.axios.delete(url)
+        .then(res=>res.data)
+
+}
+
+    getComments() {
+        let url = `/comment`;
+        return this.axios.get(url).then(request => request.data);
+    }
+    
+   
+    
     updateComment(commentId, dto) {
         let url = `/comment/${commentId}`;
         return this.axios.put(url, dto).then(request => request.data);
@@ -48,14 +60,7 @@ class feedbackService{
       .then(res => res.data);
   }
 
-  deleteRating(id){
-
-    let url = `/rating/${id}`
-
-    return this.axios.delete(url)
-        .then(res=>res.data)
-
-}
+  
     
 }
 
