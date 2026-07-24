@@ -83,6 +83,7 @@
             <div class="select-wrapper">
               <select id="subject" v-model="formData.questionType" required>
                 <option value="" disabled selected>Select a subject</option>
+                <option value="" disabled selected>Select a subject</option>
                 <option v-for="type in questionType" :key="type.questionTypeId" :value="type">
                   {{ type.question }}
                 </option>
@@ -141,12 +142,17 @@ export default {
         })
     },
     saveMessage() {
-      // let qt = {}
-      // qt.questionTypeId = 1
-      // this.formData.questionType = qt
       MessageService.addMessage(this.formData)
         .then((response) => {
           alert('Your message has been sent successfully!')
+
+          // 🟢 Message ပို့ပြီးရင် Form ထဲက Text တွေကို Auto ရှင်းပစ်မည့် ကုဒ်
+          this.formData = {
+            name: '',
+            email: '',
+            questionType: '',
+            messageText: '',
+          }
         })
         .catch((err) => {
           console.error('API Fetch Error: ', err)
@@ -165,16 +171,16 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px;
+  padding: 100px 20px 60px 20px; /* Navbar မအုပ်အောင် top padding နည်းနည်းတိုးထားပါတယ် */
 }
 
 .contact-container {
-  max-width: 1140px;
+  max-width: 960px; /* 🟢 1140px မှ 960px သို့ ခြုံ့လိုက်ပါတယ် (ပိုစစ်စစ်လစ်လစ် ဖြစ်သွားပါမယ်) */
   width: 100%;
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 60px;
+  gap: 40px; /* 🟢 60px မှ 40px သို့ လျှော့ထားပါတယ် */
 }
 
 .contact-info-side {
@@ -182,48 +188,48 @@ export default {
 }
 
 .main-title {
-  font-size: 3rem;
+  font-size: 2.3rem; /* 🟢 3rem မှ 2.3rem သို့ အချိုးချလိုက်ပါတယ် */
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 10px 0;
+  margin: 0 0 6px 0;
   letter-spacing: -0.5px;
 }
 
 .subtitle {
-  font-size: 1.35rem;
+  font-size: 1.15rem; /* 🟢 နည်းနည်းလေး သေးလိုက်ပါတယ် */
   color: #3b82f6;
   font-weight: 600;
-  margin: 0 0 20px 0;
+  margin: 0 0 14px 0;
 }
 
 .description {
   color: #94a3b8;
-  font-size: 1.05rem;
-  line-height: 1.7;
-  margin: 0 0 40px 0;
+  font-size: 0.95rem; /* 🟢 1.05rem မှ လျှော့ထားပါတယ် */
+  line-height: 1.6;
+  margin: 0 0 30px 0;
 }
 
 .info-list {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 20px; /* 🟢 28px မှ 20px သို့ ပိုကျစ်သွားအောင် ပြင်ထားပါတယ် */
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
 }
 
 .icon-box {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+  width: 44px; /* 🟢 Icon Box အရွယ်အစား သေးလိုက်ပါတယ် */
+  height: 44px;
+  border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -246,33 +252,33 @@ export default {
 }
 
 .info-text .label {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: #64748b;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .info-text .value {
-  font-size: 1.1rem;
+  font-size: 0.98rem;
   color: #f1f5f9;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 .contact-form-card {
-  flex: 1.2;
+  flex: 1.1;
   background-color: #ffffff;
-  border-radius: 24px;
-  padding: 50px;
+  border-radius: 20px;
+  padding: 32px 35px; /* 🟢 Padding 50px မှ 32px သို့ ခြုံ့လိုက်ပါပြီ */
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
 .form-row {
   display: flex;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 18px;
+  margin-bottom: 18px;
 }
 
 .form-group {
@@ -282,24 +288,24 @@ export default {
 }
 
 .form-group.full-width {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #334155;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 14px 18px;
+  padding: 10px 14px; /* 🟢 Input တွေကို အမြင့်ပြားပြီး ပိုကျစ်သွားအောင် လုပ်ထားပါတယ် */
   border: 1px solid #cbd5e1;
-  border-radius: 12px;
-  font-size: 1rem;
+  border-radius: 10px;
+  font-size: 0.92rem;
   color: #0f172a;
   background-color: #f8fafc;
   box-sizing: border-box;
@@ -317,7 +323,7 @@ export default {
   outline: none;
   border-color: #1d4ed8;
   background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
 }
 
 .select-wrapper {
@@ -337,12 +343,12 @@ export default {
   font-family: 'Font Awesome 5 Free';
   font-weight: 900;
   position: absolute;
-  right: 18px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: #64748b;
   pointer-events: none;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .submit-btn {
@@ -350,18 +356,18 @@ export default {
   background-color: #1a73e8;
   color: #ffffff;
   border: none;
-  padding: 16px;
-  font-size: 1.05rem;
+  padding: 12px; /* 🟢 Button Size လေး ခြုံ့ပေးထားပါတယ် */
+  font-size: 0.98rem;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
   transition: all 0.25s ease;
-  margin-top: 12px;
+  margin-top: 6px;
 }
 
 .submit-btn:hover {
@@ -373,7 +379,7 @@ export default {
 @media (max-width: 992px) {
   .contact-container {
     flex-direction: column;
-    gap: 50px;
+    gap: 40px;
   }
 
   .contact-info-side,
@@ -382,18 +388,18 @@ export default {
   }
 
   .main-title {
-    font-size: 2.6rem;
+    font-size: 2.2rem;
   }
 }
 
 @media (max-width: 576px) {
   .form-row {
     flex-direction: column;
-    gap: 24px;
+    gap: 18px;
   }
 
   .contact-form-card {
-    padding: 30px 20px;
+    padding: 24px 18px;
   }
 }
 </style>

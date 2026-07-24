@@ -43,6 +43,22 @@ class PackageService{
         let url = `/package/${pkg.packageId}`;
         return this.axios.delete(url).then(request => request.data);
     }
+
+    getComments() {
+            let url = `/comment`;
+            return this.axios.get(url).then(request => request.data);
+        }
+    
+       
+        getRatings() {
+            let url = `/rating`;
+            return this.axios.get(url).then(request => request.data);
+        }
+        addRatingComment(ratingDto) {
+            let url = `/package/ratingcomment`;
+            return this.axios.post(url, ratingDto).then(request => request.data);
+        }
+
 //Booking
     getProductById(productId) {
 
@@ -54,6 +70,7 @@ class PackageService{
 }
 
 
+  
     //For Admin Product
 
     getProduct(locationType ,type, search) {

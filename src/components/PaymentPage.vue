@@ -100,20 +100,33 @@ export default {
   },
 
   mounted() {
+   
   const savedData = localStorage.getItem('booking_data');
   
   if (savedData) {
     try {
       this.booking = JSON.parse(savedData);
+      this.productId = this.booking.package.productId;
       console.log("Successfully loaded booking:", this.booking);
+      console.log("PRODUCT ID =>", this.productId);
+      
     } catch (e) {
       console.error("Failed to parse booking data", e);
     }
   } else {
     console.warn("No booking data found in localStorage");
-    // data မရှိရင် အရင် page ကို ပြန်ပို့ပါ
-    // this.$router.push('/');
+    
   }
+  console.log(JSON.parse(localStorage.getItem("booking_data")));
+
+  const loginUser = localStorage.getItem("loginUser");
+
+  if (loginUser) {
+    this.loginUser = JSON.parse(loginUser);
+    console.log("LOGIN USER =>", this.loginUser);
+  }
+
+
 },
 
   computed: {
@@ -121,25 +134,45 @@ export default {
       // 1. Check if booking exists to avoid null errors
       if (!this.booking) return 0;
       
-      // 2. Access the nested properties correctly
-      // price comes from the package object
-      // travelers comes from the travelerInfo object
+      
       return this.booking.package.price * this.booking.travelerInfo.travelers;
     }
   },
 
   methods: {
     handlePayment() {
+      
       if (!this.selectedMethod) {
         alert("Please select a payment method.");
         return;
       } 
-      let saleDto = {product:{}};
-      saleDto.qty = localStorage.getItem( 'traveller');
-      saleDto.unitPrice = localStorage.getItem( 'amount');
-      saleDto.paymentType =this.selectedMethod;
-      saleDto.customerId = this.loginUser.userAccountId;
-      saleDto.product.productId = this.productId;
+     let saleDto = {};
+
+     saleDto.productId = Number(this.productId);
+
+  saleDto.customerId = this.loginUser.userAccountId;
+
+  saleDto.userAccountId = this.loginUser.userAccountId;
+
+  saleDto.qty = Number(localStorage.getItem('traveller'));
+
+  saleDto.unitPrice = Number(localStorage.getItem('amount'));
+
+  saleDto.amount = saleDto.qty * saleDto.unitPrice;
+
+  if(this.selectedMethod === 'kbzpay'){
+      saleDto.paymentType = 'KBZpay';
+  }
+  else if(this.selectedMethod === 'wavepay'){
+      saleDto.paymentType = 'WAVEpay';
+  }
+  else if(this.selectedMethod === 'ayapay'){
+      saleDto.paymentType = 'AYApay';
+  }
+
+
+      console.log("SALE DTO =>", saleDto);
+
       saleService
  .addSale(saleDto)
 
@@ -161,12 +194,14 @@ export default {
 
       booking.paymentMethod = this.selectedMethod;  
       booking.id = "BK-" + Math.floor(Math.random() * 90000 + 10000);
-      booking.status = 'confirmed';
+      booking.status = 'CONFIRM';
       booking.timestamp = new Date().toISOString();
 
       localStorage.setItem('booking_data', JSON.stringify(booking));
 
       alert('Payment Confirmed!');
+
+      // saleService.addSale()
       this.$router.push('/confirmation')
     }
   }

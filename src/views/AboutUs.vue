@@ -217,31 +217,44 @@ export default {
   background-image: url('public/about.jpg');
   background-size: cover;
   background-position: center 30%;
-  height: 300px;
+  height: 380px;
+  padding-top: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: black;
-  border-radius: 20px;
+  color: #ffffff;
   margin: 0 10px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+.hero-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.4) 100%);
+  z-index: 1;
 }
 .hero-text-content {
   position: relative;
   z-index: 2;
 }
 .hero-text-content h1 {
-  font-size: 3rem;
-  font-weight: 700;
+  font-size: 3.2rem;
+  font-weight: 800;
   margin: 0 0 12px 0;
+  color: #ffffff; 
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 .hero-text-content p {
-  font-size: 1.15rem;
-  max-width: 550px;
+  font-size: 1.2rem;
+  max-width: 600px;
   margin: 0 auto;
-  opacity: 0.95;
-  line-height: 1.5;
+  color: #e2e8f0; 
+  line-height: 1.6;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 .our-story-section {
   display: flex;
