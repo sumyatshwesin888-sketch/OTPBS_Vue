@@ -60,115 +60,189 @@
             </div>
           </v-card-title>
 
-          <v-card-text class="pt-0 px-4 pb-4">
-            <v-data-table
-              :headers="cityHeaders"
-              :items="filteredCities"
-              :loading="cityLoading"
-              item-value="cityId"
-              hide-default-footer
-              class="premium-table elevation-0"
-              fixed-header
-              height="450"
-            >
-              <!-- Index Column -->
-              <template #item.index="{ index }">
-                <span class="text-body-2 font-weight-medium text-slate-500">
-                  {{ index + 1 }}
-                </span>
-              </template>
-
-              <!-- City Column Identity -->
-              <template #item.cityName="{ item }">
-                <div class="d-flex align-center py-1">
-                  <v-avatar size="28" class="avatar-gradient mr-2 glass-avatar">
-                    <v-icon size="14" color="white">mdi-city-variant-outline</v-icon>
-                  </v-avatar>
-                  <span
-                    class="font-weight-semibold text-grey-darken-3"
-                    style="font-size: 0.8rem !important"
-                  >
-                    {{ item.cityName }}
+          <v-card class="enterprise-card border" variant="flat" rounded="lg">
+            <v-card-text class="pt-0 px-4 pb-4">
+              <v-data-table
+                v-model:items-per-page="itemsPerPage"
+                :headers="cityHeaders"
+                :items="filteredCities"
+                :loading="cityLoading"
+                item-value="cityId"
+                :items-per-page-options="[5, 10, 25, 50]"
+                class="premium-table elevation-0"
+                fixed-header
+                height="450"
+              >
+                <!-- Index Column -->
+                <template #item.index="{ index }">
+                  <span class="text-body-2 font-weight-medium text-slate-500">
+                    {{ index + 1 }}
                   </span>
-                </div>
-              </template>
+                </template>
 
-              <template #item.locationType="{ item }">
-                <span class="text-body-2 text-grey-darken-3" style="font-size: 0.8rem !important">
-                  {{ item.locationType }}
-                </span>
-              </template>
-              <template #item.photo="{ item }">
-                <span class="text-body-2 text-grey-darken-3" style="font-size: 0.8rem !important">
-                  {{ item.photo }}
-                </span>
-              </template>
-              <template #item.region="{ item }">
-                <span class="text-body-2 text-grey-darken-3" style="font-size: 0.8rem !important">
-                  {{ item.region }}
-                </span>
-              </template>
+                <!-- City Name Column -->
+                <template #item.cityName="{ item }">
+                  <div class="d-flex align-center py-1 text-no-wrap">
+                    <v-avatar size="28" class="avatar-gradient mr-2 glass-avatar">
+                      <v-icon size="14" color="white">mdi-city-variant-outline</v-icon>
+                    </v-avatar>
+                    <span
+                      class="font-weight-semibold text-grey-darken-3"
+                      style="font-size: 0.8rem !important"
+                    >
+                      {{ item.cityName }}
+                    </span>
+                  </div>
+                </template>
 
-              <template #item.website="{ item }">
-                <span class="text-body-2 text-grey-darken-3" style="font-size: 0.8rem !important">
-                  {{ item.website }}
-                </span>
-              </template>
-
-              <template #item.detail="{ item }">
-                <span class="text-body-2 text-grey-darken-3" style="font-size: 0.8rem !important">
-                  {{ item.detail }}
-                </span>
-              </template>
-
-              <!-- Operation Control Handlers -->
-              <template #item.actions="{ item }">
-                <v-btn
-                  icon
-                  variant="text"
-                  color="slate-600"
-                  size="small"
-                  class="mr-1"
-                  @click="openEditCityDialog(item)"
-                >
-                  <v-icon size="18">mdi-pencil-outline</v-icon>
-                  <v-tooltip activator="parent" location="top">Edit Hub</v-tooltip>
-                </v-btn>
-                <v-btn
-                  icon
-                  variant="text"
-                  color="error"
-                  size="small"
-                  @click="openDeleteCityDialog(item)"
-                >
-                  <v-icon size="18">mdi-delete-outline</v-icon>
-                  <v-tooltip activator="parent" location="top">Delete Hub</v-tooltip>
-                </v-btn>
-              </template>
-
-              <!-- Table State Fallback -->
-              <template #no-data>
-                <div class="premium-empty-state pa-6 text-center">
-                  <v-avatar size="48" color="grey-lighten-4" class="mb-2">
-                    <v-icon color="grey-darken-1" size="22">mdi-city-off-outline</v-icon>
-                  </v-avatar>
-                  <p class="card-title-text mb-0">No municipal areas discovered</p>
-                  <p class="card-subtitle-text">
-                    Adjust query conditions or provision a new regional boundary entry
-                  </p>
-                  <v-btn
-                    color="primary"
-                    class="btn-primary text-none text-caption font-weight-bold mt-3"
-                    prepend-icon="mdi-plus"
-                    size="small"
-                    @click="openAddCityDialog"
+                <!-- Location Type Column -->
+                <template #item.locationType="{ item }">
+                  <span
+                    v-if="item.locationType"
+                    class="status-chip d-inline-flex align-center text-no-wrap"
+                    :class="item.locationType === 'DOMESTIC' ? 'chip-cyan' : 'chip-indigo'"
+                    style="gap: 4px"
                   >
-                    Add City
+                    <v-icon size="12">
+                      {{ item.locationType === 'DOMESTIC' ? 'mdi-home-map-marker' : 'mdi-earth' }}
+                    </v-icon>
+                    {{ item.locationType }}
+                  </span>
+                  <span v-else class="text-grey-lighten-1" style="font-size: 0.8rem">-</span>
+                </template>
+
+                <!-- Photo Column -->
+                <template #item.photo="{ item }">
+                  <div class="d-flex align-center text-no-wrap">
+                    <div
+                      v-if="item.photo"
+                      class="d-flex align-center cursor-pointer ga-2"
+                      @click="previewImage(item)"
+                    >
+                      <v-avatar size="32" rounded="md" class="border glass-avatar">
+                        <v-img :src="getImageUrl(item.photo)" cover>
+                          <template #error>
+                            <v-icon size="16" color="grey-darken-1"
+                              >mdi-image-broken-variant</v-icon
+                            >
+                          </template>
+                        </v-img>
+                      </v-avatar>
+
+                      <span
+                        class="text-caption text-primary font-weight-medium text-truncate"
+                        style="max-width: 110px"
+                      >
+                        {{ item.photo }}
+                      </span>
+
+                      <v-tooltip activator="parent" location="top"
+                        >Click to preview image</v-tooltip
+                      >
+                    </div>
+
+                    <div v-else class="d-flex align-center text-grey-lighten-1">
+                      <v-icon size="16" class="mr-1">mdi-image-off-outline</v-icon>
+                      <span style="font-size: 0.75rem !important">No photo</span>
+                    </div>
+                  </div>
+                </template>
+
+                <!-- Region Column -->
+                <template #item.region="{ item }">
+                  <div class="d-flex align-center text-no-wrap ga-1">
+                    <v-icon size="14" color="teal-darken-1">mdi-map-marker-radius-outline</v-icon>
+                    <span
+                      class="text-body-2 text-grey-darken-3"
+                      style="font-size: 0.8rem !important"
+                    >
+                      {{ item.region || 'N/A' }}
+                    </span>
+                  </div>
+                </template>
+
+                <!-- Website Column -->
+                <template #item.website="{ item }">
+                  <div class="d-flex align-center text-no-wrap ga-1">
+                    <v-icon size="14" color="primary">mdi-web</v-icon>
+                    <a
+                      v-if="item.website"
+                      :href="item.website.replace(/^'|'$/g, '')"
+                      target="_blank"
+                      class="text-decoration-none text-primary text-truncate"
+                      style="max-width: 160px; font-size: 0.8rem !important"
+                    >
+                      {{ item.website.replace(/^'|'$/g, '') }}
+                    </a>
+                    <span v-else class="text-grey-lighten-1" style="font-size: 0.8rem">-</span>
+                  </div>
+                </template>
+
+                <!-- Detail Column -->
+                <template #item.detail="{ item }">
+                  <div class="d-flex align-center text-no-wrap ga-1">
+                    <v-icon size="14" color="amber-darken-2">mdi-information-outline</v-icon>
+                    <span
+                      class="text-body-2 text-grey-darken-3 text-truncate"
+                      style="max-width: 220px; font-size: 0.8rem !important"
+                    >
+                      {{ item.detail || 'N/A' }}
+                    </span>
+                    <v-tooltip v-if="item.detail" activator="parent" location="top" max-width="300">
+                      {{ item.detail }}
+                    </v-tooltip>
+                  </div>
+                </template>
+
+                <!-- Actions Column -->
+                <template #item.actions="{ item }">
+                  <v-btn
+                    icon
+                    variant="text"
+                    color="slate-600"
+                    size="small"
+                    class="mr-1"
+                    @click="openEditCityDialog(item)"
+                  >
+                    <v-icon size="18">mdi-pencil-outline</v-icon>
+                    <v-tooltip activator="parent" location="top">Edit Hub</v-tooltip>
                   </v-btn>
-                </div>
-              </template>
-            </v-data-table>
-          </v-card-text>
+                  <v-btn
+                    icon
+                    variant="text"
+                    color="error"
+                    size="small"
+                    @click="openDeleteCityDialog(item)"
+                  >
+                    <v-icon size="18">mdi-delete-outline</v-icon>
+                    <v-tooltip activator="parent" location="top">Delete Hub</v-tooltip>
+                  </v-btn>
+                </template>
+
+                <!-- No Data -->
+                <template #no-data>
+                  <div class="premium-empty-state pa-6 text-center">
+                    <v-avatar size="48" color="grey-lighten-4" class="mb-2">
+                      <v-icon color="grey-darken-1" size="22">mdi-city-off-outline</v-icon>
+                    </v-avatar>
+                    <p class="card-title-text mb-0">No municipal areas discovered</p>
+                    <p class="card-subtitle-text">
+                      Adjust query conditions or provision a new regional boundary entry
+                    </p>
+                    <v-btn
+                      color="primary"
+                      class="btn-primary text-none text-caption font-weight-bold mt-3"
+                      prepend-icon="mdi-plus"
+                      size="small"
+                      @click="openAddCityDialog"
+                    >
+                      Add City
+                    </v-btn>
+                  </div>
+                </template>
+              </v-data-table>
+            </v-card-text>
+          </v-card>
         </v-card>
       </v-window-item>
 
@@ -221,7 +295,7 @@
           </v-row>
         </v-card>
 
-        <!-- Hotels High-Density Enterprise Registry -->
+        <!-- Hotels Registry -->
         <v-card class="enterprise-card">
           <v-card-title class="pa-4 pb-2">
             <div>
@@ -234,18 +308,24 @@
 
           <v-card-text class="pt-0 px-4 pb-4">
             <v-data-table
+              v-model:items-per-page="itemsPerPage"
               :headers="hotelHeaders"
               :items="hotels"
               :loading="hotelLoading"
               item-value="hotelId"
-              hide-default-footer
+              :items-per-page-options="[5, 10, 25, 50]"
               class="premium-table elevation-0"
               fixed-header
               height="450"
             >
-              <!-- Hotel Identity Column -->
+              <template #item.index="{ index }">
+                <span class="text-body-2 font-weight-medium text-slate-500">
+                  {{ index + 1 }}
+                </span>
+              </template>
+
               <template #item.hotelName="{ item }">
-                <div class="d-flex align-center py-1">
+                <div class="d-flex align-center py-1 text-no-wrap">
                   <v-avatar size="28" class="indigo-gradient mr-2 glass-avatar">
                     <v-icon size="14" color="white">mdi-domain</v-icon>
                   </v-avatar>
@@ -258,7 +338,6 @@
                 </div>
               </template>
 
-              <!-- City Dynamic Link Tag (FIXED SLOT NAME) -->
               <template #item.cityDto.cityName="{ item }">
                 <span class="status-chip chip-indigo d-inline-flex align-center" style="gap: 4px">
                   <v-icon size="11">mdi-map-marker-outline</v-icon>
@@ -266,32 +345,32 @@
                 </span>
               </template>
 
-              <!-- Operation Control Handlers -->
               <template #item.actions="{ item }">
-                <v-btn
-                  icon
-                  variant="text"
-                  color="slate-600"
-                  size="small"
-                  class="mr-1"
-                  @click="openEditHotelDialog(item)"
-                >
-                  <v-icon size="18">mdi-pencil-outline</v-icon>
-                  <v-tooltip activator="parent" location="top">Edit Asset</v-tooltip>
-                </v-btn>
-                <v-btn
-                  icon
-                  variant="text"
-                  color="error"
-                  size="small"
-                  @click="openDeleteHotelDialog(item)"
-                >
-                  <v-icon size="18">mdi-delete-outline</v-icon>
-                  <v-tooltip activator="parent" location="top">Delete Asset</v-tooltip>
-                </v-btn>
+                <div class="text-no-wrap">
+                  <v-btn
+                    icon
+                    variant="text"
+                    color="slate-600"
+                    size="small"
+                    class="mr-1"
+                    @click="openEditHotelDialog(item)"
+                  >
+                    <v-icon size="18">mdi-pencil-outline</v-icon>
+                    <v-tooltip activator="parent" location="top">Edit Asset</v-tooltip>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    variant="text"
+                    color="error"
+                    size="small"
+                    @click="openDeleteHotelDialog(item)"
+                  >
+                    <v-icon size="18">mdi-delete-outline</v-icon>
+                    <v-tooltip activator="parent" location="top">Delete Asset</v-tooltip>
+                  </v-btn>
+                </div>
               </template>
 
-              <!-- Table State Fallback -->
               <template #no-data>
                 <div class="premium-empty-state pa-6 text-center">
                   <v-avatar size="48" color="grey-lighten-4" class="mb-2">
@@ -318,9 +397,9 @@
       </v-window-item>
     </v-window>
 
-    <!-- ================= MODAL SCHEMATICS DIALOGS ================= -->
+    <!-- ================= DIALOGS ================= -->
 
-    <!-- City Manifest Context Dialog -->
+    <!-- City Dialog -->
     <v-dialog v-model="cityDialog" max-width="460px" persistent>
       <v-card class="premium-dialog">
         <v-card-title class="d-flex justify-space-between align-center pa-5 pb-2">
@@ -368,19 +447,33 @@
                 ></v-text-field>
               </v-col>
 
-              <!-- Photo URL Field -->
               <v-col cols="12">
-                <v-text-field
-                  v-model="cityForm.photo"
-                  label="Photo URL"
-                  prepend-inner-icon="mdi-image-outline"
-                  variant="outlined"
-                  density="compact"
-                  hide-details="auto"
-                  class="sleek-input"
-                ></v-text-field>
+                <div class="d-flex align-center ga-3">
+                  <v-avatar size="48" rounded="lg" class="border glass-avatar bg-grey-lighten-4">
+                    <v-img :src="previewUrl || getImageUrl(cityForm.photo)" cover>
+                      <template #error>
+                        <v-icon color="grey">mdi-image-outline</v-icon>
+                      </template>
+                    </v-img>
+                  </v-avatar>
+
+                  <v-file-input
+                    v-model="selectedFile"
+                    label="Choose photo"
+                    prepend-inner-icon="mdi-camera"
+                    prepend-icon=""
+                    density="compact"
+                    variant="outlined"
+                    accept="image/*"
+                    hide-details
+                    clearable
+                    class="sleek-input flex-grow-1"
+                    @change="onFileChange"
+                    @click:clear="previewUrl = null"
+                  ></v-file-input>
+                </div>
               </v-col>
-              <!-- Region Field -->
+
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="cityForm.region"
@@ -393,7 +486,6 @@
                 ></v-text-field>
               </v-col>
 
-              <!-- Website Field -->
               <v-col cols="12">
                 <v-text-field
                   v-model="cityForm.website"
@@ -406,7 +498,6 @@
                 ></v-text-field>
               </v-col>
 
-              <!-- Detail Field -->
               <v-col cols="12">
                 <v-textarea
                   v-model="cityForm.detail"
@@ -437,7 +528,7 @@
                 height="34"
                 :disabled="!cityFormValid"
               >
-                {{ editingCity ? 'Update Parameters' : 'Add' }}
+                {{ editingCity ? 'Update' : 'Add' }}
               </v-btn>
             </v-card-actions>
           </v-form>
@@ -445,7 +536,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- Hotel Manifest Context Dialog -->
+    <!-- Hotel Dialog -->
     <v-dialog v-model="hotelDialog" max-width="480px" persistent>
       <v-card class="premium-dialog">
         <v-card-title class="d-flex justify-space-between align-center pa-5 pb-2">
@@ -482,18 +573,13 @@
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
+                <!-- Hotel Dialog ထဲရှိ v-select ကို အောက်ပါအတိုင်း ပြင်ပါ -->
                 <v-select
-                  v-model="hotelForm.cityDto"
-                  label="Assigned Administrative Hub Area *"
+                  v-model="hotelForm.cityId"
                   :items="cityList"
                   item-title="cityName"
-                  prepend-inner-icon="mdi-map-marker-radius-outline"
-                  required
-                  variant="outlined"
-                  density="compact"
-                  hide-details="auto"
-                  class="sleek-input"
-                  return-object
+                  item-value="cityId"
+                  label="Select City "
                 ></v-select>
               </v-col>
             </v-row>
@@ -514,7 +600,7 @@
                 height="34"
                 :disabled="!hotelFormValid"
               >
-                {{ editingHotel ? 'Update Properties' : 'Add' }}
+                {{ editingHotel ? 'Update' : 'Add' }}
               </v-btn>
             </v-card-actions>
           </v-form>
@@ -581,12 +667,43 @@
             class="text-none text-caption font-weight-bold"
             height="32"
             @click="deleteHotel"
-            >Delete</v-btn>
-          
+            >Delete</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
+
+  <!-- Image Preview Lightbox Dialog -->
+  <v-dialog v-model="imagePreviewDialog" max-width="500px">
+    <v-card class="premium-dialog text-center pa-4">
+      <v-card-title class="d-flex justify-space-between align-center pa-2 pb-0">
+        <span class="card-title-text">{{ selectedCityForPreview?.cityName }}</span>
+        <v-btn icon variant="text" size="small" @click="imagePreviewDialog = false">
+          <v-icon size="18">mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
+      <v-card-text class="pa-2">
+        <v-img
+          v-if="selectedCityForPreview?.photo"
+          :src="getImageUrl(selectedCityForPreview.photo)"
+          rounded="lg"
+          max-height="350"
+          cover
+          class="elevation-2"
+        >
+          <template #error>
+            <div
+              class="d-flex flex-column align-center justify-center fill-height bg-grey-lighten-4"
+            >
+              <v-icon size="40" color="grey-darken-1">mdi-image-broken-variant</v-icon>
+              <span class="text-caption text-grey-darken-1 mt-2">Image failed to load</span>
+            </div>
+          </template>
+        </v-img>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script lang="ts">
@@ -598,6 +715,11 @@ export default defineComponent({
   name: 'AdminHotels',
   data() {
     return {
+      selectedFile: null as File | null,
+      previewUrl: null as string | null,
+      imagePreviewDialog: false,
+      selectedCityForPreview: null as City | null,
+      itemsPerPage: 10,
       cityList: [] as City[],
       cityAllList: [] as any[],
       cityAll: 'ALL',
@@ -626,9 +748,9 @@ export default defineComponent({
       deleteHotelDialog: false,
       hotelSearch: '',
       hotelForm: {
-        hotelId: '',
+        hotelId: null,
         hotelName: '',
-        cityDto: { cityId: 0, cityName: '' },
+        cityId: null,
       },
       editingHotel: false,
       hotelToDelete: null as Hotel | null,
@@ -647,9 +769,16 @@ export default defineComponent({
       ],
 
       hotelHeaders: [
+        { title: 'No.', key: 'index', align: 'start' as const, sortable: false, width: '80px' },
         { title: 'Hotel Name', key: 'hotelName', align: 'start' as const },
-        { title: 'City', key: 'cityDto.cityName', align: 'start' as const },
-        { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
+        { title: 'City', key: 'cityDto.cityName', align: 'start' as const, width: '220px' },
+        {
+          title: 'Actions',
+          key: 'actions',
+          sortable: false,
+          align: 'end' as const,
+          width: '120px',
+        },
       ],
     }
   },
@@ -662,8 +791,9 @@ export default defineComponent({
     cityFormValid(): boolean {
       return !!this.cityForm.cityName
     },
-    hotelFormValid(): boolean {
-      return !!this.hotelForm.hotelName && !!this.hotelForm.cityDto?.cityId
+    //  Validation စစ်
+    hotelFormValid() {
+      return !!this.hotelForm.hotelName && !!this.hotelForm.cityId
     },
   },
   mounted() {
@@ -671,26 +801,37 @@ export default defineComponent({
     this.getHotelListMethod()
   },
   methods: {
-   getHotelListMethod() {
-  this.hotelLoading = true
-  cityService
-    .getHotel('ALL', 'ALL', '')
-    .then((response) => {
-      let hotelData = [];
-      if (response && response.data) {
-        hotelData = response.data;
-      } else if (Array.isArray(response)) {
-        hotelData = response;
-      }
+    getImageUrl(photoName: string) {
+      if (!photoName) return ''
+      if (photoName.startsWith('http')) return photoName
 
-      this.hotels.splice(0)
-      this.hotels.push(...hotelData)
-      
-      console.log("True Data:", hotelData)
-    })
-    .catch((err) => console.error('Hotel Fetch Error: ', err))
-    .finally(() => (this.hotelLoading = false))
-},
+      const backendBaseUrl = 'http://localhost:8088/productphoto'
+      return `${backendBaseUrl}/${photoName}`
+    },
+
+    previewImage(city: City) {
+      this.selectedCityForPreview = city
+      this.imagePreviewDialog = true
+    },
+
+    getHotelListMethod() {
+      this.hotelLoading = true
+      cityService
+        .getHotel('ALL', 'ALL', '')
+        .then((response) => {
+          let hotelData = []
+          if (response && response.data) {
+            hotelData = response.data
+          } else if (Array.isArray(response)) {
+            hotelData = response
+          }
+
+          this.hotels.splice(0)
+          this.hotels.push(...hotelData)
+        })
+        .catch((err) => console.error('Hotel Fetch Error: ', err))
+        .finally(() => (this.hotelLoading = false))
+    },
 
     getCityMethod() {
       this.cityLoading = true
@@ -702,12 +843,12 @@ export default defineComponent({
         .getCity(this.cityNameInput || 'ALL', searchStr)
         .then((res) => {
           this.cities = res
-          this.cityList = res; 
-          
+          this.cityList = res
+
           this.cityAllList.splice(0)
           this.cityAllList.push({ cityName: 'ALL', cityId: 0 })
           this.cityAllList.push(...res)
-          
+
           this.cityLoading = false
         })
         .catch((err) => {
@@ -762,8 +903,21 @@ export default defineComponent({
       this.hotels.splice(0, this.hotels.length, ...filtered)
     },
 
+    onFileChange(event: any) {
+      const file = event.target.files?.[0] || this.selectedFile
+      if (file) {
+        this.previewUrl = URL.createObjectURL(file)
+        this.cityForm.photo = file.name
+      } else {
+        this.previewUrl = null
+        this.cityForm.photo = ''
+      }
+    },
+
     openAddCityDialog() {
-      this.editingCity = false // Add လုပ်မှာဖြစ်လို့ false ပေး
+      this.editingCity = false
+      this.selectedFile = null
+      this.previewUrl = null
       this.cityForm = {
         cityId: '',
         cityName: '',
@@ -777,12 +931,12 @@ export default defineComponent({
     },
 
     openEditCityDialog(city: City) {
-      this.editingCity = true //  Edit လုပ်မှာဖြစ်လို့ true ပေး
+      this.editingCity = true
       this.cityForm = { ...city }
       this.cityDialog = true
     },
-async saveCity() {
-      // Database ထဲထည့်ဖို့ payload Object တည်ဆောက်
+
+    async saveCity() {
       const payload = {
         cityId: this.cityForm.cityId ? Number(this.cityForm.cityId) : null,
         cityName: this.cityForm.cityName,
@@ -791,19 +945,17 @@ async saveCity() {
         region: this.cityForm.region,
         website: this.cityForm.website,
         detail: this.cityForm.detail,
-      };
+      }
 
-      // အသစ်ဆောက်တာလား (Add)၊ ပြင်တာလား (Edit) ခွဲပြီး API ခေါ်ပါတယ်
-      const apiCall = this.editingCity 
-        ? cityService.updateCity(payload) //  Edit/Update အတွက်
-        : cityService.addCity(payload);    //  Database ထဲ Add ဖို့အတွက်
+      const apiCall = this.editingCity
+        ? cityService.updateCity(payload)
+        : cityService.addCity(payload)
 
       apiCall
         .then(() => {
-          this.cityDialog = false  // Modal Box ကို ပိတ်မယ်
-          this.getCityMethod()     // Table မှာ Data ချက်ချင်း update ဖြစ်အောင် ပြန်ခေါ်
-          
-          //  Form ထဲကစာတွေကို ပြန်ရှင်း
+          this.cityDialog = false
+          this.getCityMethod()
+
           this.cityForm = {
             cityId: '',
             cityName: '',
@@ -814,7 +966,7 @@ async saveCity() {
             detail: '',
           }
         })
-        .catch((err) => console.error("City Save Error", err))
+        .catch((err) => console.error('City Save Error', err))
     },
 
     openDeleteCityDialog(city: City) {
@@ -824,61 +976,132 @@ async saveCity() {
 
     async deleteCity() {
       if (!this.cityToDelete) return
-      
-      // Delete APIကို လှမ်းခေါ်ပေးလိုက်ပါတယ်
-      cityService.deleteCity(this.cityToDelete.cityId)
+
+      cityService
+        .deleteCity(this.cityToDelete.cityId)
         .then(() => {
           this.deleteCityDialog = false
           this.getCityMethod()
         })
-        .catch((err) => console.error("City Delete Error", err))
+        .catch((err) => console.error('City Delete Error', err))
     },
 
+   // Hotel သစ်ထည့်ရန် Dialog ဖွင့်ခြင်း
     openAddHotelDialog() {
       this.editingHotel = false
+      
+      // cityList ထဲမှာ city ရှိရင် ပထမဆုံး city ရဲ့ id ကို default ထည့် မရှိရင် null
+      const defaultCityId = this.cityList.length > 0 ? this.cityList[0].cityId : null
+
       this.hotelForm = {
-        hotelId: '',
+        hotelId: null,
         hotelName: '',
-        cityDto: this.cityList[0] || { cityId: 0, cityName: '' },
+        cityId: defaultCityId
       }
       this.hotelDialog = true
     },
 
-    openEditHotelDialog(item: any) {
+    // Hotel ပြင်ရန် Dialog 
+   openEditHotelDialog(item: any) {
       this.editingHotel = true
-      this.hotelForm = JSON.parse(JSON.stringify(item))
+      
+      // ID များကို ရှာဖွေယူခြင်း
+      const hId = item.hotelId || (item.raw && item.raw.hotelId)
+      const hName = item.hotelName || (item.raw && item.raw.hotelName) || ''
+      
+      // cityDto ထဲက cityId သို့မဟုတ် item ထဲက cityId ကို ယူမည်
+      const cId = item.cityDto ? item.cityDto.cityId : (item.cityId || null)
+
+      this.hotelForm = {
+        hotelId: hId ? Number(hId) : null,
+        hotelName: hName,
+        cityId: cId ? Number(cId) : null
+      }
+
       this.hotelDialog = true
     },
 
     async saveHotel() {
-      // Hotel အတွက်လည်း Add / Update ခွဲခေါ်ပေး
+      if (!this.hotelForm.hotelName || !this.hotelForm.cityId) {
+        alert('Hotel Name နှင့် City ကို ရွေးချယ်ပေးပါ။')
+        return
+      }
+
+      if (this.editingHotel && !this.hotelForm.hotelId) {
+        alert('Hotel ID is null')
+        return
+      }
+
+      const payload = {
+        hotelId: Number(this.hotelForm.hotelId),
+        hotelName: this.hotelForm.hotelName,
+        cityDto: {
+          cityId: Number(this.hotelForm.cityId)
+        }
+      }
+
       const apiCall = this.editingHotel
-        ? cityService.updateHotel(this.hotelForm) 
-        : cityService.addHotel(this.hotelForm);
+        ? cityService.updateHotel(payload)
+        : cityService.addHotel(payload)
 
       apiCall
         .then(() => {
           this.hotelDialog = false
-          this.getHotelListMethod()
+          this.getHotelListMethod() // Table Data ကို Refresh ပြန်လုပ်
         })
-        .catch((err) => console.error('Hotel Save Error: ', err))
+        .catch((err) => {
+          console.error('Hotel Save Error: ', err)
+          alert('Update Error!')
+        })
     },
 
-    openDeleteHotelDialog(hotel: Hotel) {
+    confirmDeleteHotel() {
+    if (!this.hotelToDelete) return
+
+    const id = this.hotelToDelete.hotelId
+
+    // 1. Backend Delete API ကို ခေါ်ပါမည်
+    cityService.deleteHotel(id)
+      .then((response) => {
+        // 2. Database ထဲမှာ status = 'DELETED' ဖြစ်သွားပြီဖြစ်၍ 
+        //    UI ထဲက hotels array ထဲမှလည်း ချက်ချင်း ဖယ်ထုတ်ပေးပါမည်
+        this.hotels = this.hotels.filter(hotel => hotel.hotelId !== id)
+
+        // 3. Delete Modal/Dialog ကို ပိတ်ပြီး အကြောင်းကြားစာ ပြပါမည်
+        this.deleteHotelDialog = false
+        alert('Hotel has been deleted successfully!')
+      })
+      .catch((error) => {
+        console.error('Error deleting hotel:', error)
+        alert('Failed to delete hotel. Please try again.')
+      })
+  },
+     openDeleteHotelDialog(hotel: Hotel) {
       this.hotelToDelete = hotel
       this.deleteHotelDialog = true
     },
 
-    async deleteHotel() {
+   async deleteHotel() {
       if (!this.hotelToDelete) return
-      
-      //  Hotel Delete API ကို လှမ်းခေါ်ပေး
-      cityService.deleteHotel(this.hotelToDelete.hotelId)
+
+      const id = this.hotelToDelete.hotelId
+
+      cityService
+        .deleteHotel(id)
         .then(() => {
           this.deleteHotelDialog = false
+          //  Local Array ထဲကနေ တိုက်ရိုက် ဖျက်ထုတ်ပါ
+          this.hotels = this.hotels.filter(hotel => hotel.hotelId !== id)
+          
+          // Backend ကနေ List ကို အသစ်ပြန်ဆွဲပါ
           this.getHotelListMethod()
+          
+          alert('Hotel deleted successfully!')
         })
-        .catch((err) => console.error("Hotel Delete Error", err))
+        .catch((err) => {
+          console.error('Hotel Delete Error', err)
+          alert('Failed to delete hotel!')
+        })
     },
   },
 })
@@ -967,14 +1190,6 @@ async saveCity() {
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }
-.chip-cyan {
-  background: rgba(6, 182, 212, 0.08);
-  color: #0891b2;
-}
-.chip-indigo {
-  background: rgba(99, 102, 241, 0.08);
-  color: #4f46e5;
-}
 
 /* High-Density Matrix Table Blueprint */
 .premium-table {
@@ -987,10 +1202,12 @@ async saveCity() {
   background: rgba(241, 245, 249, 0.4) !important;
   border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
   padding: 8px 12px !important;
+  white-space: nowrap !important;
 }
 .premium-table :deep(td) {
   border-bottom: 1px solid rgba(241, 245, 249, 0.3) !important;
   padding: 6px 12px !important;
+  white-space: nowrap !important;
 }
 
 /* Elegant Soft Dialog Configurations */
@@ -1027,5 +1244,16 @@ async saveCity() {
 }
 .shadow-glow-error {
   box-shadow: 0 0 14px rgba(239, 68, 68, 0.3) !important;
+}
+:deep(.v-table__wrapper) {
+  overflow-x: auto !important;
+}
+.chip-cyan {
+  background: rgba(6, 182, 212, 0.1) !important;
+  color: #0891b2 !important;
+}
+.chip-indigo {
+  background: rgba(99, 102, 241, 0.1) !important;
+  color: #4f46e5 !important;
 }
 </style>
