@@ -29,7 +29,44 @@
             required
           />
 
-          <span class="toggle-password" @click="showPassword = !showPassword"> 👁 </span>
+          <span class="toggle-password" @click.prevent="showPassword = !showPassword"
+            >
+            <!-- Password မြင်နေရချိန် (slash တုတ်ချောင်းပါသော မျက်လုံး) -->
+            <svg
+              v-if="showPassword"
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+              ></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+
+            <!-- Password ဖုံးထားချိန် (ရိုးရိုးမျက်လုံး) -->
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </span>
         </div>
 
         <!-- OPTIONS -->
@@ -39,8 +76,7 @@
             <span>Remember Me</span>
           </label>
 
-          <a href="#" @click.prevent="forgotPassword"> Forgot Password? </a>
-        </div>
+<a href="#" @click.prevent="showForgotModal = true"> Forgot Password? </a>        </div>
 
         <!-- SUBMIT -->
         <button type="submit" class="btn-submit" :disabled="loading">
@@ -56,6 +92,37 @@
         </p>
       </footer>
     </main>
+    <div v-if="showForgotModal" class="modal-overlay">
+  <div class="forgot-modal-card">
+    <h3 class="modal-title">Reset Password</h3>
+    <p class="modal-subtitle">Enter your account email and new password.</p>
+
+    <form @submit.prevent="handleResetPassword" class="modal-form">
+      <div class="input-group">
+        <i class="fa-solid fa-envelope input-icon"></i>
+        <input type="email" v-model="forgotForm.email" placeholder="Enter your Email" required />
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-lock input-icon"></i>
+        <input type="password" v-model="forgotForm.newPassword" placeholder="New Password" required />
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-lock input-icon"></i>
+        <input type="password" v-model="forgotForm.confirmPassword" placeholder="Confirm Password" required />
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" @click="showForgotModal = false">Cancel</button>
+        <button type="submit" class="btn-reset" :disabled="loading">
+          <span v-if="loading">Updating...</span>
+          <span v-else>Update Password</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
   </div>
 </template>
 
@@ -74,6 +141,13 @@ export default {
       loading: false,
       authStore: useAuthStore(),
       loginUser: {},
+      showForgotModal: false,
+    forgotForm: {
+      email: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  
     }
   },
 
@@ -127,12 +201,12 @@ export default {
               localStorage.setItem('loginUser', JSON.stringify(response))
 
               this.loginUser = JSON.parse(localStorage.getItem('loginUser'))
-              console.log(this.loginUser);
-              
-              if(this.loginUser.userType =='ADMIN'){
+              console.log(this.loginUser)
+
+              if (this.loginUser.userType == 'ADMIN') {
                 this.$router.push('/admin/dashboard')
-              }else{
-              this.$router.push('/')
+              } else {
+                this.$router.push('/')
               }
               // location.reload();
             }
@@ -165,9 +239,35 @@ export default {
     //   this.$router.push(redirect)
     // },
 
-    forgotPassword() {
-      alert('Forgot password feature coming soon')
-    },
+   async handleResetPassword() {
+    // ၁. Password နှစ်ခု တူမတူ စစ်မည်
+    if (this.forgotForm.newPassword !== this.forgotForm.confirmPassword) {
+      alert('New passwords do not match!');
+      return;
+    }
+
+    this.loading = true;
+    try {
+      const payload = {
+        email: this.forgotForm.email,
+        password: this.forgotForm.newPassword,
+      };
+
+      // JS Service ထဲက updatePassword() ကို လှမ်းခေါ်မည်
+      await userAccountService.updatePassword(payload);
+
+      alert('Password Reset Successfully! You can now login.');
+      
+      // Modal ပြန်ပိတ်ပြီး Form ကို Reset လုပ်မည်
+      this.showForgotModal = false;
+      this.forgotForm = { email: '', newPassword: '', confirmPassword: '' };
+    } catch (error) {
+      console.error('Password Reset Error:', error);
+      alert('Failed to reset password. Please try again!');
+    } finally {
+      this.loading = false;
+    }
+  }
   },
 }
 </script>
@@ -181,22 +281,24 @@ export default {
 
 .login-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(110vh);
   display: flex;
   justify-content: center;
   align-items: center;
 
-  /* 🔥 Background image + dark overlay */
+  /*  Background image + dark overlay */
   background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url('/login.avif');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   padding: 20px;
+  overflow: hidden;
+  position: fixed;
 }
 
 .login-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
 
@@ -247,9 +349,9 @@ export default {
 }
 
 .input-group input:focus {
-  border-color: #00bcd4;
+  border-color: #2563eb;
   background: white;
-  box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.15);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 /* ICON */
@@ -268,9 +370,16 @@ export default {
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
+  color: #94a3b8;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
+.toggle-password:hover {
+  color:#2563eb;
+}
 /* OPTIONS */
 .form-options {
   display: flex;
@@ -287,7 +396,7 @@ export default {
 }
 
 .form-options a {
-  color: #00bcd4;
+  color: #2563eb;
   text-decoration: none;
 }
 
@@ -301,7 +410,7 @@ export default {
   padding: 14px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #00bcd4, #0097a7);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
   font-weight: 600;
   font-size: 15px;
@@ -312,7 +421,7 @@ export default {
 
 .btn-submit:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 188, 212, 0.3);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
 }
 
 .btn-submit:disabled {
@@ -329,9 +438,71 @@ export default {
 }
 
 .card-footer a {
-  color: #00bcd4;
+  color: #2563eb;
   font-weight: 600;
   cursor: pointer;
+}
+/* 💡 FORGOT PASSWORD MODAL STYLES */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.forgot-modal-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 15px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-cancel {
+  padding: 10px 16px;
+  border: none;
+  background: #e2e8f0;
+  color: #475569;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-reset {
+  padding: 10px 16px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-reset:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
 }
 
 /* ANIMATION */

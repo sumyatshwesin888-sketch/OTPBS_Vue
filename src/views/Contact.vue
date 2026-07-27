@@ -146,7 +146,7 @@ export default {
         .then((response) => {
           alert('Your message has been sent successfully!')
 
-          // 🟢 Message ပို့ပြီးရင် Form ထဲက Text တွေကို Auto ရှင်းပစ်မည့် ကုဒ်
+          // Message ပို့ပြီးရင် Form ထဲက Text တွေကို Auto ရှင်းတာ
           this.formData = {
             name: '',
             email: '',
@@ -171,16 +171,16 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 100px 20px 60px 20px; /* Navbar မအုပ်အောင် top padding နည်းနည်းတိုးထားပါတယ် */
+  padding: 100px 20px 60px 20px; 
 }
 
 .contact-container {
-  max-width: 960px; /* 🟢 1140px မှ 960px သို့ ခြုံ့လိုက်ပါတယ် (ပိုစစ်စစ်လစ်လစ် ဖြစ်သွားပါမယ်) */
+  max-width: 960px; 
   width: 100%;
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 40px; /* 🟢 60px မှ 40px သို့ လျှော့ထားပါတယ် */
+  gap: 40px;
 }
 
 .contact-info-side {
@@ -188,7 +188,7 @@ export default {
 }
 
 .main-title {
-  font-size: 2.3rem; /* 🟢 3rem မှ 2.3rem သို့ အချိုးချလိုက်ပါတယ် */
+  font-size: 2.3rem; 
   font-weight: 700;
   color: #ffffff;
   margin: 0 0 6px 0;
@@ -196,7 +196,7 @@ export default {
 }
 
 .subtitle {
-  font-size: 1.15rem; /* 🟢 နည်းနည်းလေး သေးလိုက်ပါတယ် */
+  font-size: 1.15rem;
   color: #3b82f6;
   font-weight: 600;
   margin: 0 0 14px 0;
@@ -204,7 +204,7 @@ export default {
 
 .description {
   color: #94a3b8;
-  font-size: 0.95rem; /* 🟢 1.05rem မှ လျှော့ထားပါတယ် */
+  font-size: 0.95rem; 
   line-height: 1.6;
   margin: 0 0 30px 0;
 }
@@ -212,7 +212,7 @@ export default {
 .info-list {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* 🟢 28px မှ 20px သို့ ပိုကျစ်သွားအောင် ပြင်ထားပါတယ် */
+  gap: 20px; 
 }
 
 .info-item {
@@ -222,7 +222,7 @@ export default {
 }
 
 .icon-box {
-  width: 44px; /* 🟢 Icon Box အရွယ်အစား သေးလိုက်ပါတယ် */
+  width: 44px; 
   height: 44px;
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.05);
@@ -271,7 +271,7 @@ export default {
   flex: 1.1;
   background-color: #ffffff;
   border-radius: 20px;
-  padding: 32px 35px; /* 🟢 Padding 50px မှ 32px သို့ ခြုံ့လိုက်ပါပြီ */
+  padding: 32px 35px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
@@ -302,7 +302,7 @@ export default {
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 10px 14px; /* 🟢 Input တွေကို အမြင့်ပြားပြီး ပိုကျစ်သွားအောင် လုပ်ထားပါတယ် */
+  padding: 10px 14px; 
   border: 1px solid #cbd5e1;
   border-radius: 10px;
   font-size: 0.92rem;
@@ -356,7 +356,7 @@ export default {
   background-color: #1a73e8;
   color: #ffffff;
   border: none;
-  padding: 12px; /* 🟢 Button Size လေး ခြုံ့ပေးထားပါတယ် */
+  padding: 12px; 
   font-size: 0.98rem;
   font-weight: 600;
   border-radius: 10px;
