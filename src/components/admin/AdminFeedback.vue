@@ -9,13 +9,13 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Average Rating</p>
-                <p class="stat-value text-amber-darken-2">
+                <p class="stat-value text-blue-darken-4">
                   {{ averageRating }}
                   <v-icon size="14" color="amber" class="ml-1">mdi-star</v-icon>
                 </p>
               </div>
               <v-avatar size="28" class="stat-icon-container bg-amber-lighten-5">
-                <v-icon size="16" color="amber-darken-2">mdi-star-face</v-icon>
+                <v-icon size="16" color="blue-darken-4">mdi-star-face</v-icon>
               </v-avatar>
             </div>
           </v-card-text>
@@ -46,10 +46,10 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Total Comments</p>
-                <p class="stat-value text-purple-darken-2">{{ comments.length }}</p>
+                <p class="stat-value text-blue-darken-2">{{ comments.length }}</p>
               </div>
               <v-avatar size="28" class="stat-icon-container bg-purple-lighten-5">
-                <v-icon size="16" color="purple-darken-2">mdi-comment-text-outline</v-icon>
+                <v-icon size="16" color="blue-darken-2">mdi-comment-text-outline</v-icon>
               </v-avatar>
             </div>
           </v-card-text>
@@ -63,10 +63,10 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Customer Messages</p>
-                <p class="stat-value text-green-darken-2">{{ messages.length }}</p>
+                <p class="stat-value text-blue-lighten-1">{{ messages.length }}</p>
               </div>
               <v-avatar size="28" class="stat-icon-container bg-green-lighten-5">
-                <v-icon size="16" color="green-darken-2">mdi-email-outline</v-icon>
+                <v-icon size="16" color="blue-lighten-1">mdi-email-outline</v-icon>
               </v-avatar>
             </div>
           </v-card-text>
@@ -79,17 +79,17 @@
       <v-tab value="ratings" class="text-none font-weight-bold text-caption rounded-t-lg">
         <v-icon start size="16">mdi-star-box-outline</v-icon>
         Ratings
-        <v-badge :content="ratings.length" color="amber-darken-2" inline class="ml-2 core-badge"></v-badge>
+        <v-badge :content="ratings.length" color="blue-darken-4" inline class="ml-2 core-badge"></v-badge>
       </v-tab>
       <v-tab value="comments" class="text-none font-weight-bold text-caption rounded-t-lg">
         <v-icon start size="16">mdi-comment-multiple-outline</v-icon>
         Comments
-        <v-badge :content="comments.length" color="purple-darken-2" inline class="ml-2 core-badge"></v-badge>
+        <v-badge :content="comments.length" color="blue-darken-2" inline class="ml-2 core-badge"></v-badge>
       </v-tab>
       <v-tab value="messages" class="text-none font-weight-bold text-caption rounded-t-lg">
         <v-icon start size="16">mdi-inbox-text-outline</v-icon>
         Messages
-        <v-badge :content="messages.length" color="green-darken-2" inline class="ml-2 core-badge"></v-badge>
+        <v-badge :content="messages.length" color="blue-lighten-1" inline class="ml-2 core-badge"></v-badge>
       </v-tab>
     </v-tabs>
 
