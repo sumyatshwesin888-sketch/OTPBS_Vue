@@ -203,7 +203,7 @@
                 </div>
 
                 <!--Show Comment -->
-                <p class="comment-content-text">{{ rev.comment }}</p>
+                <p class="comment-content-text">{{ rev.message }}</p>
               </div>
             </div>
           </div>
@@ -449,6 +449,7 @@ export default {
 
         this.itineraryList = data.itineraryList
         this.ratingCommentList = data.ratingCommentList
+        console.log(this.ratingCommentList)
         this.productDto = data.productDto
 
         if (this.productDto && this.productDto.photo) {
@@ -517,16 +518,18 @@ export default {
         return
       }
 
-      const loginUserData = JSON.parse(localStorage.getItem('loginUser'))
-      let loggedInCustomerId = loginUserData ? loginUserData.userAccountId : null
+     const loginUserData = JSON.parse(localStorage.getItem("loginUser"));
 
-      if (!loggedInCustomerId) {
-        loggedInCustomerId = 6 
-      }
+if (!loginUserData || !loginUserData.userAccountId) {
+    alert("Please login first to write a review.");
+    return;
+}
+
+const loggedInCustomerId = loginUserData.userAccountId;
 
       console.log(this.newRating)
 
-      let obj = { userAccountDto: {} }
+      let obj = { userAccountDto: {userAccountId: loggedInCustomerId} }
       obj.productId = this.productId
       obj.userAccountDto.userAccountId = loggedInCustomerId
       obj.rating = this.newRating
