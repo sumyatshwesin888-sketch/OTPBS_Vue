@@ -338,7 +338,18 @@
 
             <div class="divider" />
 
-            <button class="book-btn" @click="clickBookNow">Book Now</button>
+            <div v-if="isClosed" class="closed-warning-msg">
+  ⚠️ Booking for this package is closed (Closed 3 days prior to departure).
+</div>
+
+<button 
+  class="book-btn" 
+  :class="{ 'btn-disabled': isClosed || productDto.leftTicket <= 0 }" 
+  :disabled="isClosed || productDto.leftTicket <= 0"
+  @click="clickBookNow"
+>
+  {{ isClosed ? 'Booking Closed' : (productDto.leftTicket <= 0 ? 'Out of Stock' : 'Book Now') }}
+</button>
             <button class="wishlist-btn" @click="toggleWishlist">
               <svg
                 width="16"
@@ -567,6 +578,13 @@ export default {
     },
   },
   computed: {
+    isClosed() {
+    if (!this.productDto?.travelDate) return false
+    const now = new Date().getTime()
+    const travelDate = Number(this.productDto.travelDate)
+    const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000
+    return now >= (travelDate - THREE_DAYS_MS)
+  },
     auth() {
       return useAuthStore()
     },
@@ -641,6 +659,7 @@ export default {
   gap: 32px;
   align-items: start;
 }
+
 @media (max-width: 900px) {
   .detail-layout {
     grid-template-columns: 1fr;
@@ -1119,5 +1138,39 @@ export default {
   margin: 0;
   padding-left: 40px;
   line-height: 1.5;
+}
+/* Booking Closed Badge Styling */
+.badge-closed {
+  background: #ef4444 !important; /* Red Color */
+  color: #ffffff;
+  top: 12px;
+  right: 12px;
+  left: auto !important;
+}
+
+/* Card အပေါ်မှာ မှုန်သွားစေရန် (Opacity reduction) */
+.package-premium-card.is-closed .pkg-display-img {
+  filter: grayscale(40%);
+}
+
+/* Disabled Button Styling */
+.btn-disabled {
+  background-color: #94a3b8 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  border-color: #94a3b8 !important;
+}
+
+/* Warning Text in Detail Page */
+.closed-warning-msg {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
 }
 </style>

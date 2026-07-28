@@ -215,7 +215,7 @@ export default {
 .page-wrapper {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 40px 20px;
   font-family: "Inter", sans-serif;
   
 }
@@ -224,33 +224,38 @@ export default {
 .stepper-container {
   display: flex;
   justify-content: center;
-  margin: 40px 0;
+   margin-top:70px; 
+  margin-bottom: 30px;
+ 
 }
 
 .stepper {
-  display: flex;
+   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 14px 24px;
-  border-radius: 50px;
+   gap: 25px;              /* step တွေအကွာအဝေး */
+  padding: 10px 35px; 
+  border-radius: 40px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(30, 64, 175, 0.12);
+  box-shadow: 0 8px 20px rgba(30, 64, 175, 0.12);
 }
 
 .step {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+ gap: 4px;
+  font-size: 13px;
   color: #94a3b8;
   font-weight: 500;
 }
 
 .circle {
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
   border-radius: 50%;
+ 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -280,23 +285,25 @@ export default {
 }
 
 .line {
-  width: 90px;
+ width: 60px;
   height: 2px;
   background: linear-gradient(to right, #cbd5e1, #93c5fd);
 }
 
 /* GRID */
 .checkout-grid {
+  flex: 1;
   display: grid;
   grid-template-columns: 1.5fr 1fr;
-  gap: 28px;
+  gap: 24px;
+  overflow: hidden;
 }
 
 /* CARD (glass + blue accent) */
 .card {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(37, 99, 235, 0.1);
-  padding: 26px;
+  padding: 20px;
   border-radius: 18px;
   box-shadow: 0 12px 35px rgba(29, 78, 216, 0.08);
   backdrop-filter: blur(10px);
@@ -314,10 +321,11 @@ export default {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px;
+  padding: 12px;
+  margin-bottom: 10px;
   border-radius: 14px;
   cursor: pointer;
-  margin-bottom: 12px;
+ 
   border: 1px solid #dbeafe;
   background: white;
   transition: all 0.25s ease;
@@ -349,6 +357,11 @@ export default {
   border-color: #2563eb;
 }
 
+.payment-section,
+.summary-section {
+  height: 100%;
+}
+
 .radio-dot {
   width: 10px;
   height: 10px;
@@ -364,8 +377,8 @@ export default {
 }
 
 .method-logo {
-  width: 64px;
-  height: 34px;
+  width: 56px;
+  height: 30px;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -388,7 +401,7 @@ export default {
 
 .pay-btn {
   flex: 1;
-  padding: 16px;
+  padding: 12px 20px;
   border-radius: 14px;
   border: none;
   cursor: pointer;
@@ -422,12 +435,13 @@ export default {
 /* SUMMARY */
 .summary-img {
   width: 100%;
-  height: 190px;
+ height: 160px;
   object-fit: cover;
   border-radius: 14px;
 }
 
 .summary-card h3 {
+   height: 100%;
   margin-top: 14px;
   color: #1e3a8a;
   font-weight: 800;

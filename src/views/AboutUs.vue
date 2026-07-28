@@ -26,7 +26,9 @@
             Our team of travel experts works 24/7 to bring you the best travel packages, exclusive
             deals, and excellent service.
           </p>
-          <button class="action-btn-learn" @click="scrollToValues">Learn More</button>
+          <a href="javascript:void(0)" class="action-link-learn" @click="scrollToValues">
+            Learn More <i class="fas fa-arrow-right link-arrow"></i>
+          </a>
         </div>
         <div class="story-image-side">
           <img
@@ -40,7 +42,7 @@
       <section class="floating-stats-bar">
         <!-- Travelers Box -->
         <div class="single-stat-box">
-          <div class="stat-icon-circle" style="background-color: #e8f0fe; color: #1a73e8;">
+          <div class="stat-icon-circle" style="background-color: #e8f0fe; color: #1a73e8">
             <i class="fas fa-users"></i>
           </div>
           <div class="stat-lbl-count">
@@ -51,7 +53,7 @@
 
         <!-- Packages Box -->
         <div class="single-stat-box">
-          <div class="stat-icon-circle" style="background-color: #e6f4ea; color: #137333;">
+          <div class="stat-icon-circle" style="background-color: #e6f4ea; color: #137333">
             <i class="fas fa-box-open"></i>
           </div>
           <div class="stat-lbl-count">
@@ -62,7 +64,7 @@
 
         <!-- Cities Box -->
         <div class="single-stat-box">
-          <div class="stat-icon-circle" style="background-color: #fef7e0; color: #b06000;">
+          <div class="stat-icon-circle" style="background-color: #fef7e0; color: #b06000">
             <i class="fas fa-globe"></i>
           </div>
           <div class="stat-lbl-count">
@@ -73,7 +75,7 @@
 
         <!-- Support Box -->
         <div class="single-stat-box">
-          <div class="stat-icon-circle" style="background-color: #f3e8ff; color: #a855f7;">
+          <div class="stat-icon-circle" style="background-color: #f3e8ff; color: #a855f7">
             <i class="fas fa-headset"></i>
           </div>
           <div class="stat-lbl-count">
@@ -130,7 +132,7 @@ export default {
       travelerCount: '..',
       packagesCount: '..',
       citiesCount: '..',
-      
+
       valuesBlock: [
         {
           title: 'Eco-Friendly Tourism',
@@ -152,11 +154,35 @@ export default {
         },
       ],
       featuresBlock: [
-        { title: 'Best Price Guarantee', desc: 'We offer the best prices for top destinations.', icon: 'fas fa-thumbs-up', bg: '#e8f0fe', color: '#1a73e8' },
-        { title: 'Handpicked Packages', desc: 'Carefully selected packages for an amazing experience.', icon: 'fas fa-suitcase', bg: '#e6f4ea', color: '#137333' },
-        { title: 'Trusted & Safe', desc: 'Your safety and satisfaction are our top priority.', icon: 'fas fa-shield-alt', bg: '#fce8e6', color: '#c5221f' },
-        { title: '24/7 Support', desc: 'We are here to help you anytime, anywhere.', icon: 'fas fa-headset', bg: '#f3e8ff', color: '#a855f7' }
-      ]
+        {
+          title: 'Best Price Guarantee',
+          desc: 'We offer the best prices for top destinations.',
+          icon: 'fas fa-thumbs-up',
+          bg: '#e8f0fe',
+          color: '#1a73e8',
+        },
+        {
+          title: 'Handpicked Packages',
+          desc: 'Carefully selected packages for an amazing experience.',
+          icon: 'fas fa-suitcase',
+          bg: '#e6f4ea',
+          color: '#137333',
+        },
+        {
+          title: 'Trusted & Safe',
+          desc: 'Your safety and satisfaction are our top priority.',
+          icon: 'fas fa-shield-alt',
+          bg: '#fce8e6',
+          color: '#c5221f',
+        },
+        {
+          title: '24/7 Support',
+          desc: 'We are here to help you anytime, anywhere.',
+          icon: 'fas fa-headset',
+          bg: '#f3e8ff',
+          color: '#a855f7',
+        },
+      ],
     }
   },
   created() {
@@ -166,30 +192,30 @@ export default {
     loadAboutStats() {
       MessageService.getAboutStats()
         .then((response) => {
-          console.log('Backend Response Data:', response);
-          
+          console.log('Backend Response Data:', response)
+
           if (response) {
             // Backend က List<ProductDto> ပြန်ပေးထားလို့ Array ဖြစ်နေတာကို အမှန်ဆွဲထုတ်တာ
-            const data = Array.isArray(response) ? response[0] : response;
+            const data = Array.isArray(response) ? response[0] : response
 
             if (data) {
-              console.log("Check Data fields:", data);
-              const travelers = data.traveler ?? data.travelerCount ?? 0;
-              const packages = data.packages ?? data.packagesCount ?? 0;
-              const cities = data.cities ?? data.citiesCount ?? 0;
+              console.log('Check Data fields:', data)
+              const travelers = data.traveler ?? data.travelerCount ?? 0
+              const packages = data.packages ?? data.packagesCount ?? 0
+              const cities = data.cities ?? data.citiesCount ?? 0
 
-              this.travelerCount = travelers + '+';
-              this.packagesCount = packages + '+';
-              this.citiesCount = cities + '+';
+              this.travelerCount = travelers + '+'
+              this.packagesCount = packages + '+'
+              this.citiesCount = cities + '+'
             }
           }
         })
         .catch((err) => {
-          console.error('Error fetching about stats: ', err);
-          this.travelerCount = '0+';
-          this.packagesCount = '0+';
-          this.citiesCount = '0+';
-        });
+          console.error('Error fetching about stats: ', err)
+          this.travelerCount = '0+'
+          this.packagesCount = '0+'
+          this.citiesCount = '0+'
+        })
     },
     scrollToValues() {
       if (this.$refs.valuesSection) {
@@ -224,7 +250,8 @@ export default {
   justify-content: center;
   text-align: center;
   color: #ffffff;
-  margin: 0 10px;
+  width: 100%;
+  margin: 0;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 .hero-image-overlay {
@@ -244,7 +271,7 @@ export default {
   font-size: 3.2rem;
   font-weight: 800;
   margin: 0 0 12px 0;
-  color: #ffffff; 
+  color: #ffffff;
   letter-spacing: -0.5px;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
@@ -252,7 +279,7 @@ export default {
   font-size: 1.2rem;
   max-width: 600px;
   margin: 0 auto;
-  color: #e2e8f0; 
+  color: #e2e8f0;
   line-height: 1.6;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
@@ -281,23 +308,43 @@ export default {
   font-size: 1.05rem;
   margin: 0 0 16px 0;
 }
-.action-btn-learn {
-  background-color: #1a73e8;
-  color: #ffffff;
-  border: none;
-  padding: 12px 30px;
-  font-size: 1rem;
+.action-link-learn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1a73e8; /* Modern Royal Blue */
+  font-size: 1.05rem;
   font-weight: 600;
-  border-radius: 8px;
+  text-decoration: none;
   cursor: pointer;
-  margin-top: 10px;
-  box-shadow: 0 4px 14px rgba(26, 115, 232, 0.3);
-  transition: all 0.2s ease-in-out;
-  display: inline-block;
+  margin-top: 12px;
+  padding: 4px 0;
+  position: relative;
+  transition: color 0.3s ease;
 }
-.action-btn-learn:hover {
-  background-color: #1557b0;
-  transform: translateY(-2px);
+.action-link-learn::after {
+  content: '';
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #1a73e8;
+  transition: width 0.3s ease;
+}
+.link-arrow {
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+.action-link-learn:hover {
+  color: #1557b0;
+}
+.action-link-learn:hover::after {
+  width: 100%;
+}
+
+.action-link-learn:hover .link-arrow {
+  transform: translateX(5px);
 }
 .story-image-side {
   flex: 0.9;

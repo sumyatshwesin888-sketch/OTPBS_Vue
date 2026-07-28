@@ -55,6 +55,7 @@
               v-for="pkg in filteredAllPackages"
               :key="pkg.productId"
               class="package-premium-card"
+              :class="{ 'is-closed': isBookingClosed(pkg.travelDate) }"
             >
               <div class="card-image-box">
                 <img :src="pkg.photo" :alt="pkg.title" class="pkg-display-img" />
@@ -67,6 +68,10 @@
                   "
                 >
                   {{ pkg.locationType }}
+                </span>
+
+                <span v-if="isBookingClosed(pkg.travelDate)" class="package-badge badge-closed">
+                  Booking Closed
                 </span>
               </div>
 
@@ -99,11 +104,7 @@
                     }"
                   >
                     🎫
-                    {{
-                      pkg.leftTicket > 0
-                        ? pkg.leftTicket + ' Tickets Left'
-                        : 'Out Of Stock'
-                    }}
+                    {{ pkg.leftTicket > 0 ? pkg.leftTicket + ' Tickets Left' : 'Out Of Stock' }}
                   </span>
                 </div>
 
@@ -118,8 +119,12 @@
                     <span class="price-amount">{{ pkg.amount }}</span>
                     <span class="price-label">/ person</span>
                   </div>
-                  <router-link :to="`/packagedetail/${pkg.productId}`" class="btn-view-details">
-                    View Details
+                  <router-link
+                    :to="`/packagedetail/${pkg.productId}`"
+                    class="btn-view-details"
+                    :class="{ 'btn-disabled': isBookingClosed(pkg.travelDate) }"
+                  >
+                    {{ isBookingClosed(pkg.travelDate) ? 'Closed' : 'View Details' }}
                   </router-link>
                 </div>
               </div>
@@ -145,7 +150,12 @@
             </div>
 
             <div class="packages-grid-layout">
-              <div v-for="pkg in packages" :key="pkg.id" class="package-premium-card">
+              <div
+                v-for="pkg in packages"
+                :key="pkg.id || pkg.productId"
+                class="package-premium-card"
+                :class="{ 'is-closed': isBookingClosed(pkg.travelDate) }"
+              >
                 <div class="card-image-box">
                   <img :src="pkg.photo" :alt="pkg.title" class="pkg-display-img" />
 
@@ -155,6 +165,9 @@
                     :class="`badge-${(pkg.type || pkg.Type).toLowerCase()}`"
                   >
                     {{ pkg.type || pkg.Type }}
+                  </span>
+                  <span v-if="isBookingClosed(pkg.travelDate)" class="package-badge badge-closed">
+                    Booking Closed
                   </span>
                 </div>
 
@@ -183,11 +196,7 @@
                       }"
                     >
                       🎫
-                      {{
-                        pkg.leftTicket > 0
-                          ? pkg.leftTicket + ' Tickets Left'
-                          : 'Out Of Stock'
-                      }}
+                      {{ pkg.leftTicket > 0 ? pkg.leftTicket + ' Tickets Left' : 'Out Of Stock' }}
                     </span>
                   </div>
 
@@ -202,8 +211,12 @@
                       <span class="price-amount">{{ pkg.amount }}</span>
                       <span class="price-label">/ person</span>
                     </div>
-                    <router-link :to="`/packagedetail/${pkg.productId}`" class="btn-view-details">
-                      View Details
+                    <router-link
+                      :to="`/packagedetail/${pkg.productId}`"
+                      class="btn-view-details"
+                      :class="{ 'btn-disabled': isBookingClosed(pkg.travelDate) }"
+                    >
+                      {{ isBookingClosed(pkg.travelDate) ? 'Closed' : 'View Details' }}
                     </router-link>
                   </div>
                 </div>
@@ -235,8 +248,8 @@ export default {
 
   computed: {
     filteredAllPackages() {
-      console.log(this.packagesData);
-      
+      console.log(this.packagesData)
+
       if (!this.searchQuery) return this.packagesData
 
       const query = this.searchQuery.toLowerCase().trim()
@@ -307,6 +320,41 @@ export default {
   },
 
   methods: {
+    isBookingClosed(travelDateParam) {
+      if (!travelDateParam) return false
+
+      let travelTimestamp = 0
+
+      // ၁။ အကယ်၍ Timestamp (Number) ဖြစ်နေရင်
+      if (!isNaN(travelDateParam) && Number(travelDateParam) > 1000000) {
+        travelTimestamp = Number(travelDateParam)
+      } else if (typeof travelDateParam === 'string') {
+        // ၂။ အကယ်၍ "30-07-2026" သို့မဟုတ် "30/07/2026" Format ဖြစ်နေရင်
+        if (travelDateParam.includes('-') || travelDateParam.includes('/')) {
+          const parts = travelDateParam.split(/[-/]/)
+          if (parts.length === 3) {
+            // DD-MM-YYYY -> YYYY-MM-DD သို့ ပြောင်းခြင်း
+            let formattedDateStr = ''
+            if (parts[0].length === 4) {
+              formattedDateStr = `${parts[0]}-${parts[1]}-${parts[2]}`
+            } else {
+              formattedDateStr = `${parts[2]}-${parts[1]}-${parts[0]}`
+            }
+            travelTimestamp = new Date(formattedDateStr).getTime()
+          }
+        } else {
+          travelTimestamp = new Date(travelDateParam).getTime()
+        }
+      }
+
+      if (!travelTimestamp || isNaN(travelTimestamp)) return false
+
+      const now = new Date().getTime()
+      const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000 // 3 Days in milliseconds
+
+      // Departure Date မတိုင်မီ ၃ ရက် မရောက်ခင်/ရောက်ပြီး စစ်ဆေးခြင်း
+      return now >= travelTimestamp - THREE_DAYS_MS
+    },
     setActiveTab(tab) {
       this.activeTab = tab.toUpperCase()
     },
@@ -325,8 +373,8 @@ export default {
         apiParam = this.activeTab.toLowerCase()
       }
 
-      console.log(apiParam);
-      
+      console.log(apiParam)
+
       packageService
         .getPackages(apiParam)
         .then((response) => {
@@ -674,5 +722,27 @@ export default {
   padding: 60px 0;
   color: #64748b;
   font-weight: 600;
+}
+/* 🔴 Booking Closed Badge Styling (အနီရောင် Badge လေး ညာဘက်မှာ ပေါ်မည်) */
+.badge-closed {
+  background: #ef4444 !important;
+  color: white;
+  top: 12px;
+  right: 12px;
+  left: auto !important;
+}
+
+/* 🔴 Closed ဖြစ်သွားတဲ့ Card ရဲ့ ပုံကို မီးခိုးရောင် သန်းစေရန် */
+.package-premium-card.is-closed .pkg-display-img {
+  filter: grayscale(35%);
+}
+
+/* 🔴 Disabled ဖြစ်သွားတဲ့ Button Styling (မီးခိုးရောင်) */
+.btn-disabled {
+  background-color: #94a3b8 !important;
+  border-color: #94a3b8 !important;
+  color: #ffffff !important;
+  pointer-events: none !important; /* Click နှိပ်မရအောင် တားမြစ်ခြင်း */
+  cursor: not-allowed !important;
 }
 </style>

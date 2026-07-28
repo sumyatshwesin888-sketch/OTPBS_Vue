@@ -79,7 +79,11 @@
             <p>Save tour packages you're interested in to keep track of them easily.</p>
           </div>
           <div v-else class="wishlist-grid mt-4">
-            <div v-for="item in wishes" :key="item.productId" class="wishlist-item-card">
+            <div
+              v-for="(item, index) in wishes"
+              :key="item.productId || index"
+              class="wishlist-item-card"
+            >
               <img
                 :src="'http://localhost:8088/api/v1/productphoto/' + item.photo"
                 class="wish-card-img"
@@ -98,10 +102,10 @@
                       size="small"
                       rounded="xl"
                       class="text-white"
-                      :to="'/packagedetail/:id' + item.productId"
+                      :to="'/packagedetail/' + (item.productId || item.id)"
                       >View Detail</v-btn
                     >
-                    <button class="wish-delete-btn" @click="removeFromWishlist(item.productId)">
+                    <button class="wish-delete-btn" @click="removeFromWishlist(item, index)">
                       <i class="fa-solid fa-trash"></i>
                     </button>
                   </div>
@@ -345,13 +349,28 @@ export default {
         this.wishes = JSON.parse(localStorage.getItem(wishlistKey)) || []
       }
     },
-    removeFromWishlist(prodId) {
-      const userId = this.loginUser.userAccountId
-      const wishlistKey = `wishlist_${userId}`
-      this.wishes = this.wishes.filter((item) => Number(item.productId) !== Number(prodId))
-      localStorage.setItem(wishlistKey, JSON.stringify(this.wishes))
-      alert('Removed from Wishlist!')
-    },
+   removeFromWishlist(item, index) {
+  const userId = this.loginUser.userAccountId;
+  const wishlistKey = `wishlist_${userId}`;
+
+  // ၁။ ID ရှိရင် ID နဲ့ တိုက်ဖျက်မယ်၊ မရှိရင် Array Index နဲ့ ဖျက်မယ်
+  const targetId = item.productId || item.id;
+
+  if (targetId) {
+    this.wishes = this.wishes.filter(
+      (w) => Number(w.productId || w.id) !== Number(targetId)
+    );
+  } else {
+    // ID မပါခဲ့ရင် နှိပ်လိုက်တဲ့ Card ရဲ့ Index အတိုင်း Array ထဲကနေ ကွက်တိဖျက်မယ်
+    this.wishes.splice(index, 1);
+  }
+
+  // ၂။ LocalStorage ထဲမှာ Update ပြန်သိမ်းမယ်
+  localStorage.setItem(wishlistKey, JSON.stringify(this.wishes));
+
+  alert('Removed from Wishlist!');
+},
+
 
     async handleUpdateProfile() {
       const savedUser = JSON.parse(localStorage.getItem('loginUser'))
@@ -442,7 +461,7 @@ export default {
 }
 
 .profile-page {
-  padding: 60px 20px;
+  padding: 100px 20px;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0369a1 100%);
   background-attachment: fixed;
   min-height: 100vh;
@@ -746,11 +765,20 @@ export default {
   border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.wishlist-item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 .wish-card-img {
   width: 100%;
-  height: 160px;
+  height: 200px;
   object-fit: cover;
+  object-position: center;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  display: block;
 }
 .wish-card-body {
   padding: 16px;

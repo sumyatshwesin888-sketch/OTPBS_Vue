@@ -258,10 +258,14 @@ currentStep: 1,
 }
 .page-wrapper {
   max-width: 1100px;
+  height: 100vh;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   font-family: "Inter", sans-serif;
-
 }
 
 
@@ -287,14 +291,15 @@ currentStep: 1,
 .stepper-container {
   display: flex;
   justify-content: center;
-  margin: 40px 0;
+    margin-top:70px; 
+  margin-bottom: 30px;
 }
 
 .stepper {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 14px 26px;
+  gap: 25px;              /* step တွေအကွာအဝေး */
+  padding: 10px 35px; 
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(12px);
@@ -312,8 +317,8 @@ currentStep: 1,
 }
 
 .circle {
-  width: 42px;
-  height: 42px;
+   width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -348,7 +353,7 @@ currentStep: 1,
 
 /* CONNECT LINE */
 .line {
-  width: 80px;
+  width: 60px;
   height: 2px;
   background: linear-gradient(to right, #dbeafe, #93c5fd);
   border-radius: 10px;
@@ -360,31 +365,32 @@ currentStep: 1,
 .checkout-layout {
   display: flex;
   gap: 28px;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 /* =========================
    ✨ FORM CARD (GLASS STYLE)
 ========================= */
 .form-section {
-  flex: 2;
-  padding: 28px;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.85);
+ flex: 1.7;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.9);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(37, 99, 235, 0.08);
-  box-shadow: 0 18px 45px rgba(30, 64, 175, 0.12);
+  box-shadow: 0 12px 30px rgba(30,64,175,.1);
 }
 
 .form-section h3 {
-  color: #1e3a8a;
-  font-weight: 800;
-  margin-bottom: 20px;
+   font-size:22px;
+  margin-bottom:16px;
 }
 
 /* INPUTS */
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 label {
@@ -396,7 +402,8 @@ label {
 input,
 select {
   width: 100%;
-  padding: 12px 14px;
+  padding:9px 12px;
+  font-size:14px;
   border-radius: 12px;
   border: 1px solid #dbeafe;
   margin-top: 6px;
@@ -420,7 +427,7 @@ select:focus {
 /* BUTTON */
 .btn-submit {
   width: 100%;
-  padding: 14px;
+  padding: 12px 20px;
   border-radius: 14px;
   border: none;
   cursor: pointer;
@@ -439,10 +446,16 @@ select:focus {
    ✨ SUMMARY CARD (TICKET STYLE)
 ========================= */
 .summary-section {
-  flex: 1;
+ flex: 0.9;
+  max-width: 320px;
+  display: flex;
 }
 
 .summary-card {
+  width: 100%;
+  height: 100%;      /* Form card နဲ့ height တူ */
+  display: flex;
+  flex-direction: column;
   border-radius: 22px;
   overflow: hidden;
   background: white;
@@ -457,12 +470,15 @@ select:focus {
 
 .package-img {
   width: 100%;
-  height: 210px;
+  height: 160px;
   object-fit: cover;
 }
 
 .card-body {
-  padding: 22px;
+ flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
 }
 
 .card-body h3 {
@@ -504,6 +520,7 @@ select:focus {
   }
 
   .stepper {
+    padding: 10px 20px;
     flex-wrap: wrap;
     border-radius: 20px;
   }

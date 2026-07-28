@@ -360,6 +360,7 @@
                   item-title="profileName"
                   prepend-inner-icon="mdi-account-outline"
                   required
+                  return-object
                   variant="outlined"
                   density="compact"
                   hide-details="auto"
@@ -368,18 +369,19 @@
               </v-col>
               <v-col cols="12">
                 <v-select
-                  v-model="saleForm.productId"
+                  v-model="saleForm.product"
                   label="Destination Product Package *"
-                  :items="products"
+                  :items="productList"
                   item-title="title"
-                  item-value="productId"
+                  item-value="product"
                   prepend-inner-icon="mdi-package-variant-closed"
                   required
+                  return-object
                   variant="outlined"
                   density="compact"
                   hide-details="auto"
                   class="sleek-input"
-                  @update:model-value="onProductChange"
+                  @update:model-value="onProductChange()"
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="6">
@@ -426,7 +428,7 @@
                   class="sleek-input font-weight-bold field-readonly"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="6">
+              <!-- <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="saleForm.voucherCode"
                   label="Voucher Code"
@@ -436,7 +438,7 @@
                   hide-details="auto"
                   class="sleek-input"
                 ></v-text-field>
-              </v-col>
+              </v-col> -->
 
               <!-- Payment Type Select Box -->
               <v-col cols="12" sm="6">
@@ -465,7 +467,7 @@
                   class="sleek-input"
                 ></v-select>
               </v-col>
-              <v-col cols="12" sm="6">
+              <!-- <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="saleForm.date"
                   label="Booking Ledger Date"
@@ -476,7 +478,7 @@
                   hide-details="auto"
                   class="sleek-input"
                 ></v-text-field>
-              </v-col>
+              </v-col> -->
             </v-row>
 
             <v-card-actions class="pa-0 pt-4">
@@ -493,7 +495,7 @@
                 type="submit"
                 class="btn-primary text-none text-caption font-weight-bold"
                 height="34"
-                :disabled="!formValid"
+                @click="saveOrupdate()"
               >
                 {{ editing ? 'Update Ledger' : 'Create Ledger' }}
               </v-btn>
@@ -541,9 +543,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { supabase } from '../../lib/supabase'
-import type { Sale, UserAccount, Product } from '../../lib/supabase'
+ import { supabase } from '../../lib/supabase'
+ import { Sale, UserAccount, Product } from '../../lib/supabase'
 import saleService from '@/service/SaleService'
+import userService from '@/service/UserAccountService'
+import productService from '@/service/ProductService'
 export default defineComponent({
   name: 'AdminSales',
   data() {
@@ -559,8 +563,8 @@ export default defineComponent({
       saleForm: {
         saleId: '',
         userAccountId: '',
-        customerId: '',
-        productId: '',
+        customer: {},
+        product: {},
         voucherCode: '',
         qty: 1,
         unitPrice: 0,
@@ -568,10 +572,9 @@ export default defineComponent({
         paymentType: 'KBZpay',
         status: 'CONFIRM' as 'CONFIRM' | 'APPROVED' | 'DELETE',
         date: '',
-        customer:{},
-        product:{},
       },
       userList:[],
+      productList:[],
       editing: false,
       itemToDelete: null as Sale | null,
       headers: [
@@ -659,10 +662,57 @@ export default defineComponent({
   },
   async mounted() {
     this.getSaleMethod();
-    await Promise.all([this.fetchSales(), this.fetchUsers(), this.fetchProducts()])
+    this.getCustomerListMethod();
+    this.getProductListMethod();
+    //await Promise.all([this.fetchSales(), this.fetchUsers(), this.fetchProducts()])
   },
   methods: {
-    
+    saveOrupdate:function(){
+       let user = JSON.parse(localStorage.getItem('loginUser'));
+      this.saleForm.userAccountId = user.userAccountId;
+      this.dialog = false;
+      if(this.editing){
+        saleService
+        .updateSale(this.saleForm.saleId,this.saleForm)
+        .then((response) => {
+          this.getSaleMethod();
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+      }else{
+        saleService
+        .addSale(this.saleForm)
+        .then((response) => {
+          this.getSaleMethod();
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+      } 
+    },
+    getProductListMethod:function(){
+        productService
+        .getProduct()
+        .then((response) => {
+          this.productList.splice(0);
+          this.productList.push(...response);
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+    },
+    getCustomerListMethod:function(){
+        userService
+        .getUserAccount()
+        .then((response) => {
+          this.userList.splice(0);
+          this.userList.push(...response);
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+    },
     getSaleMethod(){
             saleService
         .getSale("All")
@@ -742,6 +792,8 @@ export default defineComponent({
         paymentType: sale.paymentType || 'KBZpay',
         status: sale.status,
         date: sale.date ? new Date(sale.date).toISOString().split('T')[0] : '',
+        customer:sale.customer,
+        product:sale.product,
       }
       this.dialog = true
     },
@@ -815,11 +867,12 @@ export default defineComponent({
     },
 
     onProductChange() {
-      const product = this.products.find((p) => p.productId === this.saleForm.productId)
-      if (product) {
-        this.saleForm.unitPrice = product.amount
-        this.calculateAmount()
-      }
+      //const product = this.products.find((p) => p.productId === this.saleForm.productId)
+      //if (product) {
+      console.log(this.saleForm.product);
+        this.saleForm.unitPrice = this.saleForm.product.amount;
+        this.calculateAmount();
+      //}
     },
 
     calculateAmount() {

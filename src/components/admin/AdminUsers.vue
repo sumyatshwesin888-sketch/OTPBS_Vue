@@ -9,7 +9,7 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Total Users</p>
-                <p class="stat-value">{{ filteredUsers.length }}</p>
+                <p class="stat-value">{{ userCounts.allCount }}</p>
                 <p class="stat-trend">
                   <v-icon size="11" color="primary">mdi-account-plus-outline</v-icon>
                   <span class="ml-1">Registered accounts</span>
@@ -30,7 +30,7 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Admins</p>
-                <p class="stat-value">{{ filteredUsers.filter(u => u.userType === 'ADMIN').length }}</p>
+                <p class="stat-value">{{ userCounts.adminCount }}</p>
                 <p class="stat-trend">
                   <v-icon size="11" color="warning">mdi-shield-crown-outline</v-icon>
                   <span class="ml-1">Platform managers</span>
@@ -51,7 +51,7 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Customers</p>
-                <p class="stat-value">{{ filteredUsers.filter(u => u.userType === 'CUSTOMER').length }}</p>
+                <p class="stat-value">{{ userCounts.customerCount }}</p>
                 <p class="stat-trend">
                   <v-icon size="11" color="secondary">mdi-account-outline</v-icon>
                   <span class="ml-1">Standard consumers</span>
@@ -72,7 +72,7 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Active Users</p>
-                <p class="stat-value">{{ filteredUsers.filter(u => u.status === 1).length }}</p>
+                <p class="stat-value">{{ userCounts.activeCount }}</p>
                 <p class="stat-trend">
                   <v-icon size="11" color="success">mdi-check-circle-outline</v-icon>
                   <span class="ml-1">Currently enabled</span>
@@ -118,11 +118,11 @@
         </v-col>
         <v-spacer class="hidden-xs-only"></v-spacer>
         <v-col cols="auto" class="text-right">
-          <v-btn 
-            color="primary" 
-            class="btn-primary text-none text-caption font-weight-bold" 
-            prepend-icon="mdi-plus" 
-            elevation="0" 
+          <v-btn
+            color="primary"
+            class="btn-primary text-none text-caption font-weight-bold"
+            prepend-icon="mdi-plus"
+            elevation="0"
             height="36"
             @click="openAddDialog"
           >
@@ -156,19 +156,30 @@
                 size="32"
                 class="mr-3"
               >
-                <span class="text-white font-weight-bold text-caption" style="font-size: 0.75rem !important;">{{
-                  item.profileName.charAt(0).toUpperCase()
-                }}</span>
+                <span
+                  class="text-white font-weight-bold text-caption"
+                  style="font-size: 0.75rem !important"
+                  >{{ item.profileName.charAt(0).toUpperCase() }}</span
+                >
               </v-avatar>
               <div>
-                <p class="font-weight-semibold text-grey-darken-3 mb-0" style="font-size: 0.8rem !important; line-height: 1.2;">{{ item.profileName }}</p>
-                <p class="text-caption text-grey mb-0" style="font-size: 0.7rem !important;">{{ item.email }}</p>
+                <p
+                  class="font-weight-semibold text-grey-darken-3 mb-0"
+                  style="font-size: 0.8rem !important; line-height: 1.2"
+                >
+                  {{ item.profileName }}
+                </p>
+                <p class="text-caption text-grey mb-0" style="font-size: 0.7rem !important">
+                  {{ item.email }}
+                </p>
               </div>
             </div>
           </template>
 
           <template #item.phone="{ item }">
-            <span class="text-body-2 text-grey-darken-1" style="font-size: 0.8rem !important;">{{ item.phone || '-' }}</span>
+            <span class="text-body-2 text-grey-darken-1" style="font-size: 0.8rem !important">{{
+              item.phone || '-'
+            }}</span>
           </template>
 
           <template #item.userType="{ item }">
@@ -186,7 +197,7 @@
           <template #item.status="{ item }">
             <span
               class="status-chip cursor-pointer"
-              :class="item.status === 1 ? 'status-confirm' : 'status-delete'"
+              :class="item.status == 1 ? 'status-confirm' : 'status-delete'"
               @click="toggleStatus(item)"
             >
               <v-icon start size="11">{{
@@ -230,7 +241,7 @@
       <v-card class="premium-dialog">
         <v-card-title class="d-flex justify-space-between align-center pa-5 pb-2">
           <div>
-            <h3 class="card-title-text" style="font-size: 1.1rem !important;">
+            <h3 class="card-title-text" style="font-size: 1.1rem !important">
               {{ editing ? 'Edit User' : 'Add New User' }}
             </h3>
             <p class="card-subtitle-text">
@@ -317,7 +328,13 @@
 
           <v-card-actions class="pa-0 pt-4">
             <v-spacer></v-spacer>
-            <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="34" @click="dialog = false">Cancel</v-btn>
+            <v-btn
+              variant="outlined"
+              class="mr-2 text-none text-caption font-weight-bold"
+              height="34"
+              @click="dialog = false"
+              >Cancel</v-btn
+            >
             <v-btn
               color="primary"
               type="submit"
@@ -340,14 +357,29 @@
           <v-avatar size="48" class="avatar-error mb-3">
             <v-icon size="24" color="white">mdi-alert-outline</v-icon>
           </v-avatar>
-          <h3 class="card-title-text text-center mb-1" style="font-size: 1.05rem !important;">Confirm Delete</h3>
+          <h3 class="card-title-text text-center mb-1" style="font-size: 1.05rem !important">
+            Confirm Delete
+          </h3>
           <p class="card-subtitle-text text-center">
-            Are you sure you want to delete <strong>{{ itemToDelete?.profileName }}</strong>? This action cannot be undone.
+            Are you sure you want to delete <strong>{{ itemToDelete?.profileName }}</strong
+            >? This action cannot be undone.
           </p>
         </v-card-text>
         <v-card-actions class="pa-4 pt-0 justify-center">
-          <v-btn variant="outlined" class="mr-2 text-none text-caption font-weight-bold" height="32" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" class="btn-error text-none text-caption font-weight-bold" height="32" @click="deleteUserAccountMethod()">Delete</v-btn>
+          <v-btn
+            variant="outlined"
+            class="mr-2 text-none text-caption font-weight-bold"
+            height="32"
+            @click="deleteDialog = false"
+            >Cancel</v-btn
+          >
+          <v-btn
+            color="error"
+            class="btn-error text-none text-caption font-weight-bold"
+            height="32"
+            @click="deleteUserAccountMethod()"
+            >Delete</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -364,7 +396,15 @@ export default defineComponent({
   name: 'AdminUsers',
   data() {
     return {
-      users: [] as UserAccount[],
+      users: [],
+      filteredUsers: [],
+      userCounts: {
+        allCount: 0,
+        adminCount: 0,
+        customerCount: 0,
+        activeCount: 0,
+        inactiveCount: 0,
+      },
       loading: true,
       dialog: false,
       deleteDialog: false,
@@ -410,9 +450,17 @@ export default defineComponent({
   },
   async mounted() {
     await this.fetchUsers()
-    this.getUserAccountMethod()
+    this.getUserAccountMethod();
+    this.getUserCountMethod();
   },
   methods: {
+    getUserCountMethod() {
+    userAccountService.getUserCount().then((response) => {
+      this.userCounts = response;
+    }).catch((err) => {
+      console.error('Count API Error: ', err);
+    });
+  },
     deleteUserAccountMethod: function () {
       this.deleteDialog = false
       userAccountService
@@ -625,7 +673,8 @@ export default defineComponent({
   overflow: hidden;
 }
 
-.enterprise-card, .filter-bar-card {
+.enterprise-card,
+.filter-bar-card {
   background: rgba(255, 255, 255, 0.45) !important;
   backdrop-filter: blur(16px) saturate(120%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
@@ -651,7 +700,9 @@ export default defineComponent({
 }
 
 /* Hover Effect & Right Accent Glow */
-.stat-card:hover, .enterprise-card:hover, .filter-bar-card:hover {
+.stat-card:hover,
+.enterprise-card:hover,
+.filter-bar-card:hover {
   transform: translateY(-3px);
   background: rgba(255, 255, 255, 0.65) !important;
 }
@@ -665,15 +716,35 @@ export default defineComponent({
   height: 100%;
 }
 
-.stat-card:has(.card-accent-blue):hover { box-shadow: 0 6px 24px 0 rgba(33, 150, 243, 0.15) !important; border-color: rgba(33, 150, 243, 0.3) !important; }
-.stat-card:has(.card-accent-amber):hover { box-shadow: 0 6px 24px 0 rgba(255, 193, 7, 0.15) !important; border-color: rgba(255, 193, 7, 0.3) !important; }
-.stat-card:has(.card-accent-purple):hover { box-shadow: 0 6px 24px 0 rgba(156, 39, 176, 0.15) !important; border-color: rgba(156, 39, 176, 0.3) !important; }
-.stat-card:has(.card-accent-green):hover { box-shadow: 0 6px 24px 0 rgba(76, 175, 80, 0.15) !important; border-color: rgba(76, 175, 80, 0.3) !important; }
+.stat-card:has(.card-accent-blue):hover {
+  box-shadow: 0 6px 24px 0 rgba(33, 150, 243, 0.15) !important;
+  border-color: rgba(33, 150, 243, 0.3) !important;
+}
+.stat-card:has(.card-accent-amber):hover {
+  box-shadow: 0 6px 24px 0 rgba(255, 193, 7, 0.15) !important;
+  border-color: rgba(255, 193, 7, 0.3) !important;
+}
+.stat-card:has(.card-accent-purple):hover {
+  box-shadow: 0 6px 24px 0 rgba(156, 39, 176, 0.15) !important;
+  border-color: rgba(156, 39, 176, 0.3) !important;
+}
+.stat-card:has(.card-accent-green):hover {
+  box-shadow: 0 6px 24px 0 rgba(76, 175, 80, 0.15) !important;
+  border-color: rgba(76, 175, 80, 0.3) !important;
+}
 
-.card-accent-blue { background: linear-gradient(180deg, #2196f3, #64b5f6); }
-.card-accent-amber { background: linear-gradient(180deg, #ffc107, #ffe082); }
-.card-accent-purple { background: linear-gradient(180deg, #9c27b0, #ba68c8); }
-.card-accent-green { background: linear-gradient(180deg, #4caf50, #81c784); }
+.card-accent-blue {
+  background: linear-gradient(180deg, #2196f3, #64b5f6);
+}
+.card-accent-amber {
+  background: linear-gradient(180deg, #ffc107, #ffe082);
+}
+.card-accent-purple {
+  background: linear-gradient(180deg, #9c27b0, #ba68c8);
+}
+.card-accent-green {
+  background: linear-gradient(180deg, #4caf50, #81c784);
+}
 
 /* Compact Mini Icons */
 .stat-icon-container {
@@ -683,10 +754,22 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
 }
-.stat-icon-container-blue { background: rgba(33, 150, 243, 0.08); color: #1565c0 !important; }
-.stat-icon-container-amber { background: rgba(255, 193, 7, 0.08); color: #b78103 !important; }
-.stat-icon-container-purple { background: rgba(156, 39, 176, 0.08); color: #6a1b9a !important; }
-.stat-icon-container-green { background: rgba(76, 175, 80, 0.08); color: #2e7d32 !important; }
+.stat-icon-container-blue {
+  background: rgba(33, 150, 243, 0.08);
+  color: #1565c0 !important;
+}
+.stat-icon-container-amber {
+  background: rgba(255, 193, 7, 0.08);
+  color: #b78103 !important;
+}
+.stat-icon-container-purple {
+  background: rgba(156, 39, 176, 0.08);
+  color: #6a1b9a !important;
+}
+.stat-icon-container-green {
+  background: rgba(76, 175, 80, 0.08);
+  color: #2e7d32 !important;
+}
 
 /* Mini Stats Typography */
 .stat-label {
@@ -758,13 +841,29 @@ export default defineComponent({
   font-size: 0.7rem;
   font-weight: 600;
 }
-.chip-admin { background: rgba(255, 193, 7, 0.1); color: #b78103; }
-.chip-customer { background: rgba(156, 39, 176, 0.1); color: #6a1b9a; }
-.status-confirm { background: rgba(76, 175, 80, 0.1); color: #1b5e20; }
-.status-delete { background: rgba(244, 67, 54, 0.1); color: #b71c1c; }
+.chip-admin {
+  background: rgba(255, 193, 7, 0.1);
+  color: #b78103;
+}
+.chip-customer {
+  background: rgba(156, 39, 176, 0.1);
+  color: #6a1b9a;
+}
+.status-confirm {
+  background: rgba(76, 175, 80, 0.1);
+  color: #1b5e20;
+}
+.status-delete {
+  background: rgba(244, 67, 54, 0.1);
+  color: #b71c1c;
+}
 
-.avatar-gradient { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
-.avatar-warning { background: linear-gradient(135deg, #f59e0b, #ef4444) !important; }
+.avatar-gradient {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+}
+.avatar-warning {
+  background: linear-gradient(135deg, #f59e0b, #ef4444) !important;
+}
 
 /* Elegant Dialog Layout */
 .premium-dialog {
