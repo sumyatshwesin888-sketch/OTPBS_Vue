@@ -44,7 +44,7 @@
               {{ city.cityName }}
             </h3>
 
-            <p>
+            <p class="detail">
               {{ city.detail }}
             </p>
 
@@ -109,7 +109,7 @@
               {{ city.cityName }}
             </h3>
 
-            <p>
+            <p class="detail">
               {{ city.detail }}
             </p>
 
@@ -208,7 +208,7 @@ body{
 /* ================= HERO ================= */
 
 .hero{
-    height:500px;
+    height:400px;
     background:
         linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
         url("/DomesticHome.png");
@@ -249,7 +249,7 @@ body{
 
 .section-title{
 
-    font-size:38px;
+    font-size:30px;
     font-weight:bold;
 
     color:#1f2937;
@@ -264,9 +264,9 @@ body{
 
     display:grid;
 
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(3,1fr);
 
-    gap:30px;
+    gap:25px;
 
 }
 
@@ -274,25 +274,31 @@ body{
 
 .destination-card{
 
-    background:white;
+    background:#fff;
 
-    border-radius:18px;
+    border-radius:12px;
 
     overflow:hidden;
 
-    box-shadow:
-    0 10px 25px rgba(0,0,0,.08);
+    border:1px solid #e2e8f0;
 
-    transition:.35s;
+    box-shadow:0 2px 12px rgba(0,0,0,.05);
+
+    display:flex;
+
+    flex-direction:column;
+
+    transition:.3s;
+
+    height:100%;
 
 }
 
 .destination-card:hover{
 
-    transform:translateY(-10px);
+    transform:translateY(-5px);
 
-    box-shadow:
-    0 18px 35px rgba(0,0,0,.15);
+    box-shadow:0 8px 20px rgba(0,0,0,.12);
 
 }
 
@@ -300,18 +306,27 @@ body{
 
 .card-image{
 
-    position:relative;
+    height:190px;
+
+    overflow:hidden;
 
 }
 
 .card-image img{
 
     width:100%;
-    height:250px;
+
+    height:100%;
 
     object-fit:cover;
 
-    display:block;
+    transition:.4s;
+
+}
+
+.destination-card:hover .card-image img{
+
+    transform:scale(1.05);
 
 }
 
@@ -337,30 +352,36 @@ body{
 }
 
 /* ================= CONTENT ================= */
-
 .card-content{
 
-    padding:22px;
+    padding:16px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    flex:1;
 
 }
 
 .region{
 
-    color:#6b7280;
+    color:#64748b;
 
     font-size:13px;
 
-    font-weight:bold;
+    font-weight:600;
 
 }
-
 .card-content h3{
 
-    margin:12px 0;
+    font-size:16px;
 
-    font-size:27px;
+    font-weight:700;
 
-    color:#111827;
+    color:#0f172a;
+
+    margin:8px 0;
 
 }
 
@@ -375,10 +396,19 @@ body{
     margin-bottom:20px;
 
 }
-
+.detail {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.6;
+    min-height: 3.2em;
+}
 /* ================= FOOTER ================= */
 
 .card-footer{
+
+    margin-top:auto;
 
     display:flex;
 
@@ -386,18 +416,20 @@ body{
 
     align-items:center;
 
-}
+    border-top:1px solid #f1f5f9;
 
+    padding-top:12px;
+
+}
 .price{
 
-    color:#16a34a;
+    font-size:15px;
 
-    font-size:20px;
+    font-weight:800;
 
-    font-weight:bold;
+    color:#10b981;
 
 }
-
 .view-btn{
 
     background:#2563eb;
@@ -406,9 +438,13 @@ body{
 
     border:none;
 
-    border-radius:8px;
+    border-radius:6px;
 
-    padding:10px 18px;
+    padding:8px 14px;
+
+    font-size:12px;
+
+    font-weight:700;
 
     cursor:pointer;
 
@@ -421,6 +457,8 @@ body{
     background:#1d4ed8;
 
 }
+
+
 /* ================= IMAGE HOVER ================= */
 
 .card-image{

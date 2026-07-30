@@ -9,7 +9,7 @@
           <div class="d-flex justify-space-between align-start">
             <div>
               <p class="stat-label">Total Revenue</p>
-              <p class="stat-value">{{ currencyFormatter.format(totalRevenue) }}</p>
+              <p class="stat-value">{{ numberFormatter.format(totalRevenue) }}</p>
               <p class="stat-trend">
                 <v-icon size="11" color="success">mdi-trending-up</v-icon>
                 <span class="ml-1">+12.5% from last month</span>
@@ -406,7 +406,7 @@ export default {
     chartPoints() {
     if (!this.salesByMonth || this.salesByMonth.length === 0) return []
     const width = 1000
-    const height = 120 // Graph ၏ အမြင့်
+    const height = 130 // Graph ၏ အမြင့်
     const paddingTop = 25
     const maxAmount = Math.max(...this.salesByMonth.map(s => s.amount)) || 1
 

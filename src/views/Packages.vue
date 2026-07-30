@@ -45,7 +45,7 @@
 
     <main class="packages-grid-section">
       <div class="container-max">
-        <!--  ALL Tab တွင် ပြသမည့်ပုံစံ -->
+        <!-- ALL Tab တွင် ပြသမည့်ပုံစံ -->
         <div
           v-if="activeTab === 'ALL' && filteredAllPackages.length > 0"
           class="all-packages-layout"
@@ -55,7 +55,6 @@
               v-for="pkg in filteredAllPackages"
               :key="pkg.productId"
               class="package-premium-card"
-              :class="{ 'is-closed': isBookingClosed(pkg.travelDate) }"
             >
               <div class="card-image-box">
                 <img :src="pkg.photo" :alt="pkg.title" class="pkg-display-img" />
@@ -68,10 +67,6 @@
                   "
                 >
                   {{ pkg.locationType }}
-                </span>
-
-                <span v-if="isBookingClosed(pkg.travelDate)" class="package-badge badge-closed">
-                  Booking Closed
                 </span>
               </div>
 
@@ -122,9 +117,8 @@
                   <router-link
                     :to="`/packagedetail/${pkg.productId}`"
                     class="btn-view-details"
-                    :class="{ 'btn-disabled': isBookingClosed(pkg.travelDate) }"
                   >
-                    {{ isBookingClosed(pkg.travelDate) ? 'Closed' : 'View Details' }}
+                    View Details
                   </router-link>
                 </div>
               </div>
@@ -154,7 +148,6 @@
                 v-for="pkg in packages"
                 :key="pkg.id || pkg.productId"
                 class="package-premium-card"
-                :class="{ 'is-closed': isBookingClosed(pkg.travelDate) }"
               >
                 <div class="card-image-box">
                   <img :src="pkg.photo" :alt="pkg.title" class="pkg-display-img" />
@@ -165,9 +158,6 @@
                     :class="`badge-${(pkg.type || pkg.Type).toLowerCase()}`"
                   >
                     {{ pkg.type || pkg.Type }}
-                  </span>
-                  <span v-if="isBookingClosed(pkg.travelDate)" class="package-badge badge-closed">
-                    Booking Closed
                   </span>
                 </div>
 
@@ -214,9 +204,8 @@
                     <router-link
                       :to="`/packagedetail/${pkg.productId}`"
                       class="btn-view-details"
-                      :class="{ 'btn-disabled': isBookingClosed(pkg.travelDate) }"
                     >
-                      {{ isBookingClosed(pkg.travelDate) ? 'Closed' : 'View Details' }}
+                      View Details
                     </router-link>
                   </div>
                 </div>
@@ -248,8 +237,6 @@ export default {
 
   computed: {
     filteredAllPackages() {
-      console.log(this.packagesData)
-
       if (!this.searchQuery) return this.packagesData
 
       const query = this.searchQuery.toLowerCase().trim()
@@ -267,7 +254,6 @@ export default {
 
     filteredGroupedPackages() {
       if (this.activeTab === 'ALL') return {}
-      console.log('Check Data - ', this.packagesData)
 
       let filtered = this.packagesData.filter((pkg) => {
         if (pkg.locationType) {
@@ -286,7 +272,6 @@ export default {
         return false
       })
 
-      // Search Box Filter
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase().trim()
         filtered = filtered.filter((pkg) => {
@@ -301,7 +286,6 @@ export default {
         })
       }
 
-      // မြို့အလိုက် Group ပြန်ခွဲ
       const groups = {}
       filtered.forEach((pkg) => {
         const key = pkg.location || pkg.destination || pkg.city || 'Other'
@@ -320,41 +304,6 @@ export default {
   },
 
   methods: {
-    isBookingClosed(travelDateParam) {
-      if (!travelDateParam) return false
-
-      let travelTimestamp = 0
-
-      // ၁။ အကယ်၍ Timestamp (Number) ဖြစ်နေရင်
-      if (!isNaN(travelDateParam) && Number(travelDateParam) > 1000000) {
-        travelTimestamp = Number(travelDateParam)
-      } else if (typeof travelDateParam === 'string') {
-        // ၂။ အကယ်၍ "30-07-2026" သို့မဟုတ် "30/07/2026" Format ဖြစ်နေရင်
-        if (travelDateParam.includes('-') || travelDateParam.includes('/')) {
-          const parts = travelDateParam.split(/[-/]/)
-          if (parts.length === 3) {
-            // DD-MM-YYYY -> YYYY-MM-DD သို့ ပြောင်းခြင်း
-            let formattedDateStr = ''
-            if (parts[0].length === 4) {
-              formattedDateStr = `${parts[0]}-${parts[1]}-${parts[2]}`
-            } else {
-              formattedDateStr = `${parts[2]}-${parts[1]}-${parts[0]}`
-            }
-            travelTimestamp = new Date(formattedDateStr).getTime()
-          }
-        } else {
-          travelTimestamp = new Date(travelDateParam).getTime()
-        }
-      }
-
-      if (!travelTimestamp || isNaN(travelTimestamp)) return false
-
-      const now = new Date().getTime()
-      const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000 // 3 Days in milliseconds
-
-      // Departure Date မတိုင်မီ ၃ ရက် မရောက်ခင်/ရောက်ပြီး စစ်ဆေးခြင်း
-      return now >= travelTimestamp - THREE_DAYS_MS
-    },
     setActiveTab(tab) {
       this.activeTab = tab.toUpperCase()
     },
@@ -373,13 +322,9 @@ export default {
         apiParam = this.activeTab.toLowerCase()
       }
 
-      console.log(apiParam)
-
       packageService
         .getPackages(apiParam)
         .then((response) => {
-          console.log(response)
-
           this.packagesData.splice(0, this.packagesData.length)
           this.packagesData.push(...response)
         })
@@ -400,6 +345,27 @@ export default {
 }
 </script>
 
+
+<style>
+
+html, body {
+  scrollbar-width: none !important; 
+  -ms-overflow-style: none !important;
+  overflow-x: hidden !important;
+}
+
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+</style>
+
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -409,6 +375,7 @@ export default {
   min-height: 100vh;
   width: 100%;
   padding-bottom: 80px;
+  overflow-x: hidden;
 }
 
 .packages-hero-banner {
@@ -600,7 +567,6 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* card ပိစိလေးတွေအတွက် */
 .badge-domestic {
   background: #10b981;
 }
@@ -662,7 +628,7 @@ export default {
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  margin-bottom: 16px;
+  /* margin-bottom: 16px; အကွာအဝေးကို နီးချင်ပါက 8px၊ ဝေးချင်ပါက 20px စသဖြင့် ပြောင်းလဲနိုင်ပါသည် */
 }
 
 .rating-val {
@@ -722,27 +688,5 @@ export default {
   padding: 60px 0;
   color: #64748b;
   font-weight: 600;
-}
-/* 🔴 Booking Closed Badge Styling (အနီရောင် Badge လေး ညာဘက်မှာ ပေါ်မည်) */
-.badge-closed {
-  background: #ef4444 !important;
-  color: white;
-  top: 12px;
-  right: 12px;
-  left: auto !important;
-}
-
-/* 🔴 Closed ဖြစ်သွားတဲ့ Card ရဲ့ ပုံကို မီးခိုးရောင် သန်းစေရန် */
-.package-premium-card.is-closed .pkg-display-img {
-  filter: grayscale(35%);
-}
-
-/* 🔴 Disabled ဖြစ်သွားတဲ့ Button Styling (မီးခိုးရောင်) */
-.btn-disabled {
-  background-color: #94a3b8 !important;
-  border-color: #94a3b8 !important;
-  color: #ffffff !important;
-  pointer-events: none !important; /* Click နှိပ်မရအောင် တားမြစ်ခြင်း */
-  cursor: not-allowed !important;
 }
 </style>
