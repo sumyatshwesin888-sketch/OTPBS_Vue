@@ -453,6 +453,7 @@ export default {
 
         this.itineraryList = data.itineraryList
         this.ratingCommentList = data.ratingCommentList
+        console.log(this.ratingCommentList)
         this.productDto = data.productDto
 
         // 💡 Image Fallback Logic: photo မရှိရင် photoOne ကို ယူပါမည်
@@ -520,14 +521,18 @@ export default {
         return
       }
 
-      const loginUserData = JSON.parse(localStorage.getItem('loginUser'))
-      let loggedInCustomerId = loginUserData ? loginUserData.userAccountId : null
+     const loginUserData = JSON.parse(localStorage.getItem("loginUser"));
 
-      if (!loggedInCustomerId) {
-        loggedInCustomerId = 6 
-      }
+if (!loginUserData || !loginUserData.userAccountId) {
+    alert("Please login first to write a review.");
+    return;
+}
 
-      let obj = { userAccountDto: {} }
+const loggedInCustomerId = loginUserData.userAccountId;
+
+      console.log(this.newRating)
+
+      let obj = { userAccountDto: {userAccountId: loggedInCustomerId} }
       obj.productId = this.productId
       obj.userAccountDto.userAccountId = loggedInCustomerId
       obj.rating = this.newRating
@@ -886,6 +891,10 @@ export default {
   color: #64748b;
   line-height: 1.6;
 }
+.detail-right {
+  position: sticky;
+  top: 120px;
+}
 
 .pricing-card {
   background: #fff;
@@ -1190,7 +1199,18 @@ export default {
   padding-left: 40px;
   line-height: 1.5;
 }
+.badge-closed {
+  background: #ef4444 !important; /* Red Color */
+  color: #ffffff;
+  top: 12px;
+  right: 12px;
+  left: auto !important;
+}
 
+/* Card အပေါ်မှာ မှုန်သွားစေရန် (Opacity reduction) */
+.package-premium-card.is-closed .pkg-display-img {
+  filter: grayscale(40%);
+}
 .btn-disabled {
   background-color: #94a3b8 !important;
   cursor: not-allowed !important;
