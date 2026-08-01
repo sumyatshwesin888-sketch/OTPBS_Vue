@@ -19,12 +19,12 @@ class SaleService{
     //     let url = "/sale";
     //     return this.axios.post(url, sale).then(request => request.data);
     // }
-    getSale(status) {
+    getSale(status,search) {
         let url = "/sale"
         return axios.get(url,{
 
             params: {
-                status
+                status,search
             }
         }).then(request => request.data);
     }

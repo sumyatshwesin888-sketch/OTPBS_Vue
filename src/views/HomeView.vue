@@ -14,8 +14,12 @@
 
       <div class="trips-category-section">
         <div class="categories-grid">
-          <router-link to="/packages" replace class="trip-main-card domestic-premium-card"
-            style="display: block; text-decoration: none; color: inherit">
+          <router-link 
+  :to="{ path: '/packages', query: { type: 'DOMESTIC' } }" 
+  replace 
+  class="trip-main-card domestic-premium-card"
+  style="display: block; text-decoration: none; color: inherit"
+>
             <div class="floating-badge-icon">
               <svg viewBox="0 0 24 24" class="svg-icon-inner text-green-color">
                 <path
@@ -39,8 +43,12 @@
             </div>
           </router-link>
 
-          <router-link to="/packages" replace class="trip-main-card international-premium-card"
-            style="display: block; text-decoration: none; color: inherit">
+          <router-link 
+  :to="{ path: '/packages', query: { type: 'INTERNATIONAL' } }" 
+  replace 
+  class="trip-main-card international-premium-card"
+  style="display: block; text-decoration: none; color: inherit"
+>
             <div class="floating-badge-icon">
               <svg viewBox="0 0 24 24" class="svg-icon-inner text-blue-color">
                 <path

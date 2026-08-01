@@ -23,14 +23,14 @@ class PackageService{
             .then(request => request.data);
     
     }
-        getProductById(productId) {
+    //     getProductById(productId) {
     
-        let url = `/product/${productId}`
+    //     let url = `/product/${productId}`
     
-        return axios.get(url)
-            .then(request => request.data);
+    //     return axios.get(url)
+    //         .then(request => request.data);
     
-    }
+    // }
     addPackage(pkg) {
         let url = `/package`;
         return this.axios.post(url, pkg).then(request => request.data);
@@ -73,11 +73,11 @@ class PackageService{
   
     //For Admin Product
 
-    getProduct(locationType ,type, search) {
+    getProduct(locationType ,type, search,status) {
         let url = `/product`
         return axios.get(url,{
             params: {
-                locationType ,type, search
+                locationType ,type, search,status
             }
         }).then(request => request.data);
     }
@@ -97,7 +97,7 @@ class PackageService{
         return this.axios.delete(url).then(request => request.data);
     }
   updateProductPhoto(formData, productId,photoIndex) {
-    let url = `product/photo/${productId}/${photoIndex}`;
+    let url = `/product/photo/${productId}/${photoIndex}`;
     return axios
       .put(url, formData, {
         headers: {

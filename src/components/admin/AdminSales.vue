@@ -9,7 +9,7 @@
             <div class="d-flex justify-space-between align-start">
               <div>
                 <p class="stat-label">Total Revenue</p>
-                <p class="stat-value">{{ currencyFormatter.format(totalRevenue) }}</p>
+                <p class="stat-value">{{ currencyFormatter.format(totalRevenuetemp) }}</p>
                 <p class="stat-trend">
                   <v-icon size="11" color="success">mdi-trending-up</v-icon>
                   <span class="ml-1">Gross earnings</span>
@@ -101,6 +101,7 @@
             hide-details
             clearable
             class="sleek-input"
+
           ></v-text-field>
         </v-col>
         <v-col cols="12" sm="4" md="3">
@@ -118,6 +119,7 @@
             hide-details
             clearable
             class="sleek-input"
+            @update:model-value="changeFilter()"
           ></v-select>
         </v-col>
         <v-spacer class="hidden-xs-only"></v-spacer>
@@ -548,6 +550,7 @@ import { defineComponent } from 'vue'
 import saleService from '@/service/SaleService'
 import userService from '@/service/UserAccountService'
 import productService from '@/service/ProductService'
+import dashboardService from '@/service/DashboardService'
 export default defineComponent({
   name: 'AdminSales',
   data() {
@@ -593,6 +596,10 @@ export default defineComponent({
         { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
       ],
       saleList:[],
+      totalRevenuetemp:0,
+      approvedBookings :0,
+      confirmedBookings :0,
+      cancelledBookings :0,
     }
   },
   computed: {
@@ -635,38 +642,66 @@ export default defineComponent({
         format: (value: number) => `${formatter.format(value || 0)} MMK`,
       }
     },
-    totalRevenue(): number {
-      return this.sales
-        .filter((s) => (s.status || '').toUpperCase() !== 'DELETE')
-        .reduce((sum, s) => sum + (s.amount || 0), 0)
-    },
-    confirmedBookings(): number {
-      return this.sales.filter(
-        (s) => {
-          const status = (s.status || '').toUpperCase();
-          return status === 'CONFIRM' || status === 'CONFIRMED';
-        }
-      ).length
-    },
-    approvedBookings(): number {
-      return this.sales.filter(
-        (s) => {
-          const status = (s.status || '').toUpperCase();
-          return status === 'APPROVED' || status === 'APPROVE';
-        }
-      ).length
-    },
-    cancelledBookings(): number {
-      return this.sales.filter((s) => (s.status || '').toUpperCase() === 'DELETE').length
-    },
+    // totalRevenue(): number {
+    //   return this.sales
+    //     .filter((s) => (s.status || '').toUpperCase() !== 'DELETE')
+    //     .reduce((sum, s) => sum + (s.amount || 0), 0)
+    // },
+    // confirmedBookings(): number {
+    //   return this.sales.filter(
+    //     (s) => {
+    //       const status = (s.status || '').toUpperCase();
+    //       return status === 'CONFIRM' || status === 'CONFIRMED';
+    //     }
+    //   ).length
+    // },
+    // approvedBookings(): number {
+    //   return this.sales.filter(
+    //     (s) => {
+    //       const status = (s.status || '').toUpperCase();
+    //       return status === 'APPROVED' || status === 'APPROVE';
+    //     }
+    //   ).length
+    // },
+    // cancelledBookings(): number {
+    //   return this.sales.filter((s) => (s.status || '').toUpperCase() === 'DELETE').length
+    // },
   },
   async mounted() {
     this.getSaleMethod();
     this.getCustomerListMethod();
     this.getProductListMethod();
+    this.getDashboardMethod();
     //await Promise.all([this.fetchSales(), this.fetchUsers(), this.fetchProducts()])
   },
   methods: {
+    changeFilter:function(){
+      this.search="";
+      this.getSaleMethod();
+    },
+    getDashboardMethod:function(){
+        dashboardService
+        .getPackageDashboard()
+        .then((response) => {
+         this.totalRevenuetemp = Number(response.totalRevenue);
+         console.log("response");
+           console.log(this.totalRevenue);
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        });
+        dashboardService
+        .getPackageDashboardSale()
+        .then((response) => {
+         this.approvedBookings = Number(response.approved);
+          this.confirmedBookings = Number(response.confirm);
+          this.cancelledBookings = Number(response.cancel);
+
+        })
+        .catch((err) => {
+          console.error('API Fetch Error: ', err)
+        })
+    },
     saveOrupdate:function(){
        let user = JSON.parse(localStorage.getItem('loginUser'));
       this.saleForm.userAccountId = user.userAccountId;
@@ -715,7 +750,7 @@ export default defineComponent({
     },
     getSaleMethod(){
             saleService
-        .getSale("All")
+        .getSale(this.statusFilter,this.search)
         .then((response) => {
           this.saleList.splice(0);
           this.saleList.push(...response);
@@ -918,6 +953,12 @@ export default defineComponent({
     'saleForm.unitPrice'() {
       this.calculateAmount()
     },
+    search(){
+      if(this.search!='' || this.search != undefined){
+          this.getSaleMethod();
+      }
+      
+    }
   },
 })
 </script>

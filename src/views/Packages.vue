@@ -57,7 +57,11 @@
               class="package-premium-card"
             >
               <div class="card-image-box">
-                <img :src="pkg.photo" :alt="pkg.title" class="pkg-display-img" />
+  <img 
+    :src="pkg.photo && pkg.photo.startsWith('http') ? pkg.photo : `http://localhost:8088/api/v1/productphoto/${pkg.photo}`" 
+    :alt="pkg.title" 
+    class="pkg-display-img" 
+  />
 
                 <span
                   v-if="pkg.locationType"
@@ -150,7 +154,11 @@
                 class="package-premium-card"
               >
                 <div class="card-image-box">
-                  <img :src="pkg.photo" :alt="pkg.title" class="pkg-display-img" />
+  <img 
+    :src="pkg.photo && pkg.photo.startsWith('http') ? pkg.photo : `http://localhost:8088/api/v1/productphoto/${pkg.photo}`" 
+    :alt="pkg.title" 
+    class="pkg-display-img" 
+  />
 
                   <span
                     v-if="pkg.type || pkg.Type"

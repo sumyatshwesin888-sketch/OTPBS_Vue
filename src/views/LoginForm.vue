@@ -254,13 +254,25 @@ export default {
       };
 
       // JS Service ထဲက updatePassword() ကို လှမ်းခေါ်မည်
-      await userAccountService.updatePassword(payload);
+      //await userAccountService.updatePassword(payload);
+      
+      userAccountService
+        .updatePasswordEmail(payload)
+        .then((response) => {
+           this.showForgotModal = false;
+         alert('Password Reset Successfully! You can now login.');
+         this.forgotForm = { email: '', newPassword: '', confirmPassword: '' };
+        })
+        .catch((error) => {
+          // this.showForgotModal = false;
+          alert(error.response.data.message);
+        });
 
-      alert('Password Reset Successfully! You can now login.');
+      
       
       // Modal ပြန်ပိတ်ပြီး Form ကို Reset လုပ်မည်
-      this.showForgotModal = false;
-      this.forgotForm = { email: '', newPassword: '', confirmPassword: '' };
+     
+      
     } catch (error) {
       console.error('Password Reset Error:', error);
       alert('Failed to reset password. Please try again!');
