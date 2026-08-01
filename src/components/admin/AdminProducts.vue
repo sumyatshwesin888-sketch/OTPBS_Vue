@@ -3,7 +3,7 @@
     <!-- Filter Bar -->
     <v-card class="filter-bar border mb-6 pa-4" variant="flat" rounded="lg">
       <v-row align="center" dense>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6" md="2">
           <v-text-field
             v-model="search"
             label="Search products..."
@@ -24,7 +24,7 @@
               { title: 'All', value: null },
               { title: 'Budget', value: 'Budget' },
               { title: 'Standard', value: 'Standard' },
-              { title: 'Premium', value: 'Premium' }
+              { title: 'Premium', value: 'Premium' },
             ]"
             density="compact"
             variant="outlined"
@@ -40,8 +40,20 @@
             :items="[
               { title: 'All', value: null },
               { title: 'Domestic', value: 'DOMESTIC' },
-              { title: 'International', value: 'INTERNATIONAL' }
+              { title: 'International', value: 'INTERNATIONAL' },
             ]"
+            density="compact"
+            variant="outlined"
+            color="primary"
+            hide-details
+            clearable
+          ></v-select>
+        </v-col>
+        <v-col cols="12" sm="6" md="2">
+          <v-select
+            v-model="status"
+            label="Status"
+            :items="statusList"
             density="compact"
             variant="outlined"
             color="primary"
@@ -103,7 +115,12 @@
         </template>
 
         <template #item.locationType="{ item }">
-          <span :class="['status-chip', item.locationType === 'DOMESTIC' ? 'chip-domestic' : 'chip-international']">
+          <span
+            :class="[
+              'status-chip',
+              item.locationType === 'DOMESTIC' ? 'chip-domestic' : 'chip-international',
+            ]"
+          >
             <v-icon start size="12" class="mr-1">
               {{ item.locationType === 'DOMESTIC' ? 'mdi-home-outline' : 'mdi-airplane' }}
             </v-icon>
@@ -131,7 +148,7 @@
         </template>
 
         <template #item.meals="{ item }">
-          <span class="text-body-2 text-truncate d-inline-block" style="max-width: 120px;">
+          <span class="text-body-2 text-truncate d-inline-block" style="max-width: 120px">
             {{ item.meals || '-' }}
           </span>
         </template>
@@ -141,7 +158,12 @@
         </template>
 
         <template #item.ticket="{ item }">
-          <v-chip size="small" :color="item.ticket > 5 ? 'success' : 'warning'" variant="tonal" class="font-weight-bold text-no-wrap">
+          <v-chip
+            size="small"
+            :color="item.ticket > 5 ? 'success' : 'warning'"
+            variant="tonal"
+            class="font-weight-bold text-no-wrap"
+          >
             {{ item.ticket ?? 0 }} Left
           </v-chip>
         </template>
@@ -182,7 +204,14 @@
               </v-tooltip>
             </v-btn>
 
-            <v-btn icon variant="text" color="slate-600" size="small" class="mr-1" @click="openEditDialog(item)">
+            <v-btn
+              icon
+              variant="text"
+              color="slate-600"
+              size="small"
+              class="mr-1"
+              @click="openEditDialog(item)"
+            >
               <v-icon size="20">mdi-pencil-outline</v-icon>
             </v-btn>
 
@@ -200,54 +229,148 @@
         <v-card-title class="text-h6 font-weight-bold text-slate-800 px-2 pb-4">
           {{ editing ? 'Edit Travel Product' : 'Add New Travel Product' }}
         </v-card-title>
-        
+
         <v-card-text class="pa-2">
           <v-form ref="productForm">
             <v-row dense>
               <v-col cols="12">
-                <v-text-field v-model="newProduct.title" label="Product Title *" variant="outlined" density="compact" required></v-text-field>
+                <v-text-field
+                  v-model="newProduct.title"
+                  label="Product Title *"
+                  variant="outlined"
+                  density="compact"
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field v-model="newProduct.location" label="Location *" variant="outlined" density="compact" required></v-text-field>
+                <v-text-field
+                  v-model="newProduct.location"
+                  label="Location *"
+                  variant="outlined"
+                  density="compact"
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-select v-model="newProduct.locationType" label="Region Type *" :items="['DOMESTIC', 'INTERNATIONAL']" variant="outlined" density="compact" required></v-select>
+                <v-select
+                  v-model="newProduct.locationType"
+                  label="Region Type *"
+                  :items="['DOMESTIC', 'INTERNATIONAL']"
+                  variant="outlined"
+                  density="compact"
+                  required
+                ></v-select>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-select v-model="newProduct.type" label="Package Type *" :items="['Budget', 'Standard', 'Premium']" variant="outlined" density="compact" required></v-select>
+                <v-select
+                  v-model="newProduct.type"
+                  label="Package Type *"
+                  :items="['Budget', 'Standard', 'Premium']"
+                  variant="outlined"
+                  density="compact"
+                  required
+                ></v-select>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field v-model.number="newProduct.amount" label="Price (MMK) *" type="number" variant="outlined" density="compact" required></v-text-field>
+                <v-text-field
+                  v-model.number="newProduct.amount"
+                  label="Price (MMK) *"
+                  type="number"
+                  variant="outlined"
+                  density="compact"
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="6" sm="3">
-                <v-text-field v-model.number="newProduct.day" label="Days" type="number" variant="outlined" density="compact"></v-text-field>
+                <v-text-field
+                  v-model.number="newProduct.day"
+                  label="Days"
+                  type="number"
+                  variant="outlined"
+                  density="compact"
+                ></v-text-field>
               </v-col>
               <v-col cols="6" sm="3">
-                <v-text-field v-model.number="newProduct.night" label="Nights" type="number" variant="outlined" density="compact"></v-text-field>
+                <v-text-field
+                  v-model.number="newProduct.night"
+                  label="Nights"
+                  type="number"
+                  variant="outlined"
+                  density="compact"
+                ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field v-model="newProduct.groupSize" label="Group Size (e.g., 15 Pax)" variant="outlined" density="compact"></v-text-field>
+                <v-text-field
+                  v-model="newProduct.groupSize"
+                  label="Group Size (e.g., 15 Pax)"
+                  variant="outlined"
+                  density="compact"
+                ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field v-model="newProduct.meals" label="Meals Info" variant="outlined" density="compact"></v-text-field>
+                <v-text-field
+                  v-model="newProduct.meals"
+                  label="Meals Info"
+                  variant="outlined"
+                  density="compact"
+                ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field v-model="newProduct.travelDate" label="Travel Date" type="date" variant="outlined" density="compact"></v-text-field>
+                <v-text-field
+                  v-model="newProduct.travelDate"
+                  label="Travel Date"
+                  type="date"
+                  variant="outlined"
+                  density="compact"
+                ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-text-field v-model.number="newProduct.ticket" label="Available Tickets" type="number" variant="outlined" density="compact"></v-text-field>
+                <v-text-field
+                  v-model.number="newProduct.ticket"
+                  label="Available Tickets"
+                  type="number"
+                  variant="outlined"
+                  density="compact"
+                ></v-text-field>
               </v-col>
+              <v-col cols="12"  md="6">
+          <v-select
+            v-model="newProduct.status"
+            label="Status"
+            :items="statusListAdd"
+            density="compact"
+            variant="outlined"
+            color="primary"
+            hide-details
+            clearable
+          ></v-select>
+        </v-col>
               <v-col cols="12">
-                <v-select v-model="newProduct.transport" label="Transport" :items="['FLIGHT', 'CAR']" variant="outlined" density="compact"></v-select>
+                <v-select
+                  v-model="newProduct.transport"
+                  label="Transport"
+                  :items="['FLIGHT', 'CAR']"
+                  variant="outlined"
+                  density="compact"
+                ></v-select>
               </v-col>
             </v-row>
           </v-form>
         </v-card-text>
-        
+
         <v-card-actions class="px-2 pt-4">
           <v-spacer></v-spacer>
-          <v-btn variant="text" color="slate-600" class="text-none" @click="closeDialog">Cancel</v-btn>
-          <v-btn color="primary" variant="flat" class="text-none px-4" rounded="md" @click="saveProduct">Save Product</v-btn>
+          <v-btn variant="text" color="slate-600" class="text-none" @click="closeDialog"
+            >Cancel</v-btn
+          >
+          <v-btn
+            color="primary"
+            variant="flat"
+            class="text-none px-4"
+            rounded="md"
+            @click="saveProduct"
+            >Save Product</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -258,27 +381,45 @@
         <v-card-title class="d-flex justify-space-between align-center pa-6 border-bottom">
           <div>
             <h3 class="text-h6 font-weight-bold text-slate-800">Upload Product Photos</h3>
-            <p class="text-caption text-muted mb-0 mt-0.5">Select real image files for <strong>{{ imageForm.title }}</strong></p>
+            <p class="text-caption text-muted mb-0 mt-0.5">
+              Select real image files for <strong>{{ imageForm.title }}</strong>
+            </p>
           </div>
-          <v-btn icon variant="text" size="small" color="grey-darken-1" @click="imageDialog = false">
+          <v-btn
+            icon
+            variant="text"
+            size="small"
+            color="grey-darken-1"
+            @click="imageDialog = false"
+          >
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
-        
+
         <v-card-text class="pa-6 bg-slate-50">
           <v-row dense>
             <!-- Main Cover Photo -->
             <v-col cols="12" class="mb-4">
-              <v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
+              <v-card
+                variant="outlined"
+                class="pa-4 bg-white border d-flex align-center"
+                rounded="lg"
+              >
                 <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
-                  <v-img v-if="imagePreviews.photo!=null" 
-                  :src="filePhoto"
-                   cover></v-img>
+                  <v-img v-if="imagePreviews.photo != null" :src="filePhoto" cover></v-img>
                   <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
                 </v-avatar>
                 <div class="flex-grow-1">
-                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
-                  <input type="file" id="file" ref="file" @change="changeImage" class="file-input-anim" />
+                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">
+                    Main Cover Photo
+                  </div>
+                  <input
+                    type="file"
+                    id="file"
+                    ref="file"
+                    @change="changeImage"
+                    class="file-input-anim"
+                  />
                   <!-- <v-file-input
                     label="Select Cover Photo"
                     density="compact"
@@ -294,60 +435,103 @@
             </v-col>
 
             <v-col cols="6" md="6">
-                <v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
+              <v-card
+                variant="outlined"
+                class="pa-4 bg-white border d-flex align-center"
+                rounded="lg"
+              >
                 <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
-                  <v-img v-if="imagePreviews.photoOne!=null" 
-                  :src="filePhotoOne"
-                   cover></v-img>
+                  <v-img v-if="imagePreviews.photoOne != null" :src="filePhotoOne" cover></v-img>
                   <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
                 </v-avatar>
                 <div class="flex-grow-1">
-                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
-                  <input type="file" id="file" ref="fileOne" @change="changeImageOne" class="file-input-anim" />
+                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">
+                    Sub Photo 1
+                  </div>
+                  <input
+                    type="file"
+                    id="file"
+                    ref="fileOne"
+                    @change="changeImageOne"
+                    class="file-input-anim"
+                  />
                 </div>
               </v-card>
             </v-col>
             <v-col cols="6" md="6">
-<v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
+              <v-card
+                variant="outlined"
+                class="pa-4 bg-white border d-flex align-center"
+                rounded="lg"
+              >
                 <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
-                  <v-img v-if="imagePreviews.photoTwo!=null" 
-                  :src="filePhotoTwo"
-                   cover></v-img>
+                  <v-img v-if="imagePreviews.photoTwo != null" :src="filePhotoTwo" cover></v-img>
                   <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
                 </v-avatar>
                 <div class="flex-grow-1">
-                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
-                  <input type="file" id="file" ref="file" @change="changeImageTwo" class="file-input-anim" />
+                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">
+                   Sub Photo 2
+                  </div>
+                  <input
+                    type="file"
+                    id="file"
+                    ref="fileTwo"
+                    @change="changeImageTwo"
+                    class="file-input-anim"
+                  />
                 </div>
               </v-card>
             </v-col>
 
-            
             <v-col cols="6" md="6">
-                <v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
+              <v-card
+                variant="outlined"
+                class="pa-4 bg-white border d-flex align-center"
+                rounded="lg"
+              >
                 <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
-                  <v-img v-if="imagePreviews.photoThree!=null" 
-                  :src="filePhotoThree"
-                   cover></v-img>
+                  <v-img
+                    v-if="imagePreviews.photoThree != null"
+                    :src="filePhotoThree"
+                    cover
+                  ></v-img>
                   <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
                 </v-avatar>
                 <div class="flex-grow-1">
-                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
-                  <input type="file" id="file" ref="file" @change="changeImageThree" class="file-input-anim" />
+                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">
+                   Sub Photo 3
+                  </div>
+                  <input
+                    type="file"
+                    id="file"
+                    ref="fileThree"
+                    @change="changeImageThree"
+                    class="file-input-anim"
+                  />
                 </div>
               </v-card>
             </v-col>
             <v-col cols="6" md="6">
-<v-card variant="outlined" class="pa-4 bg-white border d-flex align-center" rounded="lg">
+              <v-card
+                variant="outlined"
+                class="pa-4 bg-white border d-flex align-center"
+                rounded="lg"
+              >
                 <v-avatar size="90" rounded="lg" class="mr-4 border bg-grey-lighten-4">
-                  <v-img v-if="imagePreviews.photoFour!=null" 
-                  :src="filePhotoFour"
-                   cover></v-img>
+                  <v-img v-if="imagePreviews.photoFour != null" :src="filePhotoFour" cover></v-img>
                   <v-icon v-else size="36" color="grey-darken-1">mdi-image-filter-hdr</v-icon>
                 </v-avatar>
                 <div class="flex-grow-1">
-                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">Main Cover Photo</div>
-                  <input type="file" id="file" ref="file" @change="changeImageFour" class="file-input-anim" />
+                  <div class="text-subtitle-2 font-weight-bold text-slate-800 mb-1">
+                   Sub Photo 4
+                  </div>
+                  <input
+                    type="file"
+                    id="file"
+                    ref="fileFour"
+                    @change="changeImageFour"
+                    class="file-input-anim"
+                  />
                 </div>
               </v-card>
             </v-col>
@@ -380,11 +564,17 @@
 
         <v-divider></v-divider>
         <v-card-actions class="pa-4 bg-white justify-end">
-          <v-btn variant="outlined" color="slate-600" class="text-none mr-2" @click="imageDialog = false">Cancel</v-btn>
-          <v-btn 
-            color="primary" 
-            class="btn-primary text-none px-5" 
-            elevation="0" 
+          <v-btn
+            variant="outlined"
+            color="slate-600"
+            class="text-none mr-2"
+            @click="imageDialog = false"
+            >Cancel</v-btn
+          >
+          <v-btn
+            color="primary"
+            class="btn-primary text-none px-5"
+            elevation="0"
             :loading="uploadingImages"
             @click="saveProductImages"
           >
@@ -403,12 +593,27 @@
           </v-avatar>
           <h3 class="text-h6 font-weight-bold text-slate-800 mb-2">Delete Product</h3>
           <p class="text-body-2 text-muted">
-            Are you sure you want to delete <strong>{{ itemToDelete?.title }}</strong>? This action cannot be undone.
+            Are you sure you want to delete <strong>{{ itemToDelete?.title }}</strong
+            >? This action cannot be undone.
           </p>
         </v-card-text>
         <v-card-actions class="pa-4 pt-0 justify-center">
-          <v-btn variant="outlined" color="slate-600" class="text-none mr-2" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn color="error" class="text-none px-4" variant="flat" rounded="md" elevation="0" @click="deleteProduct">Delete</v-btn>
+          <v-btn
+            variant="outlined"
+            color="slate-600"
+            class="text-none mr-2"
+            @click="deleteDialog = false"
+            >Cancel</v-btn
+          >
+          <v-btn
+            color="error"
+            class="text-none px-4"
+            variant="flat"
+            rounded="md"
+            elevation="0"
+            @click="deleteProduct"
+            >Delete</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -422,22 +627,22 @@ import { supabase } from '@/lib/supabase'
 
 export default defineComponent({
   name: 'AdminProducts',
-  
+
   data() {
     return {
-      itemsPerPage: 10, 
-      loading: false, 
-      dialog: false, 
-      deleteDialog: false, 
-      imageDialog: false, 
-      search: '', 
-      typeFilter: null as string | null, 
-      locationTypeFilter: null as string | null, 
-      currentStep: 1, 
-      editing: false, 
-      itemToDelete: null as any | null, 
-      
-      products: [] as any[], 
+      itemsPerPage: 10,
+      loading: false,
+      dialog: false,
+      deleteDialog: false,
+      imageDialog: false,
+      search: '',
+      typeFilter: null as string | null,
+      locationTypeFilter: null as string | null,
+      currentStep: 1,
+      editing: false,
+      itemToDelete: null as any | null,
+
+      products: [] as any[],
 
       headers: [
         { title: 'No.', key: 'index', align: 'start' as const, sortable: false },
@@ -452,8 +657,8 @@ export default defineComponent({
         { title: 'Tickets', key: 'ticket' },
         { title: 'Transport', key: 'transport' },
         { title: 'Price', key: 'amount', align: 'end' as const },
-        { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const }
-      ], 
+        { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
+      ] as any[],
 
       newProduct: {
         title: '',
@@ -467,7 +672,7 @@ export default defineComponent({
         meals: '',
         travelDate: '',
         ticket: 0,
-        transport: 'CAR'
+        transport: 'CAR',
       },
 
       imageForm: {
@@ -477,234 +682,269 @@ export default defineComponent({
         photoOne: '',
         photoTwo: '',
         photoThree: '',
-        photoFour: ''
+        photoFour: '',
       },
       imageFiles: {
         photo: null as File | null,
         photoOne: null as File | null,
         photoTwo: null as File | null,
         photoThree: null as File | null,
-        photoFour: null as File | null
+        photoFour: null as File | null,
       } as Record<string, File | null>,
       imagePreviews: {
         photo: '',
         photoOne: '',
         photoTwo: '',
         photoThree: '',
-        photoFour: ''
+        photoFour: '',
       } as Record<string, string>,
       uploadingImages: false,
-      filePhoto:'',
-      filePhotoOne:'',
-      filePhotoTwo:'',
-      filePhotoThree:'',
-      filePhotoFour:'',
+      filePhoto: '',
+      filePhotoOne: '',
+      filePhotoTwo: '',
+      filePhotoThree: '',
+      filePhotoFour: '',
+      status:"ALL",
+      statusList:["ALL","ACTIVE","DELETE"],
+      statusListAdd:["ACTIVE","DELETE"],
     }
   },
 
   computed: {
     filteredProducts(): any[] {
       return this.products.filter((p: any) => {
-        const matchesSearch = !this.search || p.title.toLowerCase().includes(this.search.toLowerCase()) || (p.location && p.location.toLowerCase().includes(this.search.toLowerCase()))
+        const matchesSearch =
+          !this.search ||
+          p.title.toLowerCase().includes(this.search.toLowerCase()) ||
+          (p.location && p.location.toLowerCase().includes(this.search.toLowerCase()))
         const matchesType = !this.typeFilter || p.type === this.typeFilter
-        const matchesLocationType = !this.locationTypeFilter || p.locationType === this.locationTypeFilter
+        const matchesLocationType =
+          !this.locationTypeFilter || p.locationType === this.locationTypeFilter
         return matchesSearch && matchesType && matchesLocationType
       })
-    }, 
-    currencyFormatter() { 
+    },
+    currencyFormatter() {
       return {
-        format: (value: number) => new Intl.NumberFormat('en-US').format(value) + ' MMK'
+        format: (value: number) => new Intl.NumberFormat('en-US').format(value) + ' MMK',
       }
-    }
+    },
   },
 
   mounted() {
-    this.fetchProducts();
+    this.fetchProducts()
   },
   watch: {
-    
     search() {
-      this.fetchProducts();
+      this.fetchProducts()
     },
     typeFilter() {
-      this.fetchProducts();
+      this.fetchProducts()
     },
     locationTypeFilter() {
-      this.fetchProducts();
-    }
+      this.fetchProducts()
+    },
+    status() {
+      this.fetchProducts()
+    },
   },
 
   methods: {
     changeImage: function (e) {
-      let image = e.target.files[0];
-      let reader = new FileReader();
-      reader.readAsDataURL(image);
+      let image = e.target.files[0]
+      let reader = new FileReader()
+      reader.readAsDataURL(image)
       reader.onload = (e) => {
-        this.filePhoto = e.target.result;
-      };
+        this.filePhoto = e.target.result
+      }
     },
     changeImageOne: function (e) {
-      let image = e.target.files[0];
-      let reader = new FileReader();
-      reader.readAsDataURL(image);
+      let image = e.target.files[0]
+      let reader = new FileReader()
+      reader.readAsDataURL(image)
       reader.onload = (e) => {
-        this.filePhotoOne = e.target.result;
-      };
+        this.filePhotoOne = e.target.result
+      }
     },
     changeImageTwo: function (e) {
-      let image = e.target.files[0];
-      let reader = new FileReader();
-      reader.readAsDataURL(image);
+      let image = e.target.files[0]
+      let reader = new FileReader()
+      reader.readAsDataURL(image)
       reader.onload = (e) => {
-        this.filePhotoTwo = e.target.result;
-      };
+        this.filePhotoTwo = e.target.result
+      }
     },
     changeImageThree: function (e) {
-      let image = e.target.files[0];
-      let reader = new FileReader();
-      reader.readAsDataURL(image);
+      let image = e.target.files[0]
+      let reader = new FileReader()
+      reader.readAsDataURL(image)
       reader.onload = (e) => {
-        this.filePhotoThree = e.target.result;
-      };
+        this.filePhotoThree = e.target.result
+      }
     },
     changeImageFour: function (e) {
-      let image = e.target.files[0];
-      let reader = new FileReader();
-      reader.readAsDataURL(image);
+      let image = e.target.files[0]
+      let reader = new FileReader()
+      reader.readAsDataURL(image)
       reader.onload = (e) => {
-        this.filePhotoFour = e.target.result;
-      };
+        this.filePhotoFour = e.target.result
+      }
     },
-    getTypeClass(type: string): string { return `chip-${(type || 'standard').toLowerCase()}` }, 
-    getDuration(p: any): string { return `${p.day || 0}D / ${p.night || 0}N` }, 
+    getTypeClass(type: string): string {
+      return `chip-${(type || 'standard').toLowerCase()}`
+    },
+    getDuration(p: any): string {
+      return `${p.day || 0}D / ${p.night || 0}N`
+    },
     formatDate(dateStr: string): string {
       if (!dateStr) return '-'
-      return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    }, 
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    },
 
     async fetchProducts() {
       try {
-        this.loading = true;
-        
+        this.loading = true
+
         const data = await PackageService.getProduct(
           this.locationTypeFilter || undefined,
           this.typeFilter || undefined,
-          this.search || undefined
-        );
-        this.products = data; 
+          this.search || undefined,
+          this.status
+        )
+        this.products = data
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error('Error fetching products:', error)
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
 
     openAddDialog() {
-      this.editing = false;
-      this.dialog = true; 
+      this.editing = false
+      this.dialog = true
     },
-    
+
     closeDialog() {
-      this.dialog = false; 
-      this.newProduct = { title: '', location: '', locationType: 'DOMESTIC', type: 'Standard', amount: 0, day: 0, night: 0, groupSize: '', meals: '', travelDate: '', ticket: 0, transport: 'CAR' };
+      this.dialog = false
+      this.newProduct = {
+        title: '',
+        location: '',
+        locationType: 'DOMESTIC',
+        type: 'Standard',
+        amount: 0,
+        day: 0,
+        night: 0,
+        groupSize: '',
+        meals: '',
+        travelDate: '',
+        ticket: 0,
+        transport: 'CAR',
+      }
     },
-    
+
     async saveProduct() {
       try {
-        this.loading = true; 
-        let response;
-        
+        this.loading = true
+        let response
+
         if (this.editing) {
           // --- EDIT PRODUCT---
-          response = await PackageService.updateProduct(this.newProduct);
+          response = await PackageService.updateProduct(this.newProduct)
         } else {
           // --- ADD PRODUCT ---
-          response = await PackageService.addProduct(this.newProduct);
+          response = await PackageService.addProduct(this.newProduct)
         }
-        
-        if (response > 0) { 
-          alert(this.editing ? 'Product updated successfully!' : 'Product saved successfully!');
-          this.closeDialog();
-          this.fetchProducts(); 
+
+        if (response > 0) {
+          alert(this.editing ? 'Product updated successfully!' : 'Product saved successfully!')
+          this.closeDialog()
+          this.fetchProducts()
         } else {
-          alert('Failed to save product.');
+          alert('Failed to save product.')
         }
       } catch (error) {
-        console.error("Error saving product:", error);
-        alert('An error occurred while connecting to the server.');
+        console.error('Error saving product:', error)
+        alert('An error occurred while connecting to the server.')
       } finally {
-        this.loading = false; 
+        this.loading = false
       }
     },
 
     openEditDialog(item: any) {
-      this.editing = true;
-      this.newProduct = { ...item };
+      this.editing = true
+      this.newProduct = { ...item }
 
-      this.dialog = true;
+      this.dialog = true
     },
 
     openDeleteDialog(item: any) {
-      this.itemToDelete = item;
-      this.deleteDialog = true;
+      this.itemToDelete = item
+      this.deleteDialog = true
     },
 
     async deleteProduct() {
-      if (!this.itemToDelete) return;
+      if (!this.itemToDelete) return
       try {
-        this.loading = true;
-      
-        const response = await PackageService.deleteProduct(this.itemToDelete.productId);
-        
+        this.loading = true
+
+        const response = await PackageService.deleteProduct(this.itemToDelete.productId)
+
         if (response > 0) {
-          this.products = this.products.filter((p: any) => p.productId !== this.itemToDelete.productId);
-          alert('Product deleted successfully.');
+          this.products = this.products.filter(
+            (p: any) => p.productId !== this.itemToDelete.productId,
+          )
+          alert('Product deleted successfully.')
         } else {
-          alert('Failed to delete product from server.');
+          alert('Failed to delete product from server.')
         }
-        
-        this.deleteDialog = false;
-        this.itemToDelete = null;
+
+        this.deleteDialog = false
+        this.itemToDelete = null
       } catch (error) {
-        console.error("Error deleting product:", error);
-        alert('An error occurred while deleting.');
+        console.error('Error deleting product:', error)
+        alert('An error occurred while deleting.')
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
 
     // Image Handlers
     getImageCount(item: any): number {
-      let count = 0;
-      if (item.photo) count++;
-      if (item.photoOne) count++;
-      if (item.photoTwo) count++;
-      if (item.photoThree) count++;
-      if (item.photoFour) count++;
-      return count;
+      let count = 0
+      if (item.photo) count++
+      if (item.photoOne) count++
+      if (item.photoTwo) count++
+      if (item.photoThree) count++
+      if (item.photoFour) count++
+      return count
     },
 
     getImageIcon(item: any): string {
-      const count = this.getImageCount(item);
-      if (count === 0) return 'mdi-image-off-outline';
-      if (count === 5) return 'mdi-image-multiple';
-      return 'mdi-image-multiple-outline';
+      const count = this.getImageCount(item)
+      if (count === 0) return 'mdi-image-off-outline'
+      if (count === 5) return 'mdi-image-multiple'
+      return 'mdi-image-multiple-outline'
     },
 
     getImageBadgeColor(item: any): string {
-      const count = this.getImageCount(item);
-      if (count === 0) return 'grey-darken-1';
-      if (count === 5) return 'success';
-      return 'primary';
+      const count = this.getImageCount(item)
+      if (count === 0) return 'grey-darken-1'
+      if (count === 5) return 'success'
+      return 'primary'
     },
 
     openImageDialog(item) {
-      this.imagePreviews = Object.assign({},item);
-      this.filePhoto = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photo;
-      this.filePhotoOne = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoOne;
-      this.filePhotoTwo = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoTwo;
-      this.filePhotoThree = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoThree;
-      this.filePhotoFour = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoFour;
+      this.imagePreviews = Object.assign({}, item)
+      this.filePhoto = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photo
+      this.filePhotoOne = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoOne
+      this.filePhotoTwo = 'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoTwo
+      this.filePhotoThree =
+        'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoThree
+      this.filePhotoFour =
+        'http://localhost:8088/api/v1/productphoto/' + this.imagePreviews.photoFour
       // this.imageForm = {
       //   productId: product.productId,
       //   title: product.title,
@@ -731,15 +971,15 @@ export default defineComponent({
       //   photoFour: product.photoFour || ''
       // };
 
-      this.imageDialog = true;
+      this.imageDialog = true
     },
 
     handleFileChange(event: any, key: string) {
-      const files = event.target.files;
+      const files = event.target.files
       if (files && files.length > 0) {
-        const file = files[0];
-        this.imageFiles[key] = file;
-        this.imagePreviews[key] = URL.createObjectURL(file);
+        const file = files[0]
+        this.imageFiles[key] = file
+        this.imagePreviews[key] = URL.createObjectURL(file)
       }
     },
 
@@ -749,15 +989,13 @@ export default defineComponent({
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`
         const filePath = `products/${fileName}`
 
-        const { data, error } = await supabase.storage
-          .from('products')
-          .upload(filePath, file)
+        const { data, error } = await supabase.storage.from('products').upload(filePath, file)
 
         if (error) throw error
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('products')
-          .getPublicUrl(filePath)
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from('products').getPublicUrl(filePath)
 
         return publicUrl
       } catch (err) {
@@ -769,88 +1007,178 @@ export default defineComponent({
         })
       }
     },
-
-    async saveProductImages() {
-      // var formData = new FormData();
-      // formData.append("file", this.$refs.file.files[0]);
-      // PackageService
-      //   .updateProductPhoto(formData, this.imagePreviews.productId,0)
-      //   .then((response) => {
-      //     this.fetchProducts();
-      //   })
-      //   .catch((error) => {
-      //     this.$swal( error.response.data.message, "error");
-      //   });
-      var formData = new FormData();
-      formData.append("file", this.$refs.fileOne.files[0]);
-      PackageService
-        .updateProductPhoto(formData, this.imagePreviews.productId,1)
+    getPhotoZero: function () {
+      var formData = new FormData()
+      formData.append('file', this.$refs.file.files[0])
+      PackageService.updateProductPhoto(formData, this.imagePreviews.productId, 0)
         .then((response) => {
-          this.fetchProducts();
+          //this.fetchProducts();
+          //this.imageDialog = false;
         })
         .catch((error) => {
-          this.$swal( error.response.data.message, "error");
-        });
-    //   this.uploadingImages = true;
-    //   try {
-    //     const payload: Record<string, string | null> = {};
-    //     const keys = ['photo', 'photoOne', 'photoTwo', 'photoThree', 'photoFour'];
-
-    //     for (const key of keys) {
-    //       const file = this.imageFiles[key];
-    //       if (file) {
-    //         const uploadedUrl = await this.uploadImageFile(file);
-    //         payload[key] = uploadedUrl;
-    //       } else {
-    //         payload[key] = this.imageForm[key as keyof typeof this.imageForm] || null;
-    //       }
-    //     }
-
-    //     const idx = this.products.findIndex(p => p.productId === this.imageForm.productId);
-    //     if (idx !== -1) {
-    //       this.products[idx] = { ...this.products[idx], ...payload };
-    //     }
-
-    //     if (supabase) {
-    //       await supabase
-    //         .from('product')
-    //         .update(payload)
-    //         .eq('productId', this.imageForm.productId);
-    //     }
-
-    //     this.imageDialog = false;
-    //     alert('Photos uploaded successfully!');
-    //   } catch (error) {
-    //     console.error('Error saving images:', error);
-    //     alert('Failed to save images.');
-    //   } finally {
-    //     this.uploadingImages = false;
-    //   }
-     }
+          //this.$swal( error.response.data.message, "error");
+        })
+    },
+    getPhotoOne: function () {
+      console.log('getPhotoOne called')
+      var formDataOne = new FormData()
+      formDataOne.append('file', this.$refs.fileOne.files[0])
+      PackageService.updateProductPhoto(formDataOne, this.imagePreviews.productId, 1)
+        .then((response) => {
+          // this.fetchProducts();
+          // this.imageDialog = false;
+        })
+        .catch((error) => {
+          //this.$swal( error.response.data.message, "error");
+        })
+    },
+    getPhotoTwo: function () {
+      var formDataTwo = new FormData()
+      formDataTwo.append('file', this.$refs.fileTwo.files[0])
+      PackageService.updateProductPhoto(formDataTwo, this.imagePreviews.productId, 2)
+        .then((response) => {
+          // this.fetchProducts();
+          // this.imageDialog = false;
+        })
+        .catch((error) => {
+          //this.$swal( error.response.data.message, "error");
+        })
+    },
+    getPhotoThree: function () {
+      var formDataThree = new FormData()
+      formDataThree.append('file', this.$refs.fileThree.files[0])
+      PackageService.updateProductPhoto(formDataThree, this.imagePreviews.productId, 3)
+        .then((response) => {})
+        .catch((error) => {
+          //this.$swal( error.response.data.message, "error");
+        })
+    },
+    getPhotoFour: function () {
+      var formDataFour = new FormData()
+      formDataFour.append('file', this.$refs.fileFour.files[0])
+      PackageService.updateProductPhoto(formDataFour, this.imagePreviews.productId, 4)
+        .then((response) => {
+          // this.fetchProducts();
+          // this.imageDialog = false;
+        })
+        .catch((error) => {
+          //this.$swal( error.response.data.message, "error");
+        })
+    },
+    // async saveProductImages() {
+    //   this.getPhotoZero()
+    //   setTimeout(() => {
+    //     this.getPhotoOne()
+    //   }, 1000)
+    //   setTimeout(() => {
+    //     this.getPhotoTwo()
+    //   }, 2000)
+    //   setTimeout(() => {
+    //     this.getPhotoThree()
+    //   }, 3000)
+    //   setTimeout(() => {
+    //     this.getPhotoFour()
+    //   }, 4000)
+    //   setTimeout(() => {
+    //     this.fetchProducts()
+    //     this.imageDialog = false
+    //   }, 5000)
+    // },
+    async getPhotoByIndex(refName: string, photoIndex: number) {
+  const fileInput = (this.$refs as any)[refName];
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    await PackageService.updateProductPhoto(formData, this.imagePreviews.productId, photoIndex);
   }
+},
+
+async saveProductImages() {
+  try {
+    this.uploadingImages = true;
+    
+    // ပုံတစ်ခုချင်းစီကို အစဉ်လိုက် စောင့်ပြီးမှ တင်မည် (သို့မဟုတ် File ရှိမှသာ တင်မည်)
+    await this.getPhotoByIndex('file', 0);
+    await this.getPhotoByIndex('fileOne', 1);
+    await this.getPhotoByIndex('fileTwo', 2);
+    await this.getPhotoByIndex('fileThree', 3);
+    await this.getPhotoByIndex('fileFour', 4);
+
+    alert('Images uploaded successfully!');
+    await this.fetchProducts();
+    this.imageDialog = false;
+  } catch (error) {
+    console.error("Error uploading product images:", error);
+    alert('Failed to upload some images.');
+  } finally {
+    this.uploadingImages = false;
+  }
+}
+  },
 })
 </script>
 
 <style scoped>
-.admin-products-container { background-color: #f8fafc; min-height: 100vh; }
-.text-slate-800 { color: #1e293b; }
-.text-slate-700 { color: #334155; }
-.border { border: 1px solid #e2e8f0 !important; }
-.status-chip { display: inline-flex; align-items: center; padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 50px; text-transform: uppercase; }
-.chip-budget { background-color: #f0fdf4; color: #16a34a; }
-.chip-standard { background-color: #eff6ff; color: #2563eb; }
-.chip-premium { background-color: #faf5ff; color: #7c3aed; }
-.chip-domestic { background-color: #f1f5f9; color: #475569; }
-.chip-international { background-color: #fff7ed; color: #ea580c; }
+.admin-products-container {
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
 
+.text-slate-800 {
+  color: #1e293b;
+}
 
-.premium-table :deep(td) { 
+.text-slate-700 {
+  color: #334155;
+}
+
+.border {
+  border: 1px solid #e2e8f0 !important;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 50px;
+  text-transform: uppercase;
+}
+
+.chip-budget {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+.chip-standard {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.chip-premium {
+  background-color: #faf5ff;
+  color: #7c3aed;
+}
+
+.chip-domestic {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.chip-international {
+  background-color: #fff7ed;
+  color: #ea580c;
+}
+
+.premium-table :deep(td) {
   white-space: nowrap !important;
 }
-.premium-table :deep(th) { 
-  font-weight: 600 !important; 
-  color: #475569 !important; 
-  background-color: #f8fafc !important; 
+
+.premium-table :deep(th) {
+  font-weight: 600 !important;
+  color: #475569 !important;
+  background-color: #f8fafc !important;
   font-size: 13px !important;
   z-index: 2 !important;
   white-space: nowrap !important;

@@ -33,6 +33,10 @@ class UserAccountService {
           let url = "/userAccount/count";
           return this.axios.get(url).then(request => request.data);
       }
+       updatePasswordEmail(userAccount) {
+    let url = `/userAccount/email`;
+    return this.axios.put(url, userAccount).then((request) => request.data);
+  }
   // addMessage(message) {
   //   let url = `/message`;
   //   return this.axios.post(url, message).then((request) => request.data);

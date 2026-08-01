@@ -9,7 +9,7 @@
           <div class="d-flex justify-space-between align-start">
             <div>
               <p class="stat-label">Total Revenue</p>
-              <p class="stat-value">{{ currencyFormatter.format(totalRevenue) }}</p>
+              <p class="stat-value">{{ numberFormatter.format(totalRevenue) }}</p>
               <p class="stat-trend">
                 <v-icon size="11" color="success">mdi-trending-up</v-icon>
                 <span class="ml-1">+12.5% from last month</span>
@@ -133,47 +133,39 @@
               <template #item.saleId="{ item }">
                 <span class="text-caption font-weight-medium text-primary">#{{ item.saleId }}</span>
               </template>
-              <template #item.profileName="{ item }">
-                <div class="d-flex align-center py-1">
-                  <v-avatar size="26" class="avatar-gradient mr-2">
-                    <span
-                      class="text-white text-caption font-weight-bold"
-                      style="font-size: 0.7rem !important"
-                      >{{ item.profileName ? item.profileName.charAt(0) : 'U' }}</span
-                    >
-                  </v-avatar>
-                  <span
-                    class="font-weight-medium text-body-2"
-                    style="font-size: 0.8rem !important"
-                    >{{ item.profileName || 'N/A' }}</span
-                  >
-                </div>
-              </template>
-              <template #item.title="{ item }">
-                <span class="text-body-2" style="font-size: 0.8rem !important">{{
-                  item.title || 'N/A'
-                }}</span>
-              </template>
-              <template #item.amount="{ item }">
-                <span
-                  class="font-weight-semibold text-body-2"
-                  style="color: #2563eb; font-size: 0.8rem !important"
-                  >{{ currencyFormatter.format(item.amount) }}</span
-                >
-              </template>
-              <template #item.status="{ item }">
-                <span
-                  class="status-chip"
-                  :class="'status-' + (item.status ? item.status.toLowerCase() : 'grey')"
-                >
-                  {{ item.status === 'DELETE' ? 'Cancelled' : item.status }}
-                </span>
-              </template>
-              <template #item.date="{ item }">
-                <span class="text-body-2 text-grey" style="font-size: 0.8rem !important">{{
-                  formatDate(item.date)
-                }}</span>
-              </template>
+              <!-- Customer Slot အသစ် (customer.name Nested Object ဖတ်ရန်) -->
+<template #item.profileName="{ item }">
+  <div class="d-flex align-center py-1">
+    <v-avatar size="26" class="avatar-gradient mr-2">
+      <span
+        class="text-white text-caption font-weight-bold"
+        style="font-size: 0.7rem !important"
+      >
+        {{ (item.customer?.name || item.customer?.profileName || item.profileName || 'U').charAt(0).toUpperCase() }}
+      </span>
+    </v-avatar>
+    <span
+      class="font-weight-medium text-body-2"
+      style="font-size: 0.8rem !important"
+    >
+      {{ item.customer?.name || item.customer?.profileName || item.profileName || 'N/A' }}
+    </span>
+  </div>
+</template>
+
+<!-- Product Slot အသစ် (product.title Nested Object ဖတ်ရန်) -->
+<template #item.title="{ item }">
+  <span class="text-body-2" style="font-size: 0.8rem !important">
+    {{ item.product?.title || item.product?.packageName || item.title || 'N/A' }}
+  </span>
+</template>
+
+<!-- Date Slot အသစ် (saleDate / date နှစ်ခုလုံး ဖတ်နိုင်ရန်) -->
+<template #item.date="{ item }">
+  <span class="text-body-2 text-grey" style="font-size: 0.8rem !important">
+    {{ formatDate(item.bookingDate || item.createdAt || item.saleDate || item.transactionDate || item.orderDate || item.date) }}
+  </span>
+</template>
             </v-data-table>
           </v-card-text>
         </v-card>
@@ -359,6 +351,7 @@ export default {
           this.recentBookings = data.recentBookings || []
           this.topProducts = data.topProducts || []
           this.salesByMonth = data.monthlyRevenues || []
+          console.log('Bookings Data:>>>>>>>>>>>>>>', data.recentBookings)
 
         }
       } catch (error) {
@@ -369,14 +362,35 @@ export default {
     },
 
 
-    formatDate(date) {
-      if (!date) return '-'
-      return new Date(date).toLocaleDateString('en-US', {
+    formatDate(dateVal) {
+  if (!dateVal) return '-'
+
+  try {
+    // 1. Java LocalDateTime [YYYY, MM, DD, ...] Array Format ဖြစ်နေပါက
+    if (Array.isArray(dateVal)) {
+      const [year, month, day] = dateVal
+      const d = new Date(year, month - 1, day)
+      return d.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
       })
     }
+
+    // 2. String သို့မဟုတ် Timestamp Format ဖြစ်နေပါက
+    const d = new Date(dateVal)
+    if (isNaN(d.getTime())) return '-'
+
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  } catch (e) {
+    console.error('Date parsing error:', e)
+    return '-'
+  }
+}
   },
   computed: {
     currencyFormatter() {
@@ -392,7 +406,7 @@ export default {
     chartPoints() {
     if (!this.salesByMonth || this.salesByMonth.length === 0) return []
     const width = 1000
-    const height = 120 // Graph ၏ အမြင့်
+    const height = 130 // Graph ၏ အမြင့်
     const paddingTop = 25
     const maxAmount = Math.max(...this.salesByMonth.map(s => s.amount)) || 1
 

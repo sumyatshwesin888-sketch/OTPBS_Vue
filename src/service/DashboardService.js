@@ -9,6 +9,10 @@ class DashboardService{
         let url = "/dashboard";
         return this.axios.get(url).then(request => request.data);
     }
+    getPackageDashboardSale() {
+        let url = "/sale/dashboard";
+        return this.axios.get(url).then(request => request.data);
+    }
 
     getSale(status) {
         let url = "/sale";

@@ -797,7 +797,7 @@ mounted() {
 
 .card-title-text,
 h3{
-    font-weight:700;
+    font-weight:500;
     color:#1f2937;
 }
 
@@ -820,15 +820,15 @@ h3{
 
 .day-indicator{
 
-    width:90px;
+    width:70px;
 
     text-align:center;
 
-    font-weight:700;
+    font-weight:500;
 
     color:#1976d2;
 
-    font-size:17px;
+    font-size:13px;
 
 }
 
@@ -867,7 +867,7 @@ h3{
 
     width:100%;
 
-    min-height:120px;
+    min-height:80px;
 
     border-radius:18px;
 
@@ -907,7 +907,7 @@ h3{
 
 .timeline-content h3{
 
-    font-size:19px;
+    font-size:14px;
 
     margin-bottom:10px;
 
@@ -939,15 +939,15 @@ h3{
 
 .timeline-action .v-btn{
 
-    width:36px;
+    width:30px;
 
-    height:36px;
+    height:30px;
 
 }
 
 .timeline-action .v-icon{
 
-    font-size:20px;
+    font-size:15px;
 
 }
 
@@ -957,7 +957,7 @@ h3{
 
 .v-dialog .v-card{
 
-    border-radius:18px;
+    border-radius:10px;
 
 }
 
@@ -967,7 +967,7 @@ h3{
 
 :deep(.v-field){
 
-    border-radius:12px;
+    border-radius:10px;
 
 }
 
@@ -989,7 +989,7 @@ h3{
 
     .admin-itinerary-page{
 
-        padding:18px;
+        padding:10px;
 
     }
 
@@ -1013,7 +1013,7 @@ h3{
 
     .admin-itinerary-page{
 
-        padding:12px;
+        padding:8px;
 
     }
 
@@ -1027,19 +1027,19 @@ h3{
 
     .timeline-card{
 
-        min-height:100px;
+        min-height:80px;
 
     }
 
     .timeline-content h3{
 
-        font-size:17px;
+        font-size:8px;
 
     }
 
     .timeline-content p{
 
-        font-size:14px;
+        font-size:8px;
 
     }
 
