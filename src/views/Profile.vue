@@ -101,10 +101,9 @@
               </div>
               <div>
                 <p class="booking-date-text">
-                  {{ item.date ? item.date.split('T')[0] : 'N/A' }}
+                  {{ formatDate(item.date) }}
                 </p>
               </div>
-              
 
               <!-- Right: Status Badge -->
               <div class="booking-status-box">
@@ -223,157 +222,163 @@
 
               <!-- Change Password Tab Form -->
               <form
-  v-if="dialogTab === 'password'"
-  @submit.prevent="handleChangePassword"
-  id="changePasswordForm"
-  class="modern-dialog-form"
->
-  <!-- Current Password -->
-  <div class="modern-input-group">
-    <label class="modern-input-label">Current Password</label>
-    <div class="password-input-wrapper">
-      <input
-        :type="showCurrentPassword ? 'text' : 'password'"
-        v-model="passwordForm.currentPassword"
-        placeholder="Enter your current password"
-        class="modern-input-field"
-        required
-      />
-      <span
-        class="toggle-password"
-        @click="showCurrentPassword = !showCurrentPassword"
-      >
-        <!-- Eye Open -->
-        <svg
-          v-if="!showCurrentPassword"
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        <!-- Eye Off (Slash) -->
-        <svg
-          v-else
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-          <line x1="1" y1="1" x2="23" y2="23"></line>
-        </svg>
-      </span>
-    </div>
-  </div>
+                v-if="dialogTab === 'password'"
+                @submit.prevent="handleChangePassword"
+                id="changePasswordForm"
+                class="modern-dialog-form"
+              >
+                <!-- Current Password -->
+                <div class="modern-input-group">
+                  <label class="modern-input-label">Current Password</label>
+                  <div class="password-input-wrapper">
+                    <input
+                      :type="showCurrentPassword ? 'text' : 'password'"
+                      v-model="passwordForm.currentPassword"
+                      placeholder="Enter your current password"
+                      class="modern-input-field"
+                      required
+                    />
+                    <span
+                      class="toggle-password"
+                      @click="showCurrentPassword = !showCurrentPassword"
+                    >
+                      <!-- Eye Open -->
+                      <svg
+                        v-if="!showCurrentPassword"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <!-- Eye Off (Slash) -->
+                      <svg
+                        v-else
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                        ></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
 
-  <!-- New Password -->
-  <div class="modern-input-group mt-4">
-    <label class="modern-input-label">New Password</label>
-    <div class="password-input-wrapper">
-      <input
-        :type="showNewPassword ? 'text' : 'password'"
-        v-model="passwordForm.newPassword"
-        placeholder="Enter your new password"
-        class="modern-input-field"
-        required
-      />
-      <span class="toggle-password" @click="showNewPassword = !showNewPassword">
-        <svg
-          v-if="!showNewPassword"
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        <svg
-          v-else
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-          <line x1="1" y1="1" x2="23" y2="23"></line>
-        </svg>
-      </span>
-    </div>
-  </div>
+                <!-- New Password -->
+                <div class="modern-input-group mt-4">
+                  <label class="modern-input-label">New Password</label>
+                  <div class="password-input-wrapper">
+                    <input
+                      :type="showNewPassword ? 'text' : 'password'"
+                      v-model="passwordForm.newPassword"
+                      placeholder="Enter your new password"
+                      class="modern-input-field"
+                      required
+                    />
+                    <span class="toggle-password" @click="showNewPassword = !showNewPassword">
+                      <svg
+                        v-if="!showNewPassword"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <svg
+                        v-else
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                        ></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
 
-  <!-- Confirm New Password -->
-  <div class="modern-input-group mt-4">
-    <label class="modern-input-label">Confirm New Password</label>
-    <div class="password-input-wrapper">
-      <input
-        :type="showConfirmPassword ? 'text' : 'password'"
-        v-model="passwordForm.confirmPassword"
-        placeholder="Confirm your new password"
-        class="modern-input-field"
-        required
-      />
-      <span
-        class="toggle-password"
-        @click="showConfirmPassword = !showConfirmPassword"
-      >
-        <svg
-          v-if="!showConfirmPassword"
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        <svg
-          v-else
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-          <line x1="1" y1="1" x2="23" y2="23"></line>
-        </svg>
-      </span>
-    </div>
-  </div>
-</form>
+                <!-- Confirm New Password -->
+                <div class="modern-input-group mt-4">
+                  <label class="modern-input-label">Confirm New Password</label>
+                  <div class="password-input-wrapper">
+                    <input
+                      :type="showConfirmPassword ? 'text' : 'password'"
+                      v-model="passwordForm.confirmPassword"
+                      placeholder="Confirm your new password"
+                      class="modern-input-field"
+                      required
+                    />
+                    <span
+                      class="toggle-password"
+                      @click="showConfirmPassword = !showConfirmPassword"
+                    >
+                      <svg
+                        v-if="!showConfirmPassword"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <svg
+                        v-else
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                        ></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </form>
             </v-card-text>
 
             <!-- Actions Footer -->
@@ -464,6 +469,27 @@ export default {
     },
   },
   methods: {
+    formatDate(dateVal) {
+    if (!dateVal) return 'N/A'
+
+    // Date က String ဖြစ်နေလျှင် (ဥပမာ- "2026-08-01T12:56:44")
+    if (typeof dateVal === 'string') {
+      return dateVal.split('T')[0]
+    }
+
+    // Date က Array ဖြစ်နေလျှင် (Spring Boot LocalDateTime standard mapper output [yyyy, mm, dd, ...])
+    if (Array.isArray(dateVal)) {
+      const [year, month, day] = dateVal
+      return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    }
+
+    // Date က Timestamp (Number) ဖြစ်နေလျှင်
+    if (typeof dateVal === 'number') {
+      return new Date(dateVal).toISOString().split('T')[0]
+    }
+
+    return 'N/A'
+  },
     async loadUserBookings() {
       if (this.loginUser && this.loginUser.userAccountId) {
         try {
@@ -559,75 +585,76 @@ export default {
         alert('Failed to update profile. Please try again!')
       }
     },
-   async handleChangePassword() {
-  const { currentPassword, newPassword, confirmPassword } = this.passwordForm;
+    async handleChangePassword() {
+      const { currentPassword, newPassword, confirmPassword } = this.passwordForm
 
-  // 1. ကွက်လပ် အားလုံး ဖြည့်ထားခြင်း ရှိမရှိ စစ်ဆေးခြင်း
-  if (!currentPassword || !newPassword || !confirmPassword) {
-    alert('Please fill in all password fields!');
-    return;
-  }
+      // 1. ကွက်လပ် အားလုံး ဖြည့်ထားခြင်း ရှိမရှိ စစ်ဆေးခြင်း
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        alert('Please fill in all password fields!')
+        return
+      }
 
-  // 2. Password အသစ် အနည်းဆုံး ၆ လုံး ရှိရမည်
-  if (newPassword.length < 6) {
-    alert('New password must be at least 6 characters long!');
-    return;
-  }
+      // 2. Password အသစ် အနည်းဆုံး ၆ လုံး ရှိရမည်
+      if (newPassword.length < 6) {
+        alert('New password must be at least 6 characters long!')
+        return
+      }
 
-  // 3. Password အသစ် နှင့် Confirm Password ကိုက်ညီမှု ရှိမရှိ စစ်ဆေးခြင်း
-  if (newPassword !== confirmPassword) {
-    alert('New password and confirm password do not match!');
-    return;
-  }
+      // 3. Password အသစ် နှင့် Confirm Password ကိုက်ညီမှု ရှိမရှိ စစ်ဆေးခြင်း
+      if (newPassword !== confirmPassword) {
+        alert('New password and confirm password do not match!')
+        return
+      }
 
-  // 4. Password အသစ်သည် Password အဟောင်းနှင့် တူနေပါက တားမြစ်ခြင်း
-  if (currentPassword === newPassword) {
-    alert('New password cannot be the same as current password!');
-    return;
-  }
+      // 4. Password အသစ်သည် Password အဟောင်းနှင့် တူနေပါက တားမြစ်ခြင်း
+      if (currentPassword === newPassword) {
+        alert('New password cannot be the same as current password!')
+        return
+      }
 
-  const savedUser = JSON.parse(localStorage.getItem('loginUser'));
-  if (!savedUser) {
-    alert('Session expired. Please log in again!');
-    return;
-  }
+      const savedUser = JSON.parse(localStorage.getItem('loginUser'))
+      if (!savedUser) {
+        alert('Session expired. Please log in again!')
+        return
+      }
 
-  // 5. Current password မှန်/မမှန် စစ်ဆေးခြင်း
-  if (savedUser.password && savedUser.password !== currentPassword) {
-    alert('Current password is incorrect!');
-    return;
-  }
+      // 5. Current password မှန်/မမှန် စစ်ဆေးခြင်း
+      if (savedUser.password && savedUser.password !== currentPassword) {
+        alert('Current password is incorrect!')
+        return
+      }
 
-  // Backend သို့ ပို့မည့် Payload
-  const passwordPayload = {
-    userAccountId: savedUser.userAccountId,
-    password: newPassword,
-  };
+      // Backend သို့ ပို့မည့် Payload
+      const passwordPayload = {
+        userAccountId: savedUser.userAccountId,
+        password: newPassword,
+      }
 
-  try {
-    await UserAccountService.updatePassword(passwordPayload);
+      try {
+        await UserAccountService.updatePassword(passwordPayload)
 
-    // Local Storage နှင့် UI state ကို update လုပ်ခြင်း
-    savedUser.password = newPassword;
-    localStorage.setItem('loginUser', JSON.stringify(savedUser));
-    this.loginUser = savedUser;
+        // Local Storage နှင့် UI state ကို update လုပ်ခြင်း
+        savedUser.password = newPassword
+        localStorage.setItem('loginUser', JSON.stringify(savedUser))
+        this.loginUser = savedUser
 
-    alert('Password updated successfully!');
+        alert('Password updated successfully!')
 
-    // Form fields များကို Reset ပြန်ချခြင်း
-    this.passwordForm.currentPassword = '';
-    this.passwordForm.newPassword = '';
-    this.passwordForm.confirmPassword = '';
-    this.showCurrentPassword = false;
-    this.showNewPassword = false;
-    this.showConfirmPassword = false;
-    this.showEdit = false;
-  } catch (error) {
-    console.error('Password Update Error:', error);
-    alert('Failed to update password. Please try again!');
-  }
-},
+        // Form fields များကို Reset ပြန်ချခြင်း
+        this.passwordForm.currentPassword = ''
+        this.passwordForm.newPassword = ''
+        this.passwordForm.confirmPassword = ''
+        this.showCurrentPassword = false
+        this.showNewPassword = false
+        this.showConfirmPassword = false
+        this.showEdit = false
+      } catch (error) {
+        console.error('Password Update Error:', error)
+        alert('Failed to update password. Please try again!')
+      }
+    },
   },
+  
 }
 </script>
 
@@ -1103,7 +1130,7 @@ export default {
   flex: 1;
   margin: 0 !important;
   padding: 0 15px !important;
-  text-align: center; 
+  text-align: center;
 }
 
 .booking-list-item:hover {
@@ -1113,10 +1140,10 @@ export default {
 
 .booking-img-box {
   padding: 0 !important;
-  flex: 0 0 auto !important; 
+  flex: 0 0 auto !important;
 }
 /* Image Styling */
-.booking-img-box img{
+.booking-img-box img {
   width: 100px;
   height: 95px;
   object-fit: cover;
@@ -1133,7 +1160,7 @@ export default {
 
 /* Middle Details */
 .booking-info {
- margin-left: 18px;
+  margin-left: 18px;
   flex-shrink: 0;
 }
 
@@ -1156,7 +1183,7 @@ export default {
 .booking-status-box {
   display: flex;
   align-items: center;
-  flex-shrink: 0; 
+  flex-shrink: 0;
   margin-left: auto;
 }
 

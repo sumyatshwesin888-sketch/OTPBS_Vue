@@ -39,17 +39,14 @@
             </div>
           </div>
 
-          <!-- Main Hero Image Section -->
           <div class="hero-img-wrap">
+
+            <!--show the selected photo from the package -->
             <img
-              v-if="selectedImg"
-              :src="'http://localhost:8088/api/v1/productphoto/' + selectedImg"
+              :src="selectedImg ? 'http://localhost:8088/api/v1/productphoto/' + selectedImg : ''"
               :alt="productDto.title"
               class="hero-img"
             />
-            <div v-else class="no-img-placeholder">
-              <span>No Image Available</span>
-            </div>
 
             <div
               class="pkg-type-tag"
@@ -67,7 +64,6 @@
             </div>
           </div>
 
-          <!-- Thumbnail Strip -->
           <div
             v-if="
               productDto.photoOne ||
@@ -119,6 +115,7 @@
                   class="itin-content"
                   :class="{ 'itin-last': idx === itineraryList.length - 1 }"
                 >
+                  <!--  loop ပတ်ထားတဲ့ item ထဲက title နဲ့ detail ကို ထုတ် -->
                   <div class="itin-title">{{ item.title }}</div>
                   <div class="itin-desc">{{ item.detail }}</div>
                 </div>
@@ -126,11 +123,11 @@
             </div>
           </div>
 
-          <!-- Ratings & Reviews Section -->
+          <!-- Ratings  & Reviews Section -->
           <div class="content-block rating-comment-section">
             <h2 class="review-block-title">Ratings & Reviews</h2>
 
-            <!-- Review Form -->
+            <!--  Review Form -->
             <div class="comment-form">
               <h3 class="form-title">Write a Review</h3>
 
@@ -162,22 +159,28 @@
               </div>
             </div>
 
+            
             <div class="comments-list">
+              <!-- to show rating list-->
               <h3 class="list-title">
                 User Reviews ({{ ratingCommentList ? ratingCommentList.length : 0 }})
               </h3>
 
+              <!-- to show if no rating -->
               <div v-if="!ratingCommentList || ratingCommentList.length === 0" class="no-reviews">
                 No reviews yet. Be the first to review!
               </div>
 
+              <!-- show rating/comment history with loop -->
               <div v-for="(rev, index) in ratingCommentList" :key="index" class="comment-card">
                 <div class="comment-card-header">
                   <div class="user-info">
+                    <!-- Show first letter of Name -->
                     <div class="user-avatar">
                       {{ (rev.userAccountDto?.profileName || 'A')[0].toUpperCase() }}
                     </div>
 
+                    <!-- Show User Name -->
                     <span class="user-name">{{
                       rev.userAccountDto?.profileName || 'Anonymous Traveller'
                     }}</span>
@@ -199,7 +202,8 @@
                   </div>
                 </div>
 
-                <p class="comment-content-text">{{ rev.comment }}</p>
+                <!--Show Comment -->
+                <p class="comment-content-text">{{ rev.message }}</p>
               </div>
             </div>
           </div>
@@ -243,11 +247,13 @@
                 <span
                   class="spec-val"
                   :style="{
+                    //  if ticket <=5 warning sign
                     color: productDto.leftTicket <= 5 ? '#ef4444' : '#10b981',
                     fontWeight: '700',
                   }"
                 >
                   {{
+                    // Show left ticket and total ticket
                     productDto.leftTicket > 0
                       ? productDto.leftTicket + ' / ' + productDto.ticket + ' Left'
                       : 'Out Of Stock'
@@ -332,28 +338,18 @@
 
             <div class="divider" />
 
-            <!-- Warning Message Section -->
             <div v-if="isClosed" class="closed-warning-msg">
-              <span v-if="productDto.leftTicket <= 0">
-                ⚠️ This package is Out of Stock (No tickets left).
-              </span>
-              <span v-else>
-                ⚠️ Booking for this package is closed (Closed 3 days prior to departure).
-              </span>
-            </div>
+  ⚠️ Booking for this package is closed (Closed 3 days prior to departure).
+</div>
 
-            <!-- Book Now Button -->
-            <button 
-              class="book-btn" 
-              :class="{ 'btn-disabled': isClosed }" 
-              :disabled="isClosed"
-              @click="clickBookNow"
-            >
-              <span v-if="productDto.leftTicket <= 0">Out of Stock</span>
-              <span v-else-if="isClosed">Booking Closed</span>
-              <span v-else>Book Now</span>
-            </button>
-
+<button 
+  class="book-btn" 
+  :class="{ 'btn-disabled': isClosed || productDto.leftTicket <= 0 }" 
+  :disabled="isClosed || productDto.leftTicket <= 0"
+  @click="clickBookNow"
+>
+  {{ isClosed ? 'Booking Closed' : (productDto.leftTicket <= 0 ? 'Out of Stock' : 'Book Now') }}
+</button>
             <button class="wishlist-btn" @click="toggleWishlist">
               <svg
                 width="16"
@@ -399,8 +395,8 @@
 <script>
 import axios from 'axios'
 import packageDetailService from '@/service/packageDetailService'
-import { useAuthStore } from '../store/auth'
 
+import { useAuthStore } from '../store/auth'
 export default {
   name: 'PackageDetailView',
 
@@ -425,7 +421,7 @@ export default {
 
   mounted() {
     this.loginUser = JSON.parse(localStorage.getItem('loginUser')) || {}
-    const pkgId = Number(this.$route.params.id)
+    const pkgId = Number(this.$route.params.id) // 💡 Number ပြောင်းသိမ်းပါမည်
     this.productId = pkgId
     this.getPackageDetail()
     this.checkWishlistStatus()
@@ -456,9 +452,8 @@ export default {
         console.log(this.ratingCommentList)
         this.productDto = data.productDto
 
-        // 💡 Image Fallback Logic: photo မရှိရင် photoOne ကို ယူပါမည်
-        if (this.productDto) {
-          this.selectedImg = this.productDto.photo || this.productDto.photoOne || ''
+        if (this.productDto && this.productDto.photo) {
+          this.selectedImg = this.productDto.photo
         }
 
         this.commentsDataset = await packageDetailService.getComments()
@@ -488,6 +483,7 @@ export default {
       const wishlistKey = `wishlist_${userId}`;
       let currentWishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
 
+      // ရှိမရှိကို id သေချာတိုက်စစ်ခြင်း
       const exists = currentWishlist.some(item => item.productId == this.productId);
 
       if (exists) {
@@ -512,6 +508,7 @@ export default {
       localStorage.setItem(wishlistKey, JSON.stringify(currentWishlist));
     },
     async submitReview() {
+
       if (this.newRating === 0) {
         alert('Please select a star rating.')
         return
@@ -536,10 +533,16 @@ const loggedInCustomerId = loginUserData.userAccountId;
       obj.productId = this.productId
       obj.userAccountDto.userAccountId = loggedInCustomerId
       obj.rating = this.newRating
+
       obj.message = this.newComment
 
+      console.log(obj);
+      
+
       try {
+        console.log("Review Object => ", obj)
         await axios.post('http://localhost:8088/api/v1/package/ratingcomment', obj)
+        // alert('Review Success')
         this.newComment = ''
         this.newRating = 0
         this.getPackageDetail()
@@ -579,18 +582,12 @@ const loggedInCustomerId = loginUserData.userAccountId;
   },
   computed: {
     isClosed() {
-      const isSoldOut = this.productDto?.leftTicket !== undefined && Number(this.productDto.leftTicket) <= 0
-
-      let isDateClosed = false
-      if (this.productDto?.travelDate) {
-        const now = new Date().getTime()
-        const travelDate = Number(this.productDto.travelDate)
-        const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000
-        isDateClosed = now >= (travelDate - THREE_DAYS_MS)
-      }
-
-      return isSoldOut || isDateClosed
-    },
+    if (!this.productDto?.travelDate) return false
+    const now = new Date().getTime()
+    const travelDate = Number(this.productDto.travelDate)
+    const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000
+    return now >= (travelDate - THREE_DAYS_MS)
+  },
     auth() {
       return useAuthStore()
     },
@@ -632,24 +629,16 @@ const loggedInCustomerId = loginUserData.userAccountId;
   },
 }
 </script>
-
 <style scoped>
 .detail-page {
   background: #f8fafc;
-  height: 100vh;
-  padding: 100px 20px 20px;
-  box-sizing: border-box;
-  overflow: hidden;
+  min-height: 100vh;
+  padding: 120px 20px 60px;
 }
-
 .detail-container {
   max-width: 1060px;
   margin: 0 auto;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
 }
-
 .back-btn {
   display: inline-flex;
   align-items: center;
@@ -661,66 +650,39 @@ const loggedInCustomerId = loginUserData.userAccountId;
   font-weight: 600;
   color: #64748b;
   padding: 0;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   transition: color 0.2s;
-  flex-shrink: 0;
 }
 .back-btn:hover {
   color: #2563eb;
 }
-
 .detail-layout {
   display: grid;
   grid-template-columns: 1fr 340px;
   gap: 32px;
   align-items: start;
-  flex: 1;
-  min-height: 0;
-  height: 100%;
 }
 
 @media (max-width: 900px) {
   .detail-layout {
     grid-template-columns: 1fr;
-    overflow-y: auto;
   }
 }
-
 .detail-left {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-  
-  /* Firefox & IE/Edge Scrollbar Invisible */
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 }
-
-/* Chrome, Safari Invisible Scrollbar */
-.detail-left::-webkit-scrollbar {
-  display: none;
-}
-
-.detail-right {
-  position: sticky;
-  top: 0;
-  height: fit-content;
-}
-
 .pkg-title {
   font-size: 26px;
   font-weight: 900;
   color: #0f172a;
   margin: 0 0 10px;
-  flex-shrink: 0;
 }
 .pkg-meta-row {
   display: flex;
   align-items: center;
   gap: 20px;
   margin-bottom: 18px;
-  flex-shrink: 0;
 }
 .pkg-location {
   display: flex;
@@ -743,35 +705,18 @@ const loggedInCustomerId = loginUserData.userAccountId;
   font-size: 13px;
   color: #94a3b8;
 }
-
-/* 💡 Main Image Wrap: flex-shrink: 0 ထည့်ထားသဖြင့် ပုံအကြီးမညှစ်ထုတ်ခံရတော့ပါ */
 .hero-img-wrap {
   position: relative;
   border-radius: 18px;
   overflow: hidden;
   margin-bottom: 12px;
-  flex-shrink: 0;
-  height: 380px;
-  width: 100%;
-  background: #e2e8f0;
 }
-
 .hero-img {
-  height: 100%;
+  height: 380px;
   width: 100%;
   object-fit: cover;
   border-radius: 18px;
 }
-
-.no-img-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #64748b;
-  font-weight: 600;
-}
-
 .pkg-type-tag {
   position: absolute;
   top: 14px;
@@ -790,15 +735,13 @@ const loggedInCustomerId = loginUserData.userAccountId;
   background: #dbeafe;
   color: #1d4ed8;
 }
-
 .thumbs-strip {
   display: flex;
   gap: 15px;
   flex-wrap: wrap;
   margin-bottom: 28px;
-  flex-shrink: 0;
 }
-
+/* thumb image size */
 .thumb {
   width: 160px;
   height: 70px;
@@ -816,10 +759,8 @@ const loggedInCustomerId = loginUserData.userAccountId;
   width: 100%;
   object-fit: cover;
 }
-
 .content-block {
   margin-bottom: 32px;
-  flex-shrink: 0;
 }
 .block-title {
   font-size: 18px;
@@ -895,7 +836,6 @@ const loggedInCustomerId = loginUserData.userAccountId;
   position: sticky;
   top: 120px;
 }
-
 .pricing-card {
   background: #fff;
   border: 1px solid #e2e8f0;
@@ -1015,11 +955,10 @@ const loggedInCustomerId = loginUserData.userAccountId;
   font-size: 14px;
   text-decoration: none;
 }
-
+/* --- Reviews & Comments Section Styles --- */
 .rating-comment-section {
   margin-top: 40px;
   font-family: sans-serif;
-  flex-shrink: 0;
 }
 
 .review-block-title {
@@ -1029,6 +968,7 @@ const loggedInCustomerId = loginUserData.userAccountId;
   margin-bottom: 24px;
 }
 
+/* Form Card Design */
 .comment-form {
   background: #ffffff;
   padding: 24px;
@@ -1045,6 +985,7 @@ const loggedInCustomerId = loginUserData.userAccountId;
   color: #334155;
 }
 
+/* Star Inputs */
 .rating-input-wrapper {
   margin-bottom: 16px;
   display: flex;
@@ -1079,6 +1020,7 @@ const loggedInCustomerId = loginUserData.userAccountId;
   margin-left: 4px;
 }
 
+/* Textarea & Button */
 .modern-textarea {
   width: 100%;
   padding: 12px 16px;
@@ -1125,6 +1067,7 @@ const loggedInCustomerId = loginUserData.userAccountId;
   transform: scale(0.98);
 }
 
+/* Comments List & Cards */
 .list-title {
   font-size: 16px;
   margin-bottom: 16px;
@@ -1199,6 +1142,7 @@ const loggedInCustomerId = loginUserData.userAccountId;
   padding-left: 40px;
   line-height: 1.5;
 }
+/* Booking Closed Badge Styling */
 .badge-closed {
   background: #ef4444 !important; /* Red Color */
   color: #ffffff;
@@ -1211,6 +1155,8 @@ const loggedInCustomerId = loginUserData.userAccountId;
 .package-premium-card.is-closed .pkg-display-img {
   filter: grayscale(40%);
 }
+
+/* Disabled Button Styling */
 .btn-disabled {
   background-color: #94a3b8 !important;
   cursor: not-allowed !important;
@@ -1218,6 +1164,7 @@ const loggedInCustomerId = loginUserData.userAccountId;
   border-color: #94a3b8 !important;
 }
 
+/* Warning Text in Detail Page */
 .closed-warning-msg {
   background-color: #fef2f2;
   color: #dc2626;
