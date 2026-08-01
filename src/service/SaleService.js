@@ -44,6 +44,10 @@ class SaleService{
         let url = `/sale/${saleId}`;
         return this.axios.delete(url).then(request => request.data);
     }
+    getSaleByUserId(userId) {
+    let url =`/sale/user/${userId}`;
+   return this.axios.get(url).then(request => request.data);
+  }
 
 }
 

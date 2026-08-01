@@ -57,8 +57,10 @@
         </button>
       </div>
 
+      <!-- Content Area -->
       <div class="profile-dynamic-content-area">
         <div v-if="activeTab === 'bookings'" class="tab-pane-content">
+          <!-- ၁။ Empty State -->
           <div v-if="bookings.length === 0" class="empty-state-card">
             <div class="empty-icon-circle"><i class="fa-solid fa-suitcase-rolling"></i></div>
             <h4>No Bookings Found</h4>
@@ -66,12 +68,53 @@
               You haven't booked any travel packages yet. Explore our packages and start planning
               your next adventure!
             </p>
-            <v-btn color="#1B3D8A" rounded="xl" class="text-none mt-2" to="/packages"
-              >Explore Packages</v-btn
+            <v-btn color="#1B3D8A" rounded="xl" class="text-none mt-2" to="/packages">
+              Explore Packages
+            </v-btn>
+          </div>
+
+          <!-- ၂။ List View Design -->
+          <div v-else class="booking-list-container mt-4">
+            <div
+              v-for="(item, index) in bookings"
+              :key="item.saleId || index"
+              class="booking-list-item"
             >
+              <!-- Left: Image -->
+              <div class="booking-img-box">
+                <img
+                  :src="
+                    item.product && item.product.photo
+                      ? 'http://localhost:8088/api/v1/productphoto/' + item.product.photo
+                      : 'https://via.placeholder.com/150'
+                  "
+                  alt="package thumbnail"
+                  class="booking-thumb"
+                />
+              </div>
+
+              <!-- Middle: Details -->
+              <div class="booking-info">
+                <h4 class="booking-package-title">
+                  {{ item.product ? item.product.title : 'Booking #' + (item.saleId || item.id) }}
+                </h4>
+              </div>
+              <div>
+                <p class="booking-date-text">
+                  {{ item.date ? item.date.split('T')[0] : 'N/A' }}
+                </p>
+              </div>
+              
+
+              <!-- Right: Status Badge -->
+              <div class="booking-status-box">
+                <span :class="['status-badge', (item.status || 'approved').toLowerCase()]">
+                  {{ item.status || 'Approved' }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-
         <div v-if="activeTab === 'wishlist'" class="tab-pane-content">
           <div v-if="wishes.length === 0" class="empty-state-card">
             <div class="empty-icon-circle"><i class="fa-solid fa-heart"></i></div>
@@ -180,65 +223,157 @@
 
               <!-- Change Password Tab Form -->
               <form
-                v-if="dialogTab === 'password'"
-                @submit.prevent="handleChangePassword"
-                id="changePasswordForm"
-                class="modern-dialog-form"
-              >
-                <div class="modern-input-group">
-                  <label class="modern-input-label">Current Password</label>
-                  <div class="password-input-wrapper">
-                    <input
-                      :type="showCurrentPassword ? 'text' : 'password'"
-                      v-model="passwordForm.currentPassword"
-                      placeholder="Enter your current password"
-                      class="modern-input-field"
-                      required
-                    />
-                    <span
-                      class="toggle-password"
-                      @click="showCurrentPassword = !showCurrentPassword"
-                    >
-                      👁
-                    </span>
-                  </div>
-                </div>
+  v-if="dialogTab === 'password'"
+  @submit.prevent="handleChangePassword"
+  id="changePasswordForm"
+  class="modern-dialog-form"
+>
+  <!-- Current Password -->
+  <div class="modern-input-group">
+    <label class="modern-input-label">Current Password</label>
+    <div class="password-input-wrapper">
+      <input
+        :type="showCurrentPassword ? 'text' : 'password'"
+        v-model="passwordForm.currentPassword"
+        placeholder="Enter your current password"
+        class="modern-input-field"
+        required
+      />
+      <span
+        class="toggle-password"
+        @click="showCurrentPassword = !showCurrentPassword"
+      >
+        <!-- Eye Open -->
+        <svg
+          v-if="!showCurrentPassword"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <!-- Eye Off (Slash) -->
+        <svg
+          v-else
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+      </span>
+    </div>
+  </div>
 
-                <div class="modern-input-group mt-4">
-                  <label class="modern-input-label">New Password</label>
-                  <div class="password-input-wrapper">
-                    <input
-                      :type="showNewPassword ? 'text' : 'password'"
-                      v-model="passwordForm.newPassword"
-                      placeholder="Enter your new password"
-                      class="modern-input-field"
-                      required
-                    />
-                    <span class="toggle-password" @click="showNewPassword = !showNewPassword">
-                      👁
-                    </span>
-                  </div>
-                </div>
+  <!-- New Password -->
+  <div class="modern-input-group mt-4">
+    <label class="modern-input-label">New Password</label>
+    <div class="password-input-wrapper">
+      <input
+        :type="showNewPassword ? 'text' : 'password'"
+        v-model="passwordForm.newPassword"
+        placeholder="Enter your new password"
+        class="modern-input-field"
+        required
+      />
+      <span class="toggle-password" @click="showNewPassword = !showNewPassword">
+        <svg
+          v-if="!showNewPassword"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <svg
+          v-else
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+      </span>
+    </div>
+  </div>
 
-                <div class="modern-input-group mt-4">
-                  <label class="modern-input-label">Confirm New Password</label>
-                  <div class="password-input-wrapper">
-                    <input
-                      :type="showConfirmPassword ? 'text' : 'password'"
-                      v-model="passwordForm.confirmPassword"
-                      placeholder="Confirm your new password"
-                      class="modern-input-field"
-                      required
-                    />
-                    <span
-                      class="toggle-password"
-                      @click="showConfirmPassword = !showConfirmPassword"
-                    >
-                      👁
-                    </span>
-                  </div>
-                </div>
-              </form>
+  <!-- Confirm New Password -->
+  <div class="modern-input-group mt-4">
+    <label class="modern-input-label">Confirm New Password</label>
+    <div class="password-input-wrapper">
+      <input
+        :type="showConfirmPassword ? 'text' : 'password'"
+        v-model="passwordForm.confirmPassword"
+        placeholder="Confirm your new password"
+        class="modern-input-field"
+        required
+      />
+      <span
+        class="toggle-password"
+        @click="showConfirmPassword = !showConfirmPassword"
+      >
+        <svg
+          v-if="!showConfirmPassword"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <svg
+          v-else
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+      </span>
+    </div>
+  </div>
+</form>
             </v-card-text>
 
             <!-- Actions Footer -->
@@ -285,6 +420,7 @@
 
 <script>
 import UserAccountService from '@/service/UserAccountService'
+import SaleService from '@/service/SaleService'
 
 export default {
   name: 'UserProfile',
@@ -308,15 +444,18 @@ export default {
         newPassword: '',
         confirmPassword: '',
       },
-      bookings: [],
+      bookings: [], //ဒီထဲကို Backend က ရလာတဲ့ Data ရောက်လာမယ်
       wishes: [],
       loginUser: {},
+      bookingList: [],
+      bookingCount: 0,
     }
   },
   mounted() {
     this.loginUser = JSON.parse(localStorage.getItem('loginUser')) || {}
     this.loadUserData()
     this.loadWishlist()
+    this.loadUserBookings() // Page စတက်တာနဲ့ Booking ဆွဲထုတ်မယ့် function ကို ခေါ်ပေး
   },
   computed: {
     initial() {
@@ -325,6 +464,22 @@ export default {
     },
   },
   methods: {
+    async loadUserBookings() {
+      if (this.loginUser && this.loginUser.userAccountId) {
+        try {
+          // Service က request.data ကို တိုက်ရိုက် return ပြန်ပေးထားပြီးသားဖြစ်တယ်
+          const data = await SaleService.getSaleByUserId(this.loginUser.userAccountId)
+
+          console.log('Fetched Bookings >>>', data)
+
+          this.bookings = data || []
+          this.bookingList = this.bookings
+        } catch (error) {
+          console.error('Error fetching user bookings:', error)
+        }
+      }
+    },
+
     handleLogout() {
       localStorage.removeItem('loginUser')
       localStorage.removeItem('user')
@@ -349,28 +504,25 @@ export default {
         this.wishes = JSON.parse(localStorage.getItem(wishlistKey)) || []
       }
     },
-   removeFromWishlist(item, index) {
-  const userId = this.loginUser.userAccountId;
-  const wishlistKey = `wishlist_${userId}`;
+    removeFromWishlist(item, index) {
+      const userId = this.loginUser.userAccountId
+      const wishlistKey = `wishlist_${userId}`
 
-  // ၁။ ID ရှိရင် ID နဲ့ တိုက်ဖျက်မယ်၊ မရှိရင် Array Index နဲ့ ဖျက်မယ်
-  const targetId = item.productId || item.id;
+      // ၁။ ID ရှိရင် ID နဲ့ တိုက်ဖျက်မယ်၊ မရှိရင် Array Index နဲ့ ဖျက်မယ်
+      const targetId = item.productId || item.id
 
-  if (targetId) {
-    this.wishes = this.wishes.filter(
-      (w) => Number(w.productId || w.id) !== Number(targetId)
-    );
-  } else {
-    // ID မပါခဲ့ရင် နှိပ်လိုက်တဲ့ Card ရဲ့ Index အတိုင်း Array ထဲကနေ ကွက်တိဖျက်မယ်
-    this.wishes.splice(index, 1);
-  }
+      if (targetId) {
+        this.wishes = this.wishes.filter((w) => Number(w.productId || w.id) !== Number(targetId))
+      } else {
+        // ID မပါခဲ့ရင် နှိပ်လိုက်တဲ့ Card ရဲ့ Index အတိုင်း Array ထဲကနေ ကွက်တိဖျက်မယ်
+        this.wishes.splice(index, 1)
+      }
 
-  // ၂။ LocalStorage ထဲမှာ Update ပြန်သိမ်းမယ်
-  localStorage.setItem(wishlistKey, JSON.stringify(this.wishes));
+      //  LocalStorage ထဲမှာ Update ပြန်သိမ်းမယ်
+      localStorage.setItem(wishlistKey, JSON.stringify(this.wishes))
 
-  alert('Removed from Wishlist!');
-},
-
+      alert('Removed from Wishlist!')
+    },
 
     async handleUpdateProfile() {
       const savedUser = JSON.parse(localStorage.getItem('loginUser'))
@@ -407,48 +559,74 @@ export default {
         alert('Failed to update profile. Please try again!')
       }
     },
-    async handleChangePassword() {
-      if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
-        alert('New passwords do not match!')
-        return
-      }
+   async handleChangePassword() {
+  const { currentPassword, newPassword, confirmPassword } = this.passwordForm;
 
-      const savedUser = JSON.parse(localStorage.getItem('loginUser'))
-      if (!savedUser) return
+  // 1. ကွက်လပ် အားလုံး ဖြည့်ထားခြင်း ရှိမရှိ စစ်ဆေးခြင်း
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    alert('Please fill in all password fields!');
+    return;
+  }
 
-      // Current password မှန်/မမှန် အရင်စစ်
-      if (savedUser.password && savedUser.password !== this.passwordForm.currentPassword) {
-        alert('Current password is incorrect!')
-        return
-      }
+  // 2. Password အသစ် အနည်းဆုံး ၆ လုံး ရှိရမည်
+  if (newPassword.length < 6) {
+    alert('New password must be at least 6 characters long!');
+    return;
+  }
 
-      //  ပြင်ဆင်ချက်: Backend Controller / DTO က မျှော်လင့်ထားတဲ့အတိုင်း userAccountId ပါ ထည့်ပေးရပါမယ်
-      const passwordPayload = {
-        userAccountId: savedUser.userAccountId, // Backend DTO ထဲက id နဲ့ ကိုက်ညီစေရန်
-        password: this.passwordForm.newPassword, // Password အသစ်
-      }
+  // 3. Password အသစ် နှင့် Confirm Password ကိုက်ညီမှု ရှိမရှိ စစ်ဆေးခြင်း
+  if (newPassword !== confirmPassword) {
+    alert('New password and confirm password do not match!');
+    return;
+  }
 
-      try {
-        // API သို့ ၎င်း Payload ကို လှမ်းပို့
-        await UserAccountService.updatePassword(passwordPayload)
+  // 4. Password အသစ်သည် Password အဟောင်းနှင့် တူနေပါက တားမြစ်ခြင်း
+  if (currentPassword === newPassword) {
+    alert('New password cannot be the same as current password!');
+    return;
+  }
 
-        // Local Storage ထဲက password ကိုပါ အသစ်လဲပေး
-        savedUser.password = this.passwordForm.newPassword
-        localStorage.setItem('loginUser', JSON.stringify(savedUser))
-        this.loginUser = savedUser // UI State ကိုပါ ချက်ချင်း update ဖြစ်စေရန်
+  const savedUser = JSON.parse(localStorage.getItem('loginUser'));
+  if (!savedUser) {
+    alert('Session expired. Please log in again!');
+    return;
+  }
 
-        alert('Password Updated Successfully in Database!')
+  // 5. Current password မှန်/မမှန် စစ်ဆေးခြင်း
+  if (savedUser.password && savedUser.password !== currentPassword) {
+    alert('Current password is incorrect!');
+    return;
+  }
 
-        // Form field များကို Reset ပြန်ချ
-        this.passwordForm.currentPassword = ''
-        this.passwordForm.newPassword = ''
-        this.passwordForm.confirmPassword = ''
-        this.showEdit = false
-      } catch (error) {
-        console.error('Password Update Error:', error)
-        alert('Failed to update password. Please try again!')
-      }
-    },
+  // Backend သို့ ပို့မည့် Payload
+  const passwordPayload = {
+    userAccountId: savedUser.userAccountId,
+    password: newPassword,
+  };
+
+  try {
+    await UserAccountService.updatePassword(passwordPayload);
+
+    // Local Storage နှင့် UI state ကို update လုပ်ခြင်း
+    savedUser.password = newPassword;
+    localStorage.setItem('loginUser', JSON.stringify(savedUser));
+    this.loginUser = savedUser;
+
+    alert('Password updated successfully!');
+
+    // Form fields များကို Reset ပြန်ချခြင်း
+    this.passwordForm.currentPassword = '';
+    this.passwordForm.newPassword = '';
+    this.passwordForm.confirmPassword = '';
+    this.showCurrentPassword = false;
+    this.showNewPassword = false;
+    this.showConfirmPassword = false;
+    this.showEdit = false;
+  } catch (error) {
+    console.error('Password Update Error:', error);
+    alert('Failed to update password. Please try again!');
+  }
+},
   },
 }
 </script>
@@ -765,7 +943,9 @@ export default {
   border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .wishlist-item-card:hover {
   transform: translateY(-4px);
@@ -840,12 +1020,20 @@ export default {
 /* Signup file ထဲက ပုံစံအတိုင်း Class name နှင့် CSS transition style */
 .toggle-password {
   position: absolute;
-  right: 16px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  font-size: 16px;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+  color: #1b3d8a;
 }
 
 .modern-input-field {
@@ -890,5 +1078,108 @@ export default {
     margin-top: 15px;
     top: 0;
   }
+}
+/* Booking List Item Layout */
+.booking-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.booking-list-item {
+  align-items: center;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+.booking-list-item > div:not(.booking-info) {
+  flex: 1;
+  margin: 0 !important;
+  padding: 0 15px !important;
+  text-align: center; 
+}
+
+.booking-list-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.booking-img-box {
+  padding: 0 !important;
+  flex: 0 0 auto !important; 
+}
+/* Image Styling */
+.booking-img-box img{
+  width: 100px;
+  height: 95px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+
+.booking-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* Middle Details */
+.booking-info {
+ margin-left: 18px;
+  flex-shrink: 0;
+}
+
+.booking-package-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.booking-date-text {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+  display: inline-block;
+}
+
+/* Right Status Badge */
+.booking-status-box {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0; 
+  margin-left: auto;
+}
+
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Status colors (Approved / Pending / Cancelled) */
+.status-badge.confirm {
+  background-color: #ecfdf5;
+  color: blue;
+}
+.status-badge.approved {
+  background-color: #e6f4ea;
+  color: #137333;
+}
+
+.status-badge.delete {
+  background-color: #fce8e6;
+  color: #c5221f;
 }
 </style>

@@ -160,6 +160,12 @@ export default {
     },
 
     saveUser() {
+      const cleanPhone = this.phone.replace('+', '').replaceAll(' ', '').trim()
+
+      if (isNaN(cleanPhone) || cleanPhone.length < 9) {
+        alert('Enter Correct Phone No! ')
+        return
+      }
       //  Password ရှိမရှိစစ်
       if (this.password !== this.confirmPassword) {
         alert('Passwords do not match! Please check again.')
@@ -220,7 +226,6 @@ export default {
   padding: 20px;
   overflow: hidden;
   position: fixed;
-  
 }
 .toggle-password {
   position: absolute;
@@ -233,7 +238,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  
 }
 .toggle-password:hover {
   color: #2563eb;
@@ -317,8 +321,7 @@ export default {
   text-align: center;
   margin-top: 15px;
   font-size: 13px;
-  color:#475569;
-
+  color: #475569;
 }
 .card-footer a {
   color: #2563eb;
@@ -327,10 +330,9 @@ export default {
   cursor: pointer;
   text-decoration: none;
   margin-left: 4px;
-  
 }
 .card-footer a:hover {
-  color:#2563eb;
+  color: #2563eb;
 }
 .error-text {
   color: #ef4444;
@@ -360,5 +362,4 @@ export default {
     font-size: 22px;
   }
 }
-
 </style>
