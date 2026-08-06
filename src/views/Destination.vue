@@ -198,7 +198,7 @@ console.log(this.international);
 }
 
 body{
-    background:#f4f6fb;
+    background:#f8fafc;
 }
 
 .destination-page{
@@ -212,7 +212,6 @@ body{
     background:
         linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),
         url("/DomesticHome.png");
-
     background-size:cover;
     background-position:center;
     display:flex;
@@ -226,410 +225,208 @@ body{
 }
 
 .hero-overlay h1{
-    font-size:60px;
-    font-weight:bold;
+    font-size:56px;
+    font-weight:800;
     margin-bottom:15px;
 }
 
 .hero-overlay p{
-    font-size:22px;
+    font-size:20px;
     max-width:700px;
+    margin:auto;
 }
 
 /* ================= SECTION ================= */
 
 .destination-section{
-
     width:92%;
-    max-width:1400px;
-
-    margin:70px auto;
-
+    max-width:1200px;
+    margin:60px auto;
 }
 
 .section-title{
-
-    font-size:30px;
-    font-weight:bold;
-
-    color:#1f2937;
-
-    margin-bottom:35px;
-
+    font-size:28px;
+    font-weight:800;
+    color:#0f172a;
+    margin-bottom:25px;
 }
 
 /* ================= GRID ================= */
 
 .destination-grid{
-
     display:grid;
-
-    grid-template-columns:repeat(3,1fr);
-
+    grid-template-columns:repeat(4,1fr);
     gap:25px;
-
 }
 
 /* ================= CARD ================= */
 
 .destination-card{
-
     background:#fff;
-
     border-radius:12px;
-
     overflow:hidden;
-
     border:1px solid #e2e8f0;
-
     box-shadow:0 2px 12px rgba(0,0,0,.05);
-
     display:flex;
-
     flex-direction:column;
-
     transition:.3s;
-
-    height:100%;
-
 }
 
 .destination-card:hover{
-
-    transform:translateY(-5px);
-
-    box-shadow:0 8px 20px rgba(0,0,0,.12);
-
+    transform:translateY(-6px);
+    box-shadow:0 12px 25px rgba(0,0,0,.12);
 }
 
 /* ================= IMAGE ================= */
 
 .card-image{
-
     height:190px;
-
     overflow:hidden;
-
 }
 
 .card-image img{
-
     width:100%;
-
     height:100%;
-
     object-fit:cover;
-
     transition:.4s;
-
 }
 
 .destination-card:hover .card-image img{
-
-    transform:scale(1.05);
-
-}
-
-.package-badge{
-
-    position:absolute;
-
-    left:15px;
-    bottom:15px;
-
-    background:#2563eb;
-
-    color:white;
-
-    padding:7px 15px;
-
-    border-radius:30px;
-
-    font-size:13px;
-
-    font-weight:bold;
-
+    transform:scale(1.06);
 }
 
 /* ================= CONTENT ================= */
+
 .card-content{
-
     padding:16px;
-
     display:flex;
-
     flex-direction:column;
-
     flex:1;
-
 }
 
 .region{
-
-    color:#64748b;
-
     font-size:13px;
-
+    color:#64748b;
     font-weight:600;
-
 }
+
 .card-content h3{
-
     font-size:16px;
-
     font-weight:700;
-
     color:#0f172a;
-
     margin:8px 0;
-
 }
 
-.card-content p{
+/* ================= DETAIL ================= */
 
-    color:#6b7280;
-
+.detail{
+    color:#64748b;
+    font-size:14px;
     line-height:1.7;
 
-    min-height:65px;
+    display:-webkit-box;
+    display:box;
 
-    margin-bottom:20px;
+    -webkit-box-orient:vertical;
+    box-orient:vertical;
 
+    -webkit-line-clamp:2;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    height:48px;
+    margin-bottom:18px;
 }
-.detail {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    line-height: 1.6;
-    min-height: 3.2em;
-}
+
 /* ================= FOOTER ================= */
 
 .card-footer{
-
     margin-top:auto;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
+    padding-top:14px;
     border-top:1px solid #f1f5f9;
 
-    padding-top:12px;
-
-}
-.price{
-
-    font-size:15px;
-
-    font-weight:800;
-
-    color:#10b981;
-
-}
-.view-btn{
-
-    background:#2563eb;
-
-    color:white;
-
-    border:none;
-
-    border-radius:6px;
-
-    padding:8px 14px;
-
-    font-size:12px;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.3s;
-
-}
-
-.view-btn:hover{
-
-    background:#1d4ed8;
-
-}
-
-
-/* ================= IMAGE HOVER ================= */
-
-.card-image{
-    overflow:hidden;
-}
-
-.card-image img{
-    transition:0.4s ease;
-}
-
-.destination-card:hover .card-image img{
-    transform:scale(1.08);
-}
-
-/* ================= BUTTON ================= */
-
-.view-btn{
-
-    min-width:130px;
-    font-size:14px;
-    font-weight:600;
-
-}
-
-.view-btn:hover{
-
-    transform:translateY(-2px);
-
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
 /* ================= PRICE ================= */
 
 .price{
-
-    display:flex;
-    flex-direction:column;
-    gap:3px;
-
+    color:#10b981;
+    font-size:13px;
+    font-weight:800;
 }
 
-/* ================= CARD ANIMATION ================= */
+/* ================= BUTTON ================= */
 
-.destination-card{
+.view-btn{
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    border-radius:6px;
 
-    animation:fadeUp .5s ease;
+    padding:8px 14px;
 
+    font-size:12px;
+    font-weight:700;
+
+    cursor:pointer;
+    transition:.3s;
 }
 
-@keyframes fadeUp{
-
-    from{
-
-        opacity:0;
-        transform:translateY(40px);
-
-    }
-
-    to{
-
-        opacity:1;
-        transform:translateY(0);
-
-    }
-
+.view-btn:hover{
+    background:#1d4ed8;
 }
 
 /* ================= TABLET ================= */
 
-@media (max-width:1200px){
+@media(max-width:992px){
 
-    .destination-grid{
-
-        grid-template-columns:repeat(3,1fr);
-
-    }
-
+.destination-grid{
+    grid-template-columns:repeat(2,1fr);
 }
 
-/* ================= SMALL TABLET ================= */
+.hero-overlay h1{
+    font-size:42px;
+}
 
-@media (max-width:900px){
-
-    .hero{
-
-        height:400px;
-
-    }
-
-    .hero-overlay h1{
-
-        font-size:42px;
-
-    }
-
-    .hero-overlay p{
-
-        font-size:18px;
-
-        width:90%;
-        margin:auto;
-
-    }
-
-    .destination-grid{
-
-        grid-template-columns:repeat(2,1fr);
-
-    }
-
-    .section-title{
-
-        font-size:30px;
-
-    }
+.hero-overlay p{
+    font-size:18px;
+}
 
 }
 
 /* ================= MOBILE ================= */
 
-@media (max-width:600px){
+@media(max-width:768px){
 
-    .hero{
+.destination-grid{
+    grid-template-columns:1fr;
+}
 
-        height:300px;
+.hero{
+    height:300px;
+}
 
-    }
+.hero-overlay h1{
+    font-size:30px;
+}
 
-    .hero-overlay h1{
+.hero-overlay p{
+    font-size:15px;
+}
 
-        font-size:30px;
+.card-footer{
+    flex-direction:column;
+    gap:12px;
+    align-items:flex-start;
+}
 
-    }
-
-    .hero-overlay p{
-
-        font-size:15px;
-
-    }
-
-    .destination-grid{
-
-        grid-template-columns:1fr;
-
-    }
-
-    .card-content{
-
-        padding:18px;
-
-    }
-
-    .card-content h3{
-
-        font-size:22px;
-
-    }
-
-    .card-footer{
-
-        flex-direction:column;
-        gap:15px;
-
-        align-items:flex-start;
-
-    }
-
-    .view-btn{
-
-        width:100%;
-
-    }
+.view-btn{
+    width:100%;
+}
 
 }
 </style>

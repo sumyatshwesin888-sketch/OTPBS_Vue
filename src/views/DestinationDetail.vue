@@ -5,9 +5,6 @@ v-if="city && city.productList && city.productList.length"
 class="destination-detail"
 >
 
-    <!-- ========================= -->
-    <!-- Hero Section -->
-    <!-- ========================= -->
 
     <section
 class="hero"
@@ -42,10 +39,6 @@ backgroundImage:
 
 
 
-    <!-- ========================= -->
-    <!-- About -->
-    <!-- ========================= -->
-
     <section class="about-section">
 
         <div class="container">
@@ -68,10 +61,6 @@ backgroundImage:
 
 
 
-
-    <!-- ========================= -->
-    <!-- Available Packages -->
-    <!-- ========================= -->
 
     <section class="package-section">
 
@@ -272,7 +261,7 @@ Hero
 
 .hero{
 
-    height:460px;
+    height:400px;
 
     background-size:cover;
     background-position:center;
@@ -293,7 +282,7 @@ Hero
 
 .hero-content h1{
 
-    font-size:60px;
+    font-size:50px;
     font-weight:700;
     margin-bottom:15px;
 
@@ -301,7 +290,7 @@ Hero
 
 .hero-content p{
 
-    font-size:22px;
+    font-size:20px;
     margin-bottom:30px;
 
 }
@@ -344,7 +333,7 @@ About
 
 .about-section h2{
 
-    font-size:42px;
+    font-size:40px;
     color:#111827;
 
     margin-bottom:30px;
@@ -366,150 +355,136 @@ About
 Package
 =========================== */
 
+
 .package-section{
-
     padding-bottom:80px;
-
 }
 
 .package-section h2{
-
-    font-size:42px;
-
-    color:#111827;
-
-    margin-bottom:35px;
-
+    font-size:30px;
+    font-weight:800;
+    color:#0f172a;
+    margin-bottom:25px;
 }
 
 .package-grid{
-
     display:grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(330px,1fr));
-
-    gap:30px;
-
+    grid-template-columns:repeat(3,1fr);
+    gap:25px;
 }
 
+/* ===========================
+Card
+=========================== */
+
 .package-card{
-
-    background:white;
-
-    border-radius:20px;
-
+    background:#fff;
+    border-radius:12px;
+    border:1px solid #e2e8f0;
     overflow:hidden;
+    box-shadow:0 2px 12px rgba(0,0,0,.05);
 
-    box-shadow:
-    0 10px 30px rgba(0,0,0,.08);
+    display:flex;
+    flex-direction:column;
 
-    transition:.35s;
-
+    transition:.3s;
 }
 
 .package-card:hover{
-
-    transform:translateY(-8px);
-
+    transform:translateY(-6px);
+    box-shadow:0 12px 24px rgba(0,0,0,.12);
 }
+
+/* ===========================
+Image
+=========================== */
 
 .package-image{
-
     width:100%;
-
-    height:240px;
-
+    height:190px;
     object-fit:cover;
-
+    transition:.35s;
 }
 
+.package-card:hover .package-image{
+    transform:scale(1.05);
+}
+
+/* ===========================
+Body
+=========================== */
+
 .package-body{
-
-    padding:22px;
-
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    flex:1;
 }
 
 .package-type{
-
     display:inline-block;
-
     background:#2563eb;
+    color:#fff;
 
-    color:white;
+    padding:4px 10px;
+    border-radius:6px;
 
-    padding:8px 18px;
+    font-size:11px;
+    font-weight:700;
 
-    border-radius:30px;
-
-    font-size:13px;
-
-    margin-bottom:18px;
-
+    margin-bottom:10px;
 }
 
 .package-body h3{
-
-    font-size:25px;
-
-    color:#111827;
-
-    margin-bottom:18px;
-
+    font-size:16px;
+    font-weight:700;
+    color:#0f172a;
+    margin-bottom:8px;
 }
 
 .package-price{
-
-    color:#16a34a;
-
-    font-size:30px;
-
-    font-weight:bold;
-
-    margin-bottom:15px;
-
+    color:#10b981;
+    font-size:15px;
+    font-weight:800;
+    margin:10px 0;
 }
 
 .package-info{
-
     display:flex;
-
-    gap:25px;
-
-    color:#6b7280;
-
-    margin-bottom:25px;
-
+    gap:15px;
+    font-size:12px;
+    color:#64748b;
+    margin-bottom:16px;
 }
 
+/* ===========================
+Footer
+=========================== */
+
 .detail-btn{
+    margin-top:auto;
 
     width:100%;
-
     border:none;
 
     background:#2563eb;
+    color:#fff;
 
-    color:white;
+    padding:10px;
 
-    padding:15px;
+    border-radius:6px;
 
-    border-radius:10px;
+    font-size:12px;
+    font-weight:700;
 
     cursor:pointer;
 
-    font-size:16px;
-
     transition:.3s;
-
 }
 
 .detail-btn:hover{
-
     background:#1d4ed8;
-
 }
-
 
 /* ===========================
 Responsive
@@ -517,53 +492,37 @@ Responsive
 
 @media(max-width:992px){
 
+.package-grid{
+    grid-template-columns:repeat(2,1fr);
+}
+
 .hero{
-
-    height:380px;
-
+    height:350px;
 }
 
 .hero-content h1{
-
-    font-size:46px;
-
-}
-
-.about-section h2,
-.package-section h2{
-
-    font-size:34px;
-
+    font-size:42px;
 }
 
 }
 
 @media(max-width:768px){
 
+.package-grid{
+    grid-template-columns:1fr;
+}
+
 .hero{
-
-    height:320px;
-
+    height:280px;
 }
 
 .hero-content h1{
-
-    font-size:34px;
-
+    font-size:30px;
 }
 
 .hero-content p{
-
-    font-size:18px;
-
-}
-
-.package-grid{
-
-    grid-template-columns:1fr;
-
+    font-size:16px;
 }
 
 }
-
 </style>
