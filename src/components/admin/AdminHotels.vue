@@ -801,13 +801,14 @@ export default defineComponent({
     this.getHotelListMethod()
   },
   methods: {
-    getImageUrl(photoName: string) {
-      if (!photoName) return ''
-      if (photoName.startsWith('http')) return photoName
+   getImageUrl(photoName: string) {
+  if (!photoName) return ''
+  if (photoName.startsWith('http')) return photoName
 
-      const backendBaseUrl = 'http://localhost:8088/productphoto'
-      return `${backendBaseUrl}/${photoName}`
-    },
+  // URL ထဲတွင် /api/v1 ထပ်ဖြည့်လိုက်ပါ
+  const backendBaseUrl = 'http://localhost:8088/api/v1/productphoto'
+  return `${backendBaseUrl}/${photoName}`
+},
 
     previewImage(city: City) {
       this.selectedCityForPreview = city
