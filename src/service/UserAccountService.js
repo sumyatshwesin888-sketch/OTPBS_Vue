@@ -30,7 +30,7 @@ class UserAccountService {
     return this.axios.put(url, password).then((request) => request.data);
   }
    getUserCount() {
-          let url = "/userAccount/count";
+          let url = `/userAccount/count`;
           return this.axios.get(url).then(request => request.data);
       }
        updatePasswordEmail(userAccount) {
@@ -38,7 +38,7 @@ class UserAccountService {
     return this.axios.put(url, userAccount).then((request) => request.data);
   }
   // addMessage(message) {
-  //   let url = `/message`;
+  //   let url = /message;
   //   return this.axios.post(url, message).then((request) => request.data);
   // }
 
@@ -72,7 +72,7 @@ getUserAccount(userType ,search) {
   
 
   // updateBrandPhoto(formData, brand) {
-  //   let url = `brand/photo/${brand.brandId}`;
+  //   let url = brand/photo/${brand.brandId};
   //   return axios
   //     .put(url, formData, {
   //       headers: {
